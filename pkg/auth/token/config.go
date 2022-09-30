@@ -19,7 +19,7 @@ package token
 import (
 	"time"
 
-	"github.com/minio/console/pkg/auth/utils"
+	"github.com/mantle-labs/console/pkg/auth/utils"
 	"github.com/minio/pkg/env"
 )
 

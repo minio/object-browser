@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/minio/console/models"
-	"github.com/minio/console/restapi/operations/admin_api"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/restapi/operations/admin_api"
 	"github.com/minio/madmin-go"
 	"github.com/stretchr/testify/assert"
 )

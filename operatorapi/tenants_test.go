@@ -28,12 +28,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/console/pkg/utils"
+	"github.com/mantle-labs/console/pkg/utils"
 
-	"github.com/minio/console/operatorapi/operations/operator_api"
+	"github.com/mantle-labs/console/operatorapi/operations/operator_api"
 
 	"github.com/go-openapi/swag"
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 	miniov2 "github.com/minio/operator/pkg/apis/minio.min.io/v2"
 	corev1 "k8s.io/api/core/v1"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"

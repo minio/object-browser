@@ -19,8 +19,8 @@ limitations under the License.
 package v1beta2
 
 import (
-	v1beta2 "github.com/minio/console/pkg/apis/networking.gke.io/v1beta2"
-	"github.com/minio/console/pkg/clientgen/clientset/versioned/scheme"
+	v1beta2 "github.com/mantle-labs/console/pkg/apis/networking.gke.io/v1beta2"
+	"github.com/mantle-labs/console/pkg/clientgen/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 

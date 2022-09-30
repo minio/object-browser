@@ -27,7 +27,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 // AddNotificationEndpointCreatedCode is the HTTP code returned for type AddNotificationEndpointCreated

@@ -27,7 +27,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 // GetSiteReplicationStatusHandlerFunc turns a function with the right signature into a get site replication status handler

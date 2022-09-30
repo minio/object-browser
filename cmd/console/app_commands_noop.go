@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/minio/cli"
-	"github.com/minio/console/restapi"
+	"github.com/mantle-labs/console/restapi"
 )
 
 var appCmds = []cli.Command{

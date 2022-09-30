@@ -27,7 +27,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 // DeletePVCHandlerFunc turns a function with the right signature into a delete p v c handler

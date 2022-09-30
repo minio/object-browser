@@ -27,7 +27,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 // SubnetRegisterHandlerFunc turns a function with the right signature into a subnet register handler

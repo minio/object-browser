@@ -24,8 +24,8 @@ import (
 
 	"github.com/go-openapi/swag"
 
-	"github.com/minio/console/models"
-	"github.com/minio/console/restapi/operations/admin_api"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/restapi/operations/admin_api"
 )
 
 func Test_addNotificationEndpoint(t *testing.T) {

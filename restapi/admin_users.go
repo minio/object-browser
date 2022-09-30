@@ -26,9 +26,9 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/minio/console/models"
-	"github.com/minio/console/restapi/operations"
-	"github.com/minio/console/restapi/operations/admin_api"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/restapi/operations"
+	"github.com/mantle-labs/console/restapi/operations/admin_api"
 	"github.com/minio/madmin-go"
 	iampolicy "github.com/minio/pkg/iam/policy"
 )

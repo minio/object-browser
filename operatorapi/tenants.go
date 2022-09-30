@@ -36,13 +36,13 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/minio/madmin-go"
 
-	utils2 "github.com/minio/console/pkg/utils"
+	utils2 "github.com/mantle-labs/console/pkg/utils"
 
-	"github.com/minio/console/restapi"
+	"github.com/mantle-labs/console/restapi"
 
-	"github.com/minio/console/operatorapi/operations/operator_api"
+	"github.com/mantle-labs/console/operatorapi/operations/operator_api"
 
-	"github.com/minio/console/pkg/auth/utils"
+	"github.com/mantle-labs/console/pkg/auth/utils"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -54,9 +54,9 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/minio/console/cluster"
-	"github.com/minio/console/models"
-	"github.com/minio/console/operatorapi/operations"
+	"github.com/mantle-labs/console/cluster"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/operatorapi/operations"
 	miniov2 "github.com/minio/operator/pkg/apis/minio.min.io/v2"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -37,9 +37,9 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/minio/console/cluster"
+	"github.com/mantle-labs/console/cluster"
 
-	"github.com/minio/console/pkg/auth"
+	"github.com/mantle-labs/console/pkg/auth"
 )
 
 func serveProxy(responseWriter http.ResponseWriter, req *http.Request) {

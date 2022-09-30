@@ -21,7 +21,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/minio/console/cluster"
+	"github.com/mantle-labs/console/cluster"
 	operatorClientset "github.com/minio/operator/pkg/client/clientset/versioned"
 )
 

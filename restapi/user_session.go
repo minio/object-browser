@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"time"
 
-	policies "github.com/minio/console/restapi/policy"
+	policies "github.com/mantle-labs/console/restapi/policy"
 
 	jwtgo "github.com/golang-jwt/jwt/v4"
 	"github.com/minio/pkg/bucket/policy/condition"
@@ -33,11 +33,11 @@ import (
 	minioIAMPolicy "github.com/minio/pkg/iam/policy"
 
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/minio/console/models"
-	"github.com/minio/console/pkg/auth/idp/oauth2"
-	"github.com/minio/console/pkg/auth/ldap"
-	"github.com/minio/console/restapi/operations"
-	"github.com/minio/console/restapi/operations/user_api"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/pkg/auth/idp/oauth2"
+	"github.com/mantle-labs/console/pkg/auth/ldap"
+	"github.com/mantle-labs/console/restapi/operations"
+	"github.com/mantle-labs/console/restapi/operations/user_api"
 )
 
 func isErasureMode() bool {

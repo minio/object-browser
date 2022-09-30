@@ -30,11 +30,11 @@ import (
 
 	"errors"
 
-	"github.com/minio/console/models"
-	"github.com/minio/console/pkg"
-	"github.com/minio/console/pkg/auth"
-	"github.com/minio/console/pkg/auth/ldap"
-	xjwt "github.com/minio/console/pkg/auth/token"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/pkg"
+	"github.com/mantle-labs/console/pkg/auth"
+	"github.com/mantle-labs/console/pkg/auth/ldap"
+	xjwt "github.com/mantle-labs/console/pkg/auth/token"
 	mc "github.com/minio/mc/cmd"
 	"github.com/minio/mc/pkg/probe"
 	"github.com/minio/minio-go/v7"

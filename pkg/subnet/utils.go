@@ -25,7 +25,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/minio/console/pkg/utils"
+	"github.com/mantle-labs/console/pkg/utils"
 
 	"github.com/minio/madmin-go"
 	mc "github.com/minio/mc/cmd"

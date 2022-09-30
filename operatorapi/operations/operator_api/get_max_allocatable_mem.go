@@ -27,7 +27,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 // GetMaxAllocatableMemHandlerFunc turns a function with the right signature into a get max allocatable mem handler

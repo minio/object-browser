@@ -23,11 +23,11 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/swag"
-	"github.com/minio/console/models"
-	"github.com/minio/console/restapi/operations"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/restapi/operations"
 	madmin "github.com/minio/madmin-go"
 
-	"github.com/minio/console/restapi/operations/admin_api"
+	"github.com/mantle-labs/console/restapi/operations/admin_api"
 )
 
 func registerConfigHandlers(api *operations.ConsoleAPI) {

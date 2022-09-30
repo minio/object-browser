@@ -37,9 +37,9 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/minio/console/models"
-	"github.com/minio/console/restapi/operations/admin_api"
-	"github.com/minio/console/restapi/operations/user_api"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/restapi/operations/admin_api"
+	"github.com/mantle-labs/console/restapi/operations/user_api"
 )
 
 // NewConsoleAPI creates a new Console instance

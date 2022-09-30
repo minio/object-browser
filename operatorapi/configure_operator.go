@@ -24,17 +24,17 @@ import (
 
 	"github.com/klauspost/compress/gzhttp"
 
-	"github.com/minio/console/restapi"
+	"github.com/mantle-labs/console/restapi"
 	"github.com/unrolled/secure"
 
-	"github.com/minio/console/pkg/auth"
+	"github.com/mantle-labs/console/pkg/auth"
 
 	"github.com/go-openapi/swag"
 
 	"github.com/go-openapi/errors"
 
-	"github.com/minio/console/models"
-	"github.com/minio/console/operatorapi/operations"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/operatorapi/operations"
 )
 
 //go:generate swagger generate server --target ../../console --name Operator --spec ../swagger-operator.yml --server-package operatorapi --principal models.Principal --exclude-main

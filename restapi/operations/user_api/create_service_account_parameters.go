@@ -32,7 +32,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/validate"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 // NewCreateServiceAccountParams creates a new CreateServiceAccountParams object

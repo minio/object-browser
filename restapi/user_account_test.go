@@ -21,7 +21,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 var minioChangePasswordMock func(ctx context.Context, accessKey, secretKey string) error

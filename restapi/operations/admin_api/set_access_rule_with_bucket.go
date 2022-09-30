@@ -27,7 +27,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 // SetAccessRuleWithBucketHandlerFunc turns a function with the right signature into a set access rule with bucket handler

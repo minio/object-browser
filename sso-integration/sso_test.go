@@ -29,8 +29,8 @@ import (
 	"time"
 
 	"github.com/go-openapi/loads"
-	"github.com/minio/console/restapi"
-	"github.com/minio/console/restapi/operations"
+	"github.com/mantle-labs/console/restapi"
+	"github.com/mantle-labs/console/restapi/operations"
 	"github.com/stretchr/testify/assert"
 )
 

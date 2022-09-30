@@ -20,7 +20,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/minio/console/cluster"
+	"github.com/mantle-labs/console/cluster"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	operatorClientset "github.com/minio/operator/pkg/client/clientset/versioned"
 )

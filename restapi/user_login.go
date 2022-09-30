@@ -26,11 +26,11 @@ import (
 
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/minio/console/models"
-	"github.com/minio/console/pkg/auth"
-	"github.com/minio/console/pkg/auth/idp/oauth2"
-	"github.com/minio/console/restapi/operations"
-	"github.com/minio/console/restapi/operations/user_api"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/pkg/auth"
+	"github.com/mantle-labs/console/pkg/auth/idp/oauth2"
+	"github.com/mantle-labs/console/restapi/operations"
+	"github.com/mantle-labs/console/restapi/operations/user_api"
 )
 
 func registerLoginHandlers(api *operations.ConsoleAPI) {

@@ -24,13 +24,13 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/minio/console/pkg/utils"
+	"github.com/mantle-labs/console/pkg/utils"
 
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/minio/console/models"
-	"github.com/minio/console/pkg/subnet"
-	"github.com/minio/console/restapi/operations"
-	"github.com/minio/console/restapi/operations/admin_api"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/pkg/subnet"
+	"github.com/mantle-labs/console/restapi/operations"
+	"github.com/mantle-labs/console/restapi/operations/admin_api"
 	"github.com/minio/madmin-go"
 )
 

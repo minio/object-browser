@@ -26,7 +26,7 @@ import (
 
 	"errors"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 	iampolicy "github.com/minio/pkg/iam/policy"
 	"github.com/stretchr/testify/assert"
 )

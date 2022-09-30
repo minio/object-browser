@@ -18,14 +18,14 @@ package operatorapi
 
 import (
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/minio/console/models"
-	"github.com/minio/console/operatorapi/operations"
-	"github.com/minio/console/operatorapi/operations/user_api"
+	"github.com/mantle-labs/console/models"
+	"github.com/mantle-labs/console/operatorapi/operations"
+	"github.com/mantle-labs/console/operatorapi/operations/user_api"
 
 	"net/http"
 	"time"
 
-	"github.com/minio/console/pkg/utils"
+	"github.com/mantle-labs/console/pkg/utils"
 )
 
 func registerVersionHandlers(api *operations.OperatorAPI) {

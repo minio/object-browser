@@ -24,7 +24,7 @@ import (
 	"errors"
 
 	"github.com/go-openapi/swag"
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 	"github.com/minio/mc/pkg/probe"
 	"github.com/minio/minio-go/v7/pkg/notification"
 	"github.com/stretchr/testify/assert"

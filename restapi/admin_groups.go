@@ -21,12 +21,12 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/minio/console/restapi/operations"
+	"github.com/mantle-labs/console/restapi/operations"
 	"github.com/minio/madmin-go"
 
-	"github.com/minio/console/restapi/operations/admin_api"
+	"github.com/mantle-labs/console/restapi/operations/admin_api"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 func registerGroupsHandlers(api *operations.ConsoleAPI) {

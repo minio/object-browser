@@ -22,9 +22,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/minio/console/operatorapi/operations/operator_api"
-	utils2 "github.com/minio/console/pkg/utils"
-	"github.com/minio/console/restapi"
+	"github.com/mantle-labs/console/operatorapi/operations/operator_api"
+	utils2 "github.com/mantle-labs/console/pkg/utils"
+	"github.com/mantle-labs/console/restapi"
 	miniov2 "github.com/minio/operator/pkg/apis/minio.min.io/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"

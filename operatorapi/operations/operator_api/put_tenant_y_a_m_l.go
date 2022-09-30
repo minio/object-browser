@@ -27,7 +27,7 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/models"
 )
 
 // PutTenantYAMLHandlerFunc turns a function with the right signature into a put tenant y a m l handler

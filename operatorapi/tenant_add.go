@@ -24,16 +24,16 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/minio/console/restapi"
+	"github.com/mantle-labs/console/restapi"
 
-	"github.com/minio/console/operatorapi/operations/operator_api"
+	"github.com/mantle-labs/console/operatorapi/operations/operator_api"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/go-openapi/swag"
-	"github.com/minio/console/cluster"
-	"github.com/minio/console/models"
+	"github.com/mantle-labs/console/cluster"
+	"github.com/mantle-labs/console/models"
 	miniov2 "github.com/minio/operator/pkg/apis/minio.min.io/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
