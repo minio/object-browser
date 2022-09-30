@@ -15,27 +15,27 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import { Theme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import api from "../../../common/api";
 import { Grid, LinearProgress } from "@mui/material";
 import { User, UsersList } from "./types";
 import { usersSort } from "../../../utils/sortFunctions";
-import { GroupsIcon, AddIcon, UsersIcon } from "../../../icons";
+import { AddIcon, DeleteIcon, GroupsIcon, UsersIcon } from "../../../icons";
 import {
   actionsTray,
   containerForHeader,
   searchField,
   tableStyles,
 } from "../Common/FormComponents/common/styleLibrary";
-import { setErrorSnackMessage } from "../../../actions";
 import { ErrorResponseHandler } from "../../../common/types";
 
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
 import PageHeader from "../Common/PageHeader/PageHeader";
-import { decodeFileName } from "../../../common/utils";
+import { encodeURLString } from "../../../common/utils";
 import HelpBox from "../../../common/HelpBox";
 import AButton from "../Common/AButton/AButton";
 import PageLayout from "../Common/Layout/PageLayout";
@@ -53,11 +53,9 @@ import {
   hasPermission,
   SecureComponent,
 } from "../../../common/SecureComponent";
+import { setErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
-const AddUser = withSuspense(React.lazy(() => import("./AddUser")));
-const SetPolicy = withSuspense(
-  React.lazy(() => import("../Policies/SetPolicy"))
-);
 const DeleteUser = withSuspense(React.lazy(() => import("./DeleteUser")));
 const AddToGroup = withSuspense(React.lazy(() => import("./BulkAddToGroup")));
 
@@ -76,28 +74,21 @@ const styles = (theme: Theme) =>
 
 interface IUsersProps {
   classes: any;
-  history: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
-const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
+const ListUsers = ({ classes }: IUsersProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [records, setRecords] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [addScreenOpen, setAddScreenOpen] = useState<boolean>(false);
-
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [addGroupOpen, setAddGroupOpen] = useState<boolean>(false);
   const [filter, setFilter] = useState<string>("");
   const [checkedUsers, setCheckedUsers] = useState<string[]>([]);
-  const [policyOpen, setPolicyOpen] = useState<boolean>(false);
 
   const displayListUsers = hasPermission(CONSOLE_UI_RESOURCE, [
     IAM_SCOPES.ADMIN_LIST_USERS,
-  ]);
-
-  const deleteUser = hasPermission(CONSOLE_UI_RESOURCE, [
-    IAM_SCOPES.ADMIN_DELETE_USER,
   ]);
 
   const viewUser = hasPermission(CONSOLE_UI_RESOURCE, [
@@ -108,16 +99,16 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
     IAM_SCOPES.ADMIN_ADD_USER_TO_GROUP,
   ]);
 
-  const closeAddModalAndRefresh = () => {
-    setAddScreenOpen(false);
-    setLoading(true);
-  };
+  const deleteUser = hasPermission(CONSOLE_UI_RESOURCE, [
+    IAM_SCOPES.ADMIN_DELETE_USER,
+  ]);
 
   const closeDeleteModalAndRefresh = (refresh: boolean) => {
     setDeleteOpen(false);
     if (refresh) {
       setLoading(true);
     }
+    setCheckedUsers([]);
   };
 
   const closeAddGroupBulk = (unCheckAll: boolean = false) => {
@@ -140,22 +131,20 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
           })
           .catch((err: ErrorResponseHandler) => {
             setLoading(false);
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
           });
       } else {
         setLoading(false);
       }
     }
-  }, [loading, setErrorSnackMessage, displayListUsers]);
+  }, [loading, dispatch, displayListUsers]);
 
   const filteredRecords = records.filter((elementItem) =>
     elementItem.accessKey.includes(filter)
   );
 
   const selectionChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const targetD = e.target;
-    const value = targetD.value;
-    const checked = targetD.checked;
+    const { target: { value = "", checked = false } = {} } = e;
 
     let elements: string[] = [...checkedUsers]; // We clone the checkedUsers array
 
@@ -173,17 +162,10 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
   };
 
   const viewAction = (selectionElement: any): void => {
-    history.push(`${IAM_PAGES.USERS}/${encodeURI(selectionElement.accessKey)}`);
+    navigate(
+      `${IAM_PAGES.USERS}/${encodeURLString(selectionElement.accessKey)}`
+    );
   };
-
-  const deleteAction = (selectionElement: any): void => {
-    setDeleteOpen(true);
-    setSelectedUser(selectionElement);
-  };
-
-  const userLoggedIn = decodeFileName(
-    localStorage.getItem("userLoggedIn") || ""
-  );
 
   const tableActions = [
     {
@@ -192,39 +174,18 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
       disableButtonFunction: () => !viewUser,
     },
     {
-      type: "delete",
-      onClick: deleteAction,
-      disableButtonFunction: (topValue: any) =>
-        topValue === userLoggedIn || !deleteUser,
+      type: "edit",
+      onClick: viewAction,
+      disableButtonFunction: () => !viewUser,
     },
   ];
 
   return (
     <Fragment>
-      {addScreenOpen && (
-        <AddUser
-          open={addScreenOpen}
-          selectedUser={selectedUser}
-          closeModalAndRefresh={() => {
-            closeAddModalAndRefresh();
-          }}
-        />
-      )}
-      {policyOpen && (
-        <SetPolicy
-          open={policyOpen}
-          selectedUser={selectedUser}
-          selectedGroup={null}
-          closeModalAndRefresh={() => {
-            setPolicyOpen(false);
-            setLoading(true);
-          }}
-        />
-      )}
       {deleteOpen && (
         <DeleteUser
           deleteOpen={deleteOpen}
-          selectedUser={selectedUser}
+          selectedUsers={checkedUsers}
           closeDeleteModalAndRefresh={(refresh: boolean) => {
             closeDeleteModalAndRefresh(refresh);
           }}
@@ -248,6 +209,25 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
             overrideClass={classes.searchField}
             value={filter}
           />
+          <SecureComponent
+            resource={CONSOLE_UI_RESOURCE}
+            scopes={[IAM_SCOPES.ADMIN_DELETE_USER]}
+            matchAll
+            errorProps={{ disabled: true }}
+          >
+            <RBIconButton
+              tooltip={"Delete Selected"}
+              onClick={() => {
+                setDeleteOpen(true);
+              }}
+              text={"Delete Selected"}
+              icon={<DeleteIcon />}
+              color="secondary"
+              disabled={checkedUsers.length === 0}
+              variant={"outlined"}
+              aria-label="delete-selected-users"
+            />
+          </SecureComponent>
           <SecureComponent
             scopes={[IAM_SCOPES.ADMIN_ADD_USER_TO_GROUP]}
             resource={CONSOLE_UI_RESOURCE}
@@ -283,8 +263,7 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
               icon={<AddIcon />}
               color="primary"
               onClick={() => {
-                setAddScreenOpen(true);
-                setSelectedUser(null);
+                navigate(`${IAM_PAGES.USER_ADD}`);
               }}
               variant={"contained"}
             />
@@ -296,7 +275,12 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
           <Fragment>
             {records.length > 0 && (
               <Fragment>
-                <Grid item xs={12} className={classes.tableBlock}>
+                <Grid
+                  item
+                  xs={12}
+                  className={classes.tableBlock}
+                  marginBottom={"15px"}
+                >
                   <SecureComponent
                     scopes={[IAM_SCOPES.ADMIN_LIST_USERS]}
                     resource={CONSOLE_UI_RESOURCE}
@@ -307,7 +291,11 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
                       columns={[
                         { label: "Access Key", elementKey: "accessKey" },
                       ]}
-                      onSelect={addUserToGroup ? selectionChanged : undefined}
+                      onSelect={
+                        addUserToGroup || deleteUser
+                          ? selectionChanged
+                          : undefined
+                      }
                       selectedItems={checkedUsers}
                       isLoading={loading}
                       records={filteredRecords}
@@ -316,38 +304,41 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
                     />
                   </SecureComponent>
                 </Grid>
-                <Grid item xs={12} marginTop={"25px"}>
-                  <HelpBox
-                    title={"Users"}
-                    iconComponent={<UsersIcon />}
-                    help={
-                      <Fragment>
-                        A MinIO user consists of a unique access key (username)
-                        and corresponding secret key (password). Clients must
-                        authenticate their identity by specifying both a valid
-                        access key (username) and the corresponding secret key
-                        (password) of an existing MinIO user.
-                        <br />
-                        <br />
-                        Each user can have one or more assigned policies that
-                        explicitly list the actions and resources to which that
-                        user has access. Users can also inherit policies from
-                        the groups in which they have membership.
-                        <br />
-                        <br />
-                        You can learn more at our{" "}
-                        <a
-                          href="https://docs.min.io/minio/baremetal/monitoring/bucket-notifications/bucket-notifications.html?ref=con"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          documentation
-                        </a>
-                        .
-                      </Fragment>
-                    }
-                  />
-                </Grid>
+                <HelpBox
+                  title={"Users"}
+                  iconComponent={<UsersIcon />}
+                  help={
+                    <Fragment>
+                      A Mantle SDS user consists of a unique access key (username)
+                      and corresponding secret key (password). Clients must
+                      authenticate their identity by specifying both a valid
+                      access key (username) and the corresponding secret key
+                      (password) of an existing Mantle SDS user.
+                      <br />
+                      Groups provide a simplified method for managing shared
+                      permissions among users with common access patterns and
+                      workloads.
+                      <br />
+                      <br />
+                      Users inherit access permissions to data and resources
+                      through the groups they belong to.
+                      <br />
+                      Mantle SDS uses Policy-Based Access Control (PBAC) to define
+                      the authorized actions and resources to which an
+                      authenticated user has access. Each policy describes one
+                      or more actions and conditions that outline the
+                      permissions of a user or group of users.
+                      <br />
+                      <br />
+                      Each user can access only those resources and operations
+                      which are explicitly granted by the built-in role. Mantle SDS
+                      denies access to any other resource or action by default.
+                      <br />
+                      <br />
+                      .
+                    </Fragment>
+                  }
+                />
               </Fragment>
             )}
             {records.length === 0 && (
@@ -355,7 +346,7 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
                 container
                 justifyContent={"center"}
                 alignContent={"center"}
-                alignItems={"center"}
+                alignItems={"start"}
               >
                 <Grid item xs={8}>
                   <HelpBox
@@ -363,17 +354,31 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
                     iconComponent={<UsersIcon />}
                     help={
                       <Fragment>
-                        A MinIO user consists of a unique access key (username)
+                        A Mantle SDS user consists of a unique access key (username)
                         and corresponding secret key (password). Clients must
                         authenticate their identity by specifying both a valid
                         access key (username) and the corresponding secret key
-                        (password) of an existing MinIO user.
+                        (password) of an existing Mantle SDS user.
+                        <br />
+                        Groups provide a simplified method for managing shared
+                        permissions among users with common access patterns and
+                        workloads.
                         <br />
                         <br />
-                        Each user can have one or more assigned policies that
-                        explicitly list the actions and resources to which that
-                        user has access. Users can also inherit policies from
-                        the groups in which they have membership.
+                        Users inherit access permissions to data and resources
+                        through the groups they belong to.
+                        <br />
+                        Mantle SDS uses Policy-Based Access Control (PBAC) to define
+                        the authorized actions and resources to which an
+                        authenticated user has access. Each policy describes one
+                        or more actions and conditions that outline the
+                        permissions of a user or group of users.
+                        <br />
+                        <br />
+                        Each user can access only those resources and operations
+                        which are explicitly granted by the built-in role. Mantle SDS
+                        denies access to any other resource or action by
+                        default.
                         <SecureComponent
                           scopes={[
                             IAM_SCOPES.ADMIN_CREATE_USER,
@@ -383,20 +388,17 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
                           matchAll
                           resource={CONSOLE_UI_RESOURCE}
                         >
-                          <Fragment>
-                            <br />
-                            <br />
-                            To get started,{" "}
-                            <AButton
-                              onClick={() => {
-                                setAddScreenOpen(true);
-                                setSelectedUser(null);
-                              }}
-                            >
-                              Create a User
-                            </AButton>
-                            .
-                          </Fragment>
+                          <br />
+                          <br />
+                          To get started,{" "}
+                          <AButton
+                            onClick={() => {
+                              navigate(`${IAM_PAGES.USER_ADD}`);
+                            }}
+                          >
+                            Create a User
+                          </AButton>
+                          .
                         </SecureComponent>
                       </Fragment>
                     }
@@ -411,10 +413,4 @@ const ListUsers = ({ classes, setErrorSnackMessage, history }: IUsersProps) => {
   );
 };
 
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(ListUsers));
+export default withStyles(styles)(ListUsers);

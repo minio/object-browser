@@ -15,21 +15,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import { Paper } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { AppState } from "../../../../store";
-import { setErrorSnackMessage } from "../../../../actions";
+
 import { TabPanel } from "../../../shared/tabs";
 import { Policy } from "../../Policies/types";
-import { ISessionResponse } from "../../types";
 import { User } from "../../Users/types";
 import { ErrorResponseHandler } from "../../../../common/types";
 import TableWrapper from "../../Common/TableWrapper/TableWrapper";
 import api from "../../../../common/api";
-import history from "../../../../history";
-import { BucketInfo } from "../types";
 import {
   CONSOLE_UI_RESOURCE,
   IAM_PAGES,
@@ -37,21 +34,13 @@ import {
 } from "../../../../common/SecureComponent/permissions";
 import PanelTitle from "../../Common/PanelTitle/PanelTitle";
 import {
-  SecureComponent,
   hasPermission,
+  SecureComponent,
 } from "../../../../common/SecureComponent";
-import { Theme } from "@mui/material/styles";
-import createStyles from "@mui/styles/createStyles";
-import { tableStyles } from "../../Common/FormComponents/common/styleLibrary";
-import withStyles from "@mui/styles/withStyles";
-
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-  loadingBucket: state.buckets.bucketDetails.loadingBucket,
-  bucketInfo: state.buckets.bucketDetails.bucketInfo,
-});
-
-const connector = connect(mapState, { setErrorSnackMessage });
+import { encodeURLString } from "../../../../common/utils";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import { selBucketDetailsLoading } from "./bucketDetailsSlice";
+import { useAppDispatch } from "../../../../store";
 
 function a11yProps(index: any) {
   return {
@@ -60,32 +49,20 @@ function a11yProps(index: any) {
   };
 }
 
-interface IAccessDetailsProps {
-  session: ISessionResponse;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  classes: any;
-  match: any;
-  loadingBucket: boolean;
-  bucketInfo: BucketInfo | null;
-}
+const AccessDetails = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
 
-const styles = (theme: Theme) =>
-  createStyles({
-    ...tableStyles,
-  });
-const AccessDetails = ({
-  match,
-  setErrorSnackMessage,
-  loadingBucket,
-  classes,
-}: IAccessDetailsProps) => {
+  const loadingBucket = useSelector(selBucketDetailsLoading);
+
   const [curTab, setCurTab] = useState<number>(0);
   const [loadingPolicies, setLoadingPolicies] = useState<boolean>(true);
   const [bucketPolicy, setBucketPolicy] = useState<Policy[]>([]);
   const [loadingUsers, setLoadingUsers] = useState<boolean>(true);
   const [bucketUsers, setBucketUsers] = useState<User[]>([]);
 
-  const bucketName = match.params["bucketName"];
+  const bucketName = params.bucketName || "";
 
   const displayPoliciesList = hasPermission(bucketName, [
     IAM_SCOPES.ADMIN_LIST_USER_POLICIES,
@@ -122,7 +99,7 @@ const AccessDetails = ({
       type: "view",
       disableButtonFunction: () => !viewPolicy,
       onClick: (policy: any) => {
-        history.push(`${IAM_PAGES.POLICIES}/${policy.name}`);
+        navigate(`${IAM_PAGES.POLICIES}/${encodeURLString(policy.name)}`);
       },
     },
   ];
@@ -132,7 +109,7 @@ const AccessDetails = ({
       type: "view",
       disableButtonFunction: () => !viewUser,
       onClick: (user: any) => {
-        history.push(`${IAM_PAGES.USERS}/${user}`);
+        navigate(`${IAM_PAGES.USERS}/${encodeURLString(user)}`);
       },
     },
   ];
@@ -147,14 +124,14 @@ const AccessDetails = ({
             setLoadingUsers(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
             setLoadingUsers(false);
           });
       } else {
         setLoadingUsers(false);
       }
     }
-  }, [loadingUsers, setErrorSnackMessage, bucketName, displayUsersList]);
+  }, [loadingUsers, dispatch, bucketName, displayUsersList]);
 
   useEffect(() => {
     if (loadingPolicies) {
@@ -166,14 +143,14 @@ const AccessDetails = ({
             setLoadingPolicies(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
             setLoadingPolicies(false);
           });
       } else {
         setLoadingPolicies(false);
       }
     }
-  }, [loadingPolicies, setErrorSnackMessage, bucketName, displayPoliciesList]);
+  }, [loadingPolicies, dispatch, bucketName, displayPoliciesList]);
 
   return (
     <Fragment>
@@ -192,7 +169,7 @@ const AccessDetails = ({
         {displayPoliciesList && <Tab label="Policies" {...a11yProps(0)} />}
         {displayUsersList && <Tab label="Users" {...a11yProps(1)} />}
       </Tabs>
-      <Paper className={classes.tableBlock}>
+      <Paper>
         <TabPanel index={0} value={curTab}>
           <SecureComponent
             scopes={[IAM_SCOPES.ADMIN_LIST_USER_POLICIES]}
@@ -238,4 +215,4 @@ const AccessDetails = ({
   );
 };
 
-export default withStyles(styles)(connector(AccessDetails));
+export default AccessDetails;

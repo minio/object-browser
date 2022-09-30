@@ -15,20 +15,19 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
-import withStyles from "@mui/styles/withStyles";
 import Grid from "@mui/material/Grid";
 import api from "../../../common/api";
 import { Box } from "@mui/material";
-import { NewServiceAccount } from "../Common/CredentialsPrompt/types";
-import { setErrorSnackMessage, setSnackBarMessage } from "../../../actions";
+
 import {
   AccountIcon,
   AddIcon,
-  PasswordKeyIcon,
   DeleteIcon,
+  PasswordKeyIcon,
 } from "../../../icons";
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
 import { stringSort } from "../../../utils/sortFunctions";
@@ -39,6 +38,7 @@ import {
   searchField,
   tableStyles,
 } from "../Common/FormComponents/common/styleLibrary";
+
 import { ErrorResponseHandler } from "../../../common/types";
 import ChangePasswordModal from "./ChangePasswordModal";
 import HelpBox from "../../../common/HelpBox";
@@ -47,6 +47,7 @@ import SearchBox from "../Common/SearchBox";
 import withSuspense from "../Common/Components/withSuspense";
 import {
   CONSOLE_UI_RESOURCE,
+  IAM_PAGES,
   IAM_SCOPES,
 } from "../../../common/SecureComponent/permissions";
 import { SecureComponent } from "../../../common/SecureComponent";
@@ -54,18 +55,16 @@ import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
 import { selectSAs } from "../Configurations/utils";
 import DeleteMultipleServiceAccounts from "../Users/DeleteMultipleServiceAccounts";
 import ServiceAccountPolicy from "./ServiceAccountPolicy";
+import { setErrorSnackMessage, setSnackBarMessage } from "../../../systemSlice";
+import makeStyles from "@mui/styles/makeStyles";
+import { selFeatures } from "../consoleSlice";
+import { useAppDispatch } from "../../../store";
 
-const AddServiceAccount = withSuspense(
-  React.lazy(() => import("./AddServiceAccount"))
-);
 const DeleteServiceAccount = withSuspense(
   React.lazy(() => import("./DeleteServiceAccount"))
 );
-const CredentialsPrompt = withSuspense(
-  React.lazy(() => import("../Common/CredentialsPrompt/CredentialsPrompt"))
-);
 
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     ...actionsTray,
     ...searchField,
@@ -76,30 +75,30 @@ const styles = (theme: Theme) =>
     },
     ...tableStyles,
     ...containerForHeader(theme.spacing(4)),
-  });
+  })
+);
 
-interface IServiceAccountsProps {
-  classes: any;
-  displayErrorMessage: typeof setErrorSnackMessage;
-}
+const Account = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
+  const classes = useStyles();
+  const features = useSelector(selFeatures);
+
   const [records, setRecords] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [filter, setFilter] = useState<string>("");
-  const [addScreenOpen, setAddScreenOpen] = useState<boolean>(false);
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [selectedServiceAccount, setSelectedServiceAccount] = useState<
     string | null
   >(null);
-  const [showNewCredentials, setShowNewCredentials] = useState<boolean>(false);
-  const [newServiceAccount, setNewServiceAccount] =
-    useState<NewServiceAccount | null>(null);
   const [changePasswordModalOpen, setChangePasswordModalOpen] =
     useState<boolean>(false);
   const [selectedSAs, setSelectedSAs] = useState<string[]>([]);
   const [deleteMultipleOpen, setDeleteMultipleOpen] = useState<boolean>(false);
   const [policyOpen, setPolicyOpen] = useState<boolean>(false);
+
+  const userIDP = (features && features.includes("external-idp")) || false;
 
   useEffect(() => {
     fetchRecords();
@@ -116,31 +115,14 @@ const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
           setRecords(serviceAccounts);
         })
         .catch((err: ErrorResponseHandler) => {
-          displayErrorMessage(err);
+          dispatch(setErrorSnackMessage(err));
           setLoading(false);
         });
     }
-  }, [loading, setLoading, setRecords, displayErrorMessage]);
+  }, [loading, setLoading, setRecords, dispatch]);
 
   const fetchRecords = () => {
     setLoading(true);
-  };
-
-  const closeAddModalAndRefresh = (res: NewServiceAccount | null) => {
-    setAddScreenOpen(false);
-    fetchRecords();
-
-    if (res !== null) {
-      const nsa: NewServiceAccount = {
-        console: {
-          accessKey: `${res.accessKey}`,
-          secretKey: `${res.secretKey}`,
-          url: `${res.url}`,
-        },
-      };
-      setNewServiceAccount(nsa);
-      setShowNewCredentials(true);
-    }
   };
 
   const closeDeleteModalAndRefresh = (refresh: boolean) => {
@@ -154,7 +136,7 @@ const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
   const closeDeleteMultipleModalAndRefresh = (refresh: boolean) => {
     setDeleteMultipleOpen(false);
     if (refresh) {
-      setSnackBarMessage(`Service accounts deleted successfully.`);
+      dispatch(setSnackBarMessage(`Service accounts deleted successfully.`));
       setSelectedSAs([]);
       setLoading(true);
     }
@@ -171,11 +153,6 @@ const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
       return;
     }
     setSelectedSAs(records);
-  };
-
-  const closeCredentialsModal = () => {
-    setShowNewCredentials(false);
-    setNewServiceAccount(null);
   };
 
   const closePolicyModal = () => {
@@ -199,14 +176,6 @@ const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
 
   return (
     <React.Fragment>
-      {addScreenOpen && (
-        <AddServiceAccount
-          open={addScreenOpen}
-          closeModalAndRefresh={(res: NewServiceAccount | null) => {
-            closeAddModalAndRefresh(res);
-          }}
-        />
-      )}
       {deleteOpen && (
         <DeleteServiceAccount
           deleteOpen={deleteOpen}
@@ -223,16 +192,7 @@ const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
           closeDeleteModalAndRefresh={closeDeleteMultipleModalAndRefresh}
         />
       )}
-      {showNewCredentials && (
-        <CredentialsPrompt
-          newServiceAccount={newServiceAccount}
-          open={showNewCredentials}
-          closeModal={() => {
-            closeCredentialsModal();
-          }}
-          entity="Service Account"
-        />
-      )}
+
       {policyOpen && (
         <ServiceAccountPolicy
           open={policyOpen}
@@ -283,12 +243,12 @@ const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
                 icon={<PasswordKeyIcon />}
                 color={"primary"}
                 variant={"outlined"}
+                disabled={userIDP}
               />
             </SecureComponent>
             <RBIconButton
-              onClick={() => {
-                setAddScreenOpen(true);
-                setSelectedServiceAccount(null);
+              onClick={(e) => {
+                navigate(`${IAM_PAGES.ACCOUNT_ADD}`);
               }}
               text={`Create service account`}
               icon={<AddIcon />}
@@ -317,24 +277,14 @@ const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
             iconComponent={<AccountIcon />}
             help={
               <Fragment>
-                MinIO service accounts are child identities of an authenticated
-                MinIO user, including externally managed identities. Each
+                Mantle SDS service accounts are child identities of an authenticated
+                Mantle SDS user, including externally managed identities. Each
                 service account inherits its privileges based on the policies
                 attached to it’s parent user or those groups in which the parent
                 user has membership. Service accounts also support an optional
                 inline policy which further restricts access to a subset of
                 actions and resources available to the parent user.
                 <br />
-                <br />
-                You can learn more at our{" "}
-                <a
-                  href="https://docs.min.io/minio/baremetal/security/minio-identity-management/user-management.html?ref=con#service-accounts"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  documentation
-                </a>
-                .
               </Fragment>
             }
           />
@@ -344,8 +294,4 @@ const Account = ({ classes, displayErrorMessage }: IServiceAccountsProps) => {
   );
 };
 
-const connector = connect(null, {
-  displayErrorMessage: setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(Account));
+export default Account;

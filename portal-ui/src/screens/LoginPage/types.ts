@@ -16,7 +16,9 @@
 
 export interface ILoginDetails {
   loginStrategy: loginStrategyType;
-  redirect: string;
+  redirect: string[];
+  displayNames: string[];
+  isDirectPV?: boolean;
 }
 
 export enum loginStrategyType {
@@ -24,5 +26,5 @@ export enum loginStrategyType {
   form = "form",
   redirect = "redirect",
   serviceAccount = "service-account",
-  redirectServiceAccount = "redirect-service-account"
+  redirectServiceAccount = "redirect-service-account",
 }

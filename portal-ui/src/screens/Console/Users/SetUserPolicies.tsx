@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -23,11 +23,14 @@ import { Button, LinearProgress } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { modalBasic } from "../Common/FormComponents/common/styleLibrary";
 import { IPolicyItem } from "../Users/types";
-import { setModalErrorSnackMessage } from "../../../actions";
 import { ErrorResponseHandler } from "../../../common/types";
 import ModalWrapper from "../Common/ModalWrapper/ModalWrapper";
 import api from "../../../common/api";
 import PolicySelectors from "../Policies/PolicySelectors";
+import { setModalErrorSnackMessage } from "../../../systemSlice";
+import { AppState, useAppDispatch } from "../../../store";
+import { useSelector } from "react-redux";
+import { setSelectedPolicies } from "./AddUsersSlice";
 
 interface ISetUserPoliciesProps {
   classes: any;
@@ -35,7 +38,6 @@ interface ISetUserPoliciesProps {
   selectedUser: string;
   currentPolicies: IPolicyItem[];
   open: boolean;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -52,13 +54,16 @@ const SetUserPolicies = ({
   closeModalAndRefresh,
   selectedUser,
   currentPolicies,
-  setModalErrorSnackMessage,
   open,
 }: ISetUserPoliciesProps) => {
+  const dispatch = useAppDispatch();
   //Local States
   const [loading, setLoading] = useState<boolean>(false);
   const [actualPolicy, setActualPolicy] = useState<string[]>([]);
-  const [selectedPolicy, setSelectedPolicy] = useState<string[]>([]);
+
+  const statePolicies = useSelector(
+    (state: AppState) => state.createUser.selectedPolicies
+  );
 
   const SetUserPoliciesAction = () => {
     let entity = "user";
@@ -68,32 +73,32 @@ const SetUserPolicies = ({
 
     api
       .invoke("PUT", `/api/v1/set-policy`, {
-        name: selectedPolicy,
+        name: statePolicies,
         entityName: value,
         entityType: entity,
       })
       .then(() => {
         setLoading(false);
+        dispatch(setSelectedPolicies([]));
         closeModalAndRefresh();
       })
       .catch((err: ErrorResponseHandler) => {
         setLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   };
 
   const resetSelection = () => {
-    setSelectedPolicy(actualPolicy);
+    dispatch(setSelectedPolicies(actualPolicy));
   };
 
   useEffect(() => {
     if (open) {
-      const userPolicy: string[] = [];
-      for (let pol of currentPolicies) {
-        userPolicy.push(pol.policy);
-      }
+      const userPolicy: string[] = currentPolicies.map((pol) => {
+        return pol.policy;
+      });
       setActualPolicy(userPolicy);
-      setSelectedPolicy(userPolicy);
+      dispatch(setSelectedPolicies(userPolicy));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, selectedUser]);
@@ -108,10 +113,7 @@ const SetUserPolicies = ({
     >
       <Grid container>
         <Grid item xs={12}>
-          <PolicySelectors
-            selectedPolicy={selectedPolicy}
-            setSelectedPolicy={setSelectedPolicy}
-          />
+          <PolicySelectors selectedPolicy={statePolicies} />
         </Grid>
       </Grid>
       <Grid item xs={12} className={classes.buttonContainer}>
@@ -142,10 +144,4 @@ const SetUserPolicies = ({
   );
 };
 
-const mapDispatchToProps = {
-  setModalErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(SetUserPolicies));
+export default withStyles(styles)(SetUserPolicies);

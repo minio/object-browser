@@ -16,21 +16,20 @@
 
 import React, { Fragment, useEffect, useState } from "react";
 import { Theme } from "@mui/material/styles";
+import { Link, useParams } from "react-router-dom";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { containerForHeader } from "../../../Common/FormComponents/common/styleLibrary";
 import Grid from "@mui/material/Grid";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { Link } from "react-router-dom";
-import { setErrorSnackMessage } from "../../../../../actions";
+
 import PodLogs from "./PodLogs";
 import PodEvents from "./PodEvents";
+import PodDescribe from "./PodDescribe";
 
 interface IPodDetailsProps {
   classes: any;
-  match: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -42,12 +41,11 @@ const styles = (theme: Theme) =>
     ...containerForHeader(theme.spacing(4)),
   });
 
-const PodDetails = ({ classes, match }: IPodDetailsProps) => {
+const PodDetails = ({ classes }: IPodDetailsProps) => {
+  const { tenantNamespace, tenantName, podName } = useParams();
+
   const [curTab, setCurTab] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
-  const tenantNamespace = match.params["tenantNamespace"];
-  const tenantName = match.params["tenantName"];
-  const podName = match.params["podName"];
 
   function a11yProps(index: any) {
     return {
@@ -67,7 +65,9 @@ const PodDetails = ({ classes, match }: IPodDetailsProps) => {
       <Grid item xs={12}>
         <h1 className={classes.sectionTitle}>
           <Link
-            to={`/namespaces/${tenantNamespace}/tenants/${tenantName}/pods`}
+            to={`/namespaces/${tenantNamespace || ""}/tenants/${
+              tenantName || ""
+            }/pods`}
             className={classes.breadcrumLink}
           >
             Pods
@@ -89,22 +89,31 @@ const PodDetails = ({ classes, match }: IPodDetailsProps) => {
             scrollButtons="auto"
           >
             <Tab label="Events" {...a11yProps(0)} />
-            <Tab label="Logs" {...a11yProps(1)} />
+            <Tab label="Describe" {...a11yProps(1)} />
+            <Tab label="Logs" {...a11yProps(2)} />
           </Tabs>
         </Grid>
         {curTab === 0 && (
           <PodEvents
-            tenant={tenantName}
-            namespace={tenantNamespace}
-            podName={podName}
+            tenant={tenantName || ""}
+            namespace={tenantNamespace || ""}
+            podName={podName || ""}
             propLoading={loading}
           />
         )}
         {curTab === 1 && (
+          <PodDescribe
+            tenant={tenantName || ""}
+            namespace={tenantNamespace || ""}
+            podName={podName || ""}
+            propLoading={loading}
+          />
+        )}
+        {curTab === 2 && (
           <PodLogs
-            tenant={tenantName}
-            namespace={tenantNamespace}
-            podName={podName}
+            tenant={tenantName || ""}
+            namespace={tenantNamespace || ""}
+            podName={podName || ""}
             propLoading={loading}
           />
         )}

@@ -28,15 +28,6 @@ interface ISummaryUsageBar {
 
 const styles = (theme: Theme) =>
   createStyles({
-    allValue: {
-      fontSize: 16,
-      fontWeight: 700,
-      marginBottom: 8,
-    },
-    currentUsage: {
-      fontSize: 12,
-      marginTop: 8,
-    },
     centerItem: {
       textAlign: "center",
     },
@@ -66,7 +57,6 @@ const SummaryUsageBar = ({
   loading,
   error,
 }: ISummaryUsageBar) => {
-  console.log("TENANT", tenant);
   let raw: ValueUnit = { value: "n/a", unit: "" };
   let capacity: ValueUnit = { value: "n/a", unit: "" };
   let used: ValueUnit = { value: "n/a", unit: "" };

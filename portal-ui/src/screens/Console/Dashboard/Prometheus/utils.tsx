@@ -84,6 +84,31 @@ export const panelsConfiguration: IDashboardPanel[] = [
     labelDisplayFunction: niceBytes,
   },
   {
+    id: 51,
+    title: "Usable Capacity",
+    data: [],
+    dataOuter: [{ name: "outer", value: 100 }],
+    widgetConfiguration: {
+      outerChart: {
+        colorList: ["#9c9c9c"],
+        innerRadius: 0,
+        outerRadius: 0,
+        startAngle: 0,
+        endAngle: 0,
+      },
+      innerChart: {
+        colorList: colorsMain,
+        innerRadius: 20,
+        outerRadius: 50,
+        startAngle: 90,
+        endAngle: -200,
+      },
+    },
+    type: widgetType.pieChart,
+    innerLabel: "N/A",
+    labelDisplayFunction: niceBytes,
+  },
+  {
     id: 68,
     title: "Data Usage Growth",
     data: [],
@@ -106,7 +131,7 @@ export const panelsConfiguration: IDashboardPanel[] = [
     widgetConfiguration: [
       {
         dataKey: "a",
-        color: colorsMain[0],
+        color: "#2781B0",
         background: {
           fill: "#EEF1F4",
         },
@@ -170,6 +195,7 @@ export const panelsConfiguration: IDashboardPanel[] = [
         keyLabel: "",
         lineColor: "#000",
         fillColor: "#000",
+        strokeWidth: 3,
       },
     ],
     type: widgetType.linearGraph,
@@ -225,7 +251,7 @@ export const panelsConfiguration: IDashboardPanel[] = [
       },
     ],
     type: widgetType.linearGraph,
-
+    yAxisFormatter: roundNumber,
     xAxisFormatter: getTimeFromTimestamp,
   },
   {
@@ -559,34 +585,48 @@ export const widgetDetailsToPanel = (
       break;
     case widgetType.pieChart:
       if (typeOfPayload === "gauge") {
-        let chartSeries = get(payloadData, "targets[0].result", []);
-
-        if (chartSeries === null) {
-          chartSeries = [];
-        }
-
         const metricCalc = get(
           payloadData,
           "options.reduceOptions.calcs[0]",
           "lastNotNull"
         );
 
-        const valuesArray = chartSeries.length > 0 ? chartSeries[0].values : [];
+        let chartSeries = get(payloadData, "targets", []).filter(
+          (seriesItem: any) => seriesItem !== null
+        );
 
-        const totalValues = calculateMainValue(valuesArray, metricCalc);
+        const values = chartSeries.map((chartTarget: any) => {
+          const resultMap =
+            chartTarget.result && Array.isArray(chartTarget.result)
+              ? chartTarget.result
+              : [];
 
-        const values = chartSeries.map((elementValue: any) => {
-          const values = get(elementValue, "values", []);
-          const metricKeyItem = Object.keys(elementValue.metric);
+          const values = resultMap.map((elementValue: any) => {
+            const values = get(elementValue, "values", []);
+            const metricKeyItem = Object.keys(elementValue.metric);
+            const sortResult = values.sort(
+              (value1: any[], value2: any[]) =>
+                parseInt(value1[0][1]) - parseInt(value2[0][1])
+            );
 
-          const sortResult = values.sort(
-            (value1: any[], value2: any[]) => value1[0] - value2[0]
-          );
+            const metricName = elementValue.metric[metricKeyItem[0]];
+            const value = sortResult[sortResult.length - 1];
+            return {
+              name: metricName,
+              value: parseInt(value[1]),
+              legend: chartTarget.legendFormat,
+            };
+          });
 
-          const metricName = elementValue.metric[metricKeyItem[0]];
-          const value = sortResult[sortResult.length - 1];
-          return { name: metricName, value: parseInt(value) };
+          return values;
         });
+
+        const firstTarget =
+          chartSeries[0].result && chartSeries[0].result.length > 0
+            ? chartSeries[0].result[0].values
+            : [];
+
+        const totalValues = calculateMainValue(firstTarget, metricCalc);
 
         const innerLabel = panelItem.labelDisplayFunction
           ? panelItem.labelDisplayFunction(totalValues[1])

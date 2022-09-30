@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
 import { Button, SelectChangeEvent } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
@@ -26,13 +25,17 @@ import {
   modalStyleUtils,
   spacingUtils,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { setModalErrorSnackMessage } from "../../../../actions";
+
 import { ErrorResponseHandler } from "../../../../common/types";
 import api from "../../../../common/api";
 import ModalWrapper from "../../Common/ModalWrapper/ModalWrapper";
 import SelectWrapper from "../../Common/FormComponents/SelectWrapper/SelectWrapper";
 import { ChangeAccessPolicyIcon } from "../../../../icons";
 import CodeMirrorWrapper from "../../Common/FormComponents/CodeMirrorWrapper/CodeMirrorWrapper";
+
+import { setModalErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
+import { emptyPolicy } from "../../Policies/utils";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -61,7 +64,6 @@ interface ISetAccessPolicyProps {
   actualPolicy: string;
   actualDefinition: string;
   closeModalAndRefresh: () => void;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const SetAccessPolicy = ({
@@ -71,11 +73,11 @@ const SetAccessPolicy = ({
   actualPolicy,
   actualDefinition,
   closeModalAndRefresh,
-  setModalErrorSnackMessage,
 }: ISetAccessPolicyProps) => {
+  const dispatch = useAppDispatch();
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [accessPolicy, setAccessPolicy] = useState<string>("");
-  const [policyDefinition, setPolicyDefinition] = useState<string>("");
+  const [policyDefinition, setPolicyDefinition] = useState<string>(emptyPolicy);
   const addRecord = (event: React.FormEvent) => {
     event.preventDefault();
     if (addLoading) {
@@ -93,7 +95,7 @@ const SetAccessPolicy = ({
       })
       .catch((err: ErrorResponseHandler) => {
         setAddLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   };
 
@@ -102,7 +104,7 @@ const SetAccessPolicy = ({
     setPolicyDefinition(
       actualDefinition
         ? JSON.stringify(JSON.parse(actualDefinition), null, 4)
-        : ""
+        : emptyPolicy
     );
   }, [setAccessPolicy, actualPolicy, setPolicyDefinition, actualDefinition]);
 
@@ -182,8 +184,4 @@ const SetAccessPolicy = ({
   );
 };
 
-const connector = connect(null, {
-  setModalErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(SetAccessPolicy));
+export default withStyles(styles)(SetAccessPolicy);

@@ -16,34 +16,28 @@
 
 import React, { Fragment } from "react";
 import { Theme } from "@mui/material/styles";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import { Tooltip, IconButton } from "@mui/material";
-import { AppState } from "../../../../store";
-import { IFileItem } from "../../ObjectBrowser/types";
-import { deleteFromList, cleanList } from "../../ObjectBrowser/actions";
-import { TrashIcon } from "../../../../icons";
+import { IconButton, Tooltip } from "@mui/material";
+import { AppState, useAppDispatch } from "../../../../store";
+import { RemoveAllIcon } from "../../../../icons";
 import ObjectHandled from "./ObjectHandled";
-
-interface IObjectManager {
-  objects: IFileItem[];
-  classes: any;
-  managerOpen: boolean;
-  deleteFromList: typeof deleteFromList;
-  cleanList: typeof cleanList;
-}
+import {
+  cleanList,
+  deleteFromList,
+} from "../../ObjectBrowser/objectBrowserSlice";
 
 const styles = (theme: Theme) =>
   createStyles({
     downloadContainer: {
       border: "#EAEDEE 1px solid",
-      boxShadow: "rgba(0, 0, 0, 0.08) 0 3px 10px",
+      boxShadow: "rgba(0, 0, 0, 0.08) 0 2px 10px",
       backgroundColor: "#fff",
       position: "absolute",
-      right: 0,
-      top: 80,
-      width: 300,
+      right: 20,
+      top: 60,
+      width: 400,
       overflowY: "hidden",
       overflowX: "hidden",
       borderRadius: 3,
@@ -58,13 +52,13 @@ const styles = (theme: Theme) =>
       },
     },
     title: {
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: "bold",
-      textAlign: "center",
-      marginBottom: 5,
-      paddingBottom: 12,
+      textAlign: "left",
+      paddingBottom: 20,
       borderBottom: "#E2E2E2 1px solid",
-      margin: "15px 15px 5px 15px",
+      margin: "25px 30px 5px 30px",
+      color: "#000",
     },
     actionsContainer: {
       overflowY: "auto",
@@ -77,23 +71,29 @@ const styles = (theme: Theme) =>
     },
     cleanIcon: {
       position: "absolute",
-      right: 14,
-      top: 12,
+      right: 28,
+      top: 25,
     },
     cleanButton: {
       "& svg": {
-        width: 20,
+        width: 25,
       },
     },
   });
 
-const ObjectManager = ({
-  objects,
-  classes,
-  managerOpen,
-  deleteFromList,
-  cleanList,
-}: IObjectManager) => {
+interface IObjectManager {
+  classes: any;
+}
+
+const ObjectManager = ({ classes }: IObjectManager) => {
+  const dispatch = useAppDispatch();
+
+  const objects = useSelector(
+    (state: AppState) => state.objectBrowser.objectManager.objectsToManage
+  );
+  const managerOpen = useSelector(
+    (state: AppState) => state.objectBrowser.objectManager.managerOpen
+  );
   return (
     <Fragment>
       {managerOpen && (
@@ -107,10 +107,10 @@ const ObjectManager = ({
               <IconButton
                 aria-label={"Clear Completed List"}
                 size={"small"}
-                onClick={cleanList}
+                onClick={() => dispatch(cleanList())}
                 className={classes.cleanButton}
               >
-                <TrashIcon />
+                <RemoveAllIcon />
               </IconButton>
             </Tooltip>
           </div>
@@ -120,7 +120,9 @@ const ObjectManager = ({
               <ObjectHandled
                 objectToDisplay={object}
                 key={`object-handled-${object.instanceID}`}
-                deleteFromList={deleteFromList}
+                deleteFromList={(instanceID) =>
+                  dispatch(deleteFromList(instanceID))
+                }
               />
             ))}
           </div>
@@ -130,11 +132,4 @@ const ObjectManager = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  objects: state.objectBrowser.objectManager.objectsToManage,
-  managerOpen: state.objectBrowser.objectManager.managerOpen,
-});
-
-const connector = connect(mapState, { deleteFromList, cleanList });
-
-export default withStyles(styles)(connector(ObjectManager));
+export default withStyles(styles)(ObjectManager);

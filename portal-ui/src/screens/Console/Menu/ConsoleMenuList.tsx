@@ -16,6 +16,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import LogoutIcon from "../../../icons/LogoutIcon";
@@ -28,7 +29,6 @@ import {
   menuItemTextStyles,
 } from "./MenuStyleUtils";
 import MenuItem from "./MenuItem";
-import { useLocation } from "react-router-dom";
 
 import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
 
@@ -68,7 +68,6 @@ const ConsoleMenuList = ({
         justifyContent: "space-between",
         height: "100%",
         flex: 1,
-        marginTop: "35px",
         paddingRight: "8px",
 
         "&.wide": {
@@ -77,10 +76,6 @@ const ConsoleMenuList = ({
 
         "&.mini": {
           marginLeft: "10px",
-          marginTop: "30px",
-          xs: {
-            marginTop: "30px",
-          },
         },
       }}
     >
@@ -131,7 +126,6 @@ const ConsoleMenuList = ({
           paddingTop: 0,
           "&.mini": {
             padding: 0,
-            margin: "auto",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

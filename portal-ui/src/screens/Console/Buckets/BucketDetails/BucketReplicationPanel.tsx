@@ -15,24 +15,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import Grid from "@mui/material/Grid";
-import { setErrorSnackMessage } from "../../../../actions";
+
 import {
   actionsTray,
   searchField,
 } from "../../Common/FormComponents/common/styleLibrary";
 import {
-  BucketInfo,
   BucketReplication,
   BucketReplicationDestination,
   BucketReplicationRule,
 } from "../types";
 import { ErrorResponseHandler } from "../../../../common/types";
-import { AppState } from "../../../../store";
 import {
   hasPermission,
   SecureComponent,
@@ -46,6 +44,10 @@ import PanelTitle from "../../Common/PanelTitle/PanelTitle";
 import withSuspense from "../../Common/Components/withSuspense";
 import RBIconButton from "./SummaryItems/RBIconButton";
 import EditReplicationModal from "./EditReplicationModal";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import { selBucketDetailsLoading } from "./bucketDetailsSlice";
+import { useParams } from "react-router-dom";
+import { useAppDispatch } from "../../../../store";
 
 const AddReplicationModal = withSuspense(
   React.lazy(() => import("./AddReplicationModal"))
@@ -56,10 +58,6 @@ const DeleteReplicationRule = withSuspense(
 
 interface IBucketReplicationProps {
   classes: any;
-  match: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  loadingBucket: boolean;
-  bucketInfo: BucketInfo | null;
 }
 
 const styles = (theme: Theme) =>
@@ -71,12 +69,12 @@ const styles = (theme: Theme) =>
     },
   });
 
-const BucketReplicationPanel = ({
-  classes,
-  match,
-  setErrorSnackMessage,
-  loadingBucket,
-}: IBucketReplicationProps) => {
+const BucketReplicationPanel = ({ classes }: IBucketReplicationProps) => {
+  const dispatch = useAppDispatch();
+  const params = useParams();
+
+  const loadingBucket = useSelector(selBucketDetailsLoading);
+
   const [loadingReplication, setLoadingReplication] = useState<boolean>(true);
   const [replicationRules, setReplicationRules] = useState<
     BucketReplicationRule[]
@@ -91,7 +89,7 @@ const BucketReplicationPanel = ({
   const [deleteSelectedRules, setDeleteSelectedRules] =
     useState<boolean>(false);
 
-  const bucketName = match.params["bucketName"];
+  const bucketName = params.bucketName || "";
 
   const displayReplicationRules = hasPermission(bucketName, [
     IAM_SCOPES.S3_GET_REPLICATION_CONFIGURATION,
@@ -117,19 +115,14 @@ const BucketReplicationPanel = ({
             setLoadingReplication(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
             setLoadingReplication(false);
           });
       } else {
         setLoadingReplication(false);
       }
     }
-  }, [
-    loadingReplication,
-    setErrorSnackMessage,
-    bucketName,
-    displayReplicationRules,
-  ]);
+  }, [loadingReplication, dispatch, bucketName, displayReplicationRules]);
 
   const closeAddReplication = () => {
     setOpenReplicationOpen(false);
@@ -369,14 +362,4 @@ const BucketReplicationPanel = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-  loadingBucket: state.buckets.bucketDetails.loadingBucket,
-  bucketInfo: state.buckets.bucketDetails.bucketInfo,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(BucketReplicationPanel));
+export default withStyles(styles)(BucketReplicationPanel);

@@ -15,7 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
+import { useNavigate } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -28,7 +29,6 @@ import {
   LifecycleConfigIcon,
   SelectAllIcon,
 } from "../../../../icons";
-import { setErrorSnackMessage } from "../../../../actions";
 import {
   containerForHeader,
   searchField,
@@ -46,6 +46,7 @@ import SelectMultipleIcon from "../../../../icons/SelectMultipleIcon";
 import { SecureComponent } from "../../../../common/SecureComponent";
 import {
   CONSOLE_UI_RESOURCE,
+  IAM_PAGES,
   IAM_SCOPES,
 } from "../../../../common/SecureComponent/permissions";
 import PageLayout from "../../Common/Layout/PageLayout";
@@ -54,6 +55,11 @@ import VirtualizedList from "../../Common/VirtualizedList/VirtualizedList";
 import RBIconButton from "../BucketDetails/SummaryItems/RBIconButton";
 import BulkLifecycleModal from "./BulkLifecycleModal";
 import hasPermission from "../../../../common/SecureComponent/accessControl";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
+import { useSelector } from "react-redux";
+import { selFeatures } from "../../consoleSlice";
+import AutoColorIcon from "../../Common/Components/AutoColorIcon";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -66,12 +72,12 @@ const styles = (theme: Theme) =>
         backgroundColor: theme.palette.primary.main,
       },
     },
-    addBucket: {
-      marginLeft: 8,
-    },
     bucketList: {
       marginTop: 25,
       height: "calc(100vh - 210px)",
+      "&.isEmbedded": {
+        height: "calc(100vh - 128px)",
+      },
     },
     searchField: {
       ...searchField.searchField,
@@ -85,15 +91,12 @@ const styles = (theme: Theme) =>
 
 interface IListBucketsProps {
   classes: any;
-  history: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
-const ListBuckets = ({
-  classes,
-  history,
-  setErrorSnackMessage,
-}: IListBucketsProps) => {
+const ListBuckets = ({ classes }: IListBucketsProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [records, setRecords] = useState<Bucket[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterBuckets, setFilterBuckets] = useState<string>("");
@@ -101,8 +104,10 @@ const ListBuckets = ({
   const [replicationModalOpen, setReplicationModalOpen] =
     useState<boolean>(false);
   const [lifecycleModalOpen, setLifecycleModalOpen] = useState<boolean>(false);
-
   const [bulkSelect, setBulkSelect] = useState<boolean>(false);
+
+  const features = useSelector(selFeatures);
+  const obOnly = !!features?.includes("object-browser-only");
 
   useEffect(() => {
     if (loading) {
@@ -116,12 +121,12 @@ const ListBuckets = ({
           })
           .catch((err: ErrorResponseHandler) => {
             setLoading(false);
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
           });
       };
       fetchRecords();
     }
-  }, [loading, setErrorSnackMessage]);
+  }, [loading, dispatch]);
 
   const filteredRecords = records.filter((b: Bucket) => {
     if (filterBuckets === "") {
@@ -175,6 +180,7 @@ const ListBuckets = ({
           onSelect={selectListBuckets}
           selected={selectedBuckets.includes(bucket.name)}
           bulkSelect={bulkSelect}
+          noManage={obOnly}
         />
       );
     }
@@ -212,9 +218,14 @@ const ListBuckets = ({
           open={lifecycleModalOpen}
         />
       )}
-      <PageHeader label={"Buckets"} />
+      {!obOnly && <PageHeader label={"Buckets"} />}
       <PageLayout>
         <Grid item xs={12} className={classes.actionsTray} display="flex">
+          {obOnly && (
+            <Grid item xs>
+              <AutoColorIcon marginRight={15} marginTop={10} />
+            </Grid>
+          )}
           <SearchBox
             onChange={setFilterBuckets}
             placeholder="Search Buckets"
@@ -229,58 +240,38 @@ const ListBuckets = ({
             alignItems={"center"}
             justifyContent={"flex-end"}
           >
-            <RBIconButton
-              tooltip={
-                bulkSelect ? "Unselect Buckets" : "Select Multiple Buckets"
-              }
-              onClick={() => {
-                setBulkSelect(!bulkSelect);
-                setSelectedBuckets([]);
-              }}
-              text={""}
-              icon={<SelectMultipleIcon />}
-              color={"primary"}
-              variant={bulkSelect ? "contained" : "outlined"}
-            />
+            {!obOnly && (
+              <Fragment>
+                <RBIconButton
+                  tooltip={
+                    bulkSelect ? "Unselect Buckets" : "Select Multiple Buckets"
+                  }
+                  onClick={() => {
+                    setBulkSelect(!bulkSelect);
+                    setSelectedBuckets([]);
+                  }}
+                  text={""}
+                  icon={<SelectMultipleIcon />}
+                  color={"primary"}
+                  variant={bulkSelect ? "contained" : "outlined"}
+                />
 
-            {bulkSelect && (
-              <RBIconButton
-                tooltip={
-                  selectedBuckets.length === filteredRecords.length
-                    ? "Unselect All Buckets"
-                    : "Select All Buckets"
-                }
-                onClick={selectAllBuckets}
-                text={""}
-                icon={<SelectAllIcon />}
-                color={"primary"}
-                variant={"outlined"}
-              />
+                {bulkSelect && (
+                  <RBIconButton
+                    tooltip={
+                      selectedBuckets.length === filteredRecords.length
+                        ? "Unselect All Buckets"
+                        : "Select All Buckets"
+                    }
+                    onClick={selectAllBuckets}
+                    text={""}
+                    icon={<SelectAllIcon />}
+                    color={"primary"}
+                    variant={"outlined"}
+                  />
+                )}
+              </Fragment>
             )}
-
-            <RBIconButton
-              tooltip={"Set Lifecycle"}
-              onClick={() => {
-                setLifecycleModalOpen(true);
-              }}
-              text={""}
-              icon={<LifecycleConfigIcon />}
-              disabled={selectedBuckets.length === 0}
-              color={"primary"}
-              variant={"outlined"}
-            />
-
-            <RBIconButton
-              tooltip={"Set Replication"}
-              onClick={() => {
-                setReplicationModalOpen(true);
-              }}
-              text={""}
-              icon={<MultipleBucketsIcon />}
-              disabled={selectedBuckets.length === 0}
-              color={"primary"}
-              variant={"outlined"}
-            />
 
             <RBIconButton
               tooltip={"Refresh"}
@@ -293,23 +284,29 @@ const ListBuckets = ({
               variant={"outlined"}
             />
 
-            <RBIconButton
-              tooltip={"Create Bucket"}
-              onClick={() => {
-                history.push("/add-bucket");
-              }}
-              text={"Create Bucket"}
-              icon={<AddIcon />}
-              color={"primary"}
-              variant={"contained"}
-              disabled={!canCreateBucket}
-            />
+            {!obOnly && (
+              <RBIconButton
+                tooltip={"Create Bucket"}
+                onClick={() => {
+                  navigate(IAM_PAGES.ADD_BUCKETS);
+                }}
+                text={"Create Bucket"}
+                icon={<AddIcon />}
+                color={"primary"}
+                variant={"contained"}
+                disabled={!canCreateBucket}
+              />
+            )}
           </Grid>
         </Grid>
 
         {loading && <LinearProgress />}
         {!loading && (
-          <Grid item xs={12} className={classes.bucketList}>
+          <Grid
+            item
+            xs={12}
+            className={`${classes.bucketList} ${obOnly ? "isEmbedded" : ""}`}
+          >
             {filteredRecords.length !== 0 && (
               <VirtualizedList
                 rowRenderFunction={renderItemLine}
@@ -361,7 +358,7 @@ const ListBuckets = ({
                           To get started,&nbsp;
                           <AButton
                             onClick={() => {
-                              history.push("/add-bucket");
+                              navigate(IAM_PAGES.ADD_BUCKETS);
                             }}
                           >
                             Create a Bucket.
@@ -380,8 +377,4 @@ const ListBuckets = ({
   );
 };
 
-const connector = connect(null, {
-  setErrorSnackMessage,
-});
-
-export default connector(withStyles(styles)(ListBuckets));
+export default withStyles(styles)(ListBuckets);

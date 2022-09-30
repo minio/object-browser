@@ -15,9 +15,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import { Theme } from "@mui/material/styles";
 import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import {
@@ -27,8 +28,6 @@ import {
 } from "../Common/FormComponents/common/styleLibrary";
 import api from "../../../common/api";
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
-import { AppState } from "../../../store";
-import { setErrorSnackMessage, setSnackBarMessage } from "../../../actions";
 import { NewServiceAccount } from "../Common/CredentialsPrompt/types";
 import { stringSort } from "../../../utils/sortFunctions";
 import { ErrorResponseHandler } from "../../../common/types";
@@ -39,13 +38,20 @@ import { AddIcon, DeleteIcon } from "../../../icons";
 import PanelTitle from "../Common/PanelTitle/PanelTitle";
 import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
 import DeleteMultipleServiceAccounts from "./DeleteMultipleServiceAccounts";
-import { selectSAs } from "../../Console/Configurations/utils";
+import { selectSAs } from "../Configurations/utils";
 import ServiceAccountPolicy from "../Account/ServiceAccountPolicy";
+import {
+  CONSOLE_UI_RESOURCE,
+  IAM_SCOPES,
+} from "../../../common/SecureComponent/permissions";
+import { SecureComponent } from "../../../common/SecureComponent";
+import { encodeURLString } from "../../../common/utils";
+import { setErrorSnackMessage, setSnackBarMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
 interface IUserServiceAccountsProps {
   classes: any;
   user: string;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
   hasPolicy: boolean;
 }
 
@@ -62,9 +68,11 @@ const styles = (theme: Theme) =>
 const UserServiceAccountsPanel = ({
   classes,
   user,
-  setErrorSnackMessage,
   hasPolicy,
 }: IUserServiceAccountsProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [records, setRecords] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [addScreenOpen, setAddScreenOpen] = useState<boolean>(false);
@@ -86,18 +94,18 @@ const UserServiceAccountsPanel = ({
   useEffect(() => {
     if (loading) {
       api
-        .invoke("GET", `/api/v1/user/${user}/service-accounts`)
+        .invoke("GET", `/api/v1/user/${encodeURLString(user)}/service-accounts`)
         .then((res: string[]) => {
           const serviceAccounts = res.sort(stringSort);
           setLoading(false);
           setRecords(serviceAccounts);
         })
         .catch((err: ErrorResponseHandler) => {
-          setErrorSnackMessage(err);
+          dispatch(setErrorSnackMessage(err));
           setLoading(false);
         });
     }
-  }, [loading, setLoading, setRecords, setErrorSnackMessage, user]);
+  }, [loading, setLoading, setRecords, user, dispatch]);
 
   const fetchRecords = () => {
     setLoading(true);
@@ -131,7 +139,7 @@ const UserServiceAccountsPanel = ({
   const closeDeleteMultipleModalAndRefresh = (refresh: boolean) => {
     setDeleteMultipleOpen(false);
     if (refresh) {
-      setSnackBarMessage(`Service accounts deleted successfully.`);
+      dispatch(setSnackBarMessage(`Service accounts deleted successfully.`));
       setSelectedSAs([]);
       setLoading(true);
     }
@@ -228,19 +236,31 @@ const UserServiceAccountsPanel = ({
             disabled={selectedSAs.length === 0}
             variant={"outlined"}
           />
-          <RBIconButton
-            tooltip={"Create service account"}
-            text={"Create service account"}
-            variant="contained"
-            color="primary"
-            icon={<AddIcon />}
-            onClick={() => {
-              setAddScreenOpen(true);
-              setAddScreenOpen(true);
-              setSelectedServiceAccount(null);
-            }}
-            disabled={!hasPolicy}
-          />
+          <SecureComponent
+            scopes={[
+              IAM_SCOPES.ADMIN_CREATE_SERVICEACCOUNT,
+              IAM_SCOPES.ADMIN_UPDATE_SERVICEACCOUNT,
+              IAM_SCOPES.ADMIN_REMOVE_SERVICEACCOUNT,
+              IAM_SCOPES.ADMIN_LIST_SERVICEACCOUNTS,
+            ]}
+            resource={CONSOLE_UI_RESOURCE}
+            matchAll
+            errorProps={{ disabled: true }}
+          >
+            <RBIconButton
+              tooltip={"Create service account"}
+              text={"Create service account"}
+              variant="contained"
+              color="primary"
+              icon={<AddIcon />}
+              onClick={() => {
+                navigate(
+                  `/identity/users/new-user-sa/${encodeURLString(user)}`
+                );
+              }}
+              disabled={!hasPolicy}
+            />
+          </SecureComponent>
         </Box>
       </div>
       <div className={classes.tableBlock}>
@@ -260,12 +280,4 @@ const UserServiceAccountsPanel = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(UserServiceAccountsPanel));
+export default withStyles(styles)(UserServiceAccountsPanel);

@@ -15,18 +15,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment } from "react";
-import { CapacityValues, ITenant, ValueUnit } from "./types";
-import { connect } from "react-redux";
-import { setErrorSnackMessage } from "../../../../actions";
-import Grid from "@mui/material/Grid";
-import history from "../../../../history";
+
+import { useNavigate } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
+import { CapacityValues, ITenant, ValueUnit } from "./types";
+import { setTenantName } from "../tenantsSlice";
+import { getTenantAsync } from "../thunks/tenantDetailsAsync";
+import { DrivesIcon } from "../../../../icons";
+import { niceBytes, niceBytesInt } from "../../../../common/utils";
+import Grid from "@mui/material/Grid";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import { niceBytes, niceBytesInt } from "../../../../common/utils";
 import InformationItem from "./InformationItem";
 import TenantCapacity from "./TenantCapacity";
-import { DrivesIcon } from "../../../../icons";
+import { useAppDispatch } from "../../../../store";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -67,13 +69,6 @@ const styles = (theme: Theme) =>
       },
     },
     tenantIcon: { width: 40, height: 40, position: "relative" },
-    healthStatusIcon: {
-      position: "absolute",
-      fontSize: 10,
-      top: 0,
-      right: -20,
-      height: 10,
-    },
     tenantItem: {
       border: "1px solid #EAEAEA",
       marginBottom: 16,
@@ -91,30 +86,6 @@ const styles = (theme: Theme) =>
     title: {
       fontSize: 18,
       fontWeight: "bold",
-    },
-    titleSubKey: {
-      fontSize: 14,
-      paddingRight: 8,
-    },
-    titleSubValue: {
-      fontSize: 14,
-      fontWeight: "bold",
-      paddingRight: 16,
-    },
-    boxyTitle: {
-      fontWeight: "bold",
-    },
-    boxyValue: {
-      fontSize: 24,
-      fontWeight: "bold",
-    },
-    boxyUnit: {
-      fontSize: 12,
-      color: "#5E5E5E",
-    },
-    manageButton: {
-      marginRight: 8,
-      textTransform: "initial",
     },
     namespaceLabel: {
       display: "inline-flex",
@@ -136,6 +107,9 @@ interface ITenantListItem {
 }
 
 const TenantListItem = ({ tenant, classes }: ITenantListItem) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const healthStatusToClass = (health_status: string) => {
     switch (health_status) {
       case "red":
@@ -206,7 +180,14 @@ const TenantListItem = ({ tenant, classes }: ITenantListItem) => {
   }
 
   const openTenantDetails = () => {
-    history.push(`/namespaces/${tenant.namespace}/tenants/${tenant.name}`);
+    dispatch(
+      setTenantName({
+        name: tenant.name,
+        namespace: tenant.namespace,
+      })
+    );
+    dispatch(getTenantAsync());
+    navigate(`/namespaces/${tenant.namespace}/tenants/${tenant.name}`);
   };
 
   return (
@@ -231,7 +212,7 @@ const TenantListItem = ({ tenant, classes }: ITenantListItem) => {
             <Grid container>
               <Grid item xs={2}>
                 <TenantCapacity
-                  totalCapacity={tenant.capacity_raw || 0}
+                  totalCapacity={tenant.capacity || 0}
                   usedSpaceVariants={spaceVariants}
                   statusClass={healthStatusToClass(tenant.health_status)}
                 />
@@ -362,8 +343,4 @@ const TenantListItem = ({ tenant, classes }: ITenantListItem) => {
   );
 };
 
-const connector = connect(null, {
-  setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(TenantListItem));
+export default withStyles(styles)(TenantListItem);

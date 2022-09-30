@@ -15,21 +15,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { Grid, IconButton, Paper, SelectChangeEvent } from "@mui/material";
-import { AppState } from "../../../../../store";
-import {
-  addNewToleration,
-  isPageValid,
-  removeToleration,
-  setKeyValuePairs,
-  setTolerationInfo,
-  updateAddField,
-} from "../../actions";
-import { setModalErrorSnackMessage } from "../../../../../actions";
+import { AppState, useAppDispatch } from "../../../../../store";
+
 import {
   modalBasic,
   wizardCommon,
@@ -38,10 +30,7 @@ import {
   commonFormValidation,
   IValidation,
 } from "../../../../../utils/validationFunctions";
-import {
-  ErrorResponseHandler,
-  ITolerationModel,
-} from "../../../../../common/types";
+import { ErrorResponseHandler } from "../../../../../common/types";
 import { LabelKeyPair } from "../../types";
 import RadioGroupSelector from "../../../Common/FormComponents/RadioGroupSelector/RadioGroupSelector";
 import FormSwitchWrapper from "../../../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
@@ -51,21 +40,18 @@ import AddIcon from "../../../../../icons/AddIcon";
 import RemoveIcon from "../../../../../icons/RemoveIcon";
 import SelectWrapper from "../../../Common/FormComponents/SelectWrapper/SelectWrapper";
 import TolerationSelector from "../../../Common/TolerationSelector/TolerationSelector";
+import { setModalErrorSnackMessage } from "../../../../../systemSlice";
+import {
+  addNewToleration,
+  isPageValid,
+  removeToleration,
+  setKeyValuePairs,
+  setTolerationInfo,
+  updateAddField,
+} from "../createTenantSlice";
 
 interface IAffinityProps {
   classes: any;
-  podAffinity: string;
-  nodeSelectorLabels: string;
-  withPodAntiAffinity: boolean;
-  keyValuePairs: LabelKeyPair[];
-  tolerations: ITolerationModel[];
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
-  updateAddField: typeof updateAddField;
-  isPageValid: typeof isPageValid;
-  setKeyValuePairs: typeof setKeyValuePairs;
-  setTolerationInfo: typeof setTolerationInfo;
-  addNewToleration: typeof addNewToleration;
-  removeToleration: typeof removeToleration;
 }
 
 const styles = (theme: Theme) =>
@@ -116,9 +102,6 @@ const styles = (theme: Theme) =>
       display: "flex",
       alignItems: "center",
     },
-    fieldContainer: {
-      marginBottom: 0,
-    },
     affinityRow: {
       marginBottom: 10,
       display: "flex",
@@ -132,21 +115,25 @@ interface OptionPair {
   value: string;
 }
 
-const Affinity = ({
-  classes,
-  podAffinity,
-  nodeSelectorLabels,
-  withPodAntiAffinity,
-  setModalErrorSnackMessage,
-  updateAddField,
-  keyValuePairs,
-  setKeyValuePairs,
-  isPageValid,
-  tolerations,
-  setTolerationInfo,
-  addNewToleration,
-  removeToleration,
-}: IAffinityProps) => {
+const Affinity = ({ classes }: IAffinityProps) => {
+  const dispatch = useAppDispatch();
+
+  const podAffinity = useSelector(
+    (state: AppState) => state.createTenant.fields.affinity.podAffinity
+  );
+  const nodeSelectorLabels = useSelector(
+    (state: AppState) => state.createTenant.fields.affinity.nodeSelectorLabels
+  );
+  const withPodAntiAffinity = useSelector(
+    (state: AppState) => state.createTenant.fields.affinity.withPodAntiAffinity
+  );
+  const keyValuePairs = useSelector(
+    (state: AppState) => state.createTenant.nodeSelectorPairs
+  );
+  const tolerations = useSelector(
+    (state: AppState) => state.createTenant.tolerations
+  );
+
   const [validationErrors, setValidationErrors] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [keyValueMap, setKeyValueMap] = useState<{ [key: string]: string[] }>(
@@ -157,9 +144,15 @@ const Affinity = ({
   // Common
   const updateField = useCallback(
     (field: string, value: any) => {
-      updateAddField("affinity", field, value);
+      dispatch(
+        updateAddField({
+          pageName: "affinity",
+          field: field,
+          value: value,
+        })
+      );
     },
-    [updateAddField]
+    [dispatch]
   );
 
   useEffect(() => {
@@ -180,11 +173,11 @@ const Affinity = ({
         })
         .catch((err: ErrorResponseHandler) => {
           setLoading(false);
-          setModalErrorSnackMessage(err);
+          dispatch(setModalErrorSnackMessage(err));
           setKeyValueMap({});
         });
     }
-  }, [setModalErrorSnackMessage, loading]);
+  }, [dispatch, loading]);
 
   useEffect(() => {
     if (keyValuePairs) {
@@ -239,15 +232,25 @@ const Affinity = ({
 
     const commonVal = commonFormValidation(customAccountValidation);
 
-    isPageValid("affinity", Object.keys(commonVal).length === 0);
+    dispatch(
+      isPageValid({
+        pageName: "affinity",
+        valid: Object.keys(commonVal).length === 0,
+      })
+    );
 
     setValidationErrors(commonVal);
-  }, [isPageValid, podAffinity, nodeSelectorLabels]);
+  }, [dispatch, podAffinity, nodeSelectorLabels]);
 
   const updateToleration = (index: number, field: string, value: any) => {
     const alterToleration = { ...tolerations[index], [field]: value };
 
-    setTolerationInfo(index, alterToleration);
+    dispatch(
+      setTolerationInfo({
+        index: index,
+        tolerationValue: alterToleration,
+      })
+    );
   };
 
   return (
@@ -320,14 +323,13 @@ const Affinity = ({
                           <SelectWrapper
                             onChange={(e: SelectChangeEvent<string>) => {
                               const newKey = e.target.value as string;
-                              const arrCp: LabelKeyPair[] = Object.assign(
-                                [],
-                                keyValuePairs
-                              );
-
-                              arrCp[i].key = e.target.value as string;
-                              arrCp[i].value = keyValueMap[newKey][0];
-                              setKeyValuePairs(arrCp);
+                              const newLKP: LabelKeyPair = {
+                                key: newKey,
+                                value: keyValueMap[newKey][0],
+                              };
+                              const arrCp: LabelKeyPair[] = [...keyValuePairs];
+                              arrCp[i] = newLKP;
+                              dispatch(setKeyValuePairs(arrCp));
                             }}
                             id="select-access-policy"
                             name="select-access-policy"
@@ -343,12 +345,12 @@ const Affinity = ({
                             name={`nodeselector-${i.toString()}`}
                             value={kvp.key}
                             onChange={(e) => {
-                              const arrCp: LabelKeyPair[] = Object.assign(
-                                [],
-                                keyValuePairs
-                              );
-                              arrCp[i].key = e.target.value;
-                              setKeyValuePairs(arrCp);
+                              const arrCp: LabelKeyPair[] = [...keyValuePairs];
+                              arrCp[i] = {
+                                key: arrCp[i].key,
+                                value: e.target.value as string,
+                              };
+                              dispatch(setKeyValuePairs(arrCp));
                             }}
                             index={i}
                             placeholder={"Key"}
@@ -359,12 +361,12 @@ const Affinity = ({
                         {keyOptions.length > 0 && (
                           <SelectWrapper
                             onChange={(e: SelectChangeEvent<string>) => {
-                              const arrCp: LabelKeyPair[] = Object.assign(
-                                [],
-                                keyValuePairs
-                              );
-                              arrCp[i].value = e.target.value as string;
-                              setKeyValuePairs(arrCp);
+                              const arrCp: LabelKeyPair[] = [...keyValuePairs];
+                              arrCp[i] = {
+                                key: arrCp[i].key,
+                                value: e.target.value as string,
+                              };
+                              dispatch(setKeyValuePairs(arrCp));
                             }}
                             id="select-access-policy"
                             name="select-access-policy"
@@ -386,12 +388,12 @@ const Affinity = ({
                             name={`nodeselector-${i.toString()}`}
                             value={kvp.value}
                             onChange={(e) => {
-                              const arrCp: LabelKeyPair[] = Object.assign(
-                                [],
-                                keyValuePairs
-                              );
-                              arrCp[i].value = e.target.value;
-                              setKeyValuePairs(arrCp);
+                              const arrCp: LabelKeyPair[] = [...keyValuePairs];
+                              arrCp[i] = {
+                                key: arrCp[i].key,
+                                value: e.target.value as string,
+                              };
+                              dispatch(setKeyValuePairs(arrCp));
                             }}
                             index={i}
                             placeholder={"value"}
@@ -403,7 +405,7 @@ const Affinity = ({
                           <IconButton
                             size={"small"}
                             onClick={() => {
-                              const arrCp = Object.assign([], keyValuePairs);
+                              const arrCp = [...keyValuePairs];
                               if (keyOptions.length > 0) {
                                 arrCp.push({
                                   key: keyOptions[0].value,
@@ -413,7 +415,7 @@ const Affinity = ({
                                 arrCp.push({ key: "", value: "" });
                               }
 
-                              setKeyValuePairs(arrCp);
+                              dispatch(setKeyValuePairs(arrCp));
                             }}
                           >
                             <AddIcon />
@@ -427,7 +429,7 @@ const Affinity = ({
                                 const arrCp = keyValuePairs.filter(
                                   (item, index) => index !== i
                                 );
-                                setKeyValuePairs(arrCp);
+                                dispatch(setKeyValuePairs(arrCp));
                               }}
                             >
                               <RemoveIcon />
@@ -486,7 +488,9 @@ const Affinity = ({
                     <div className={classes.overlayAction}>
                       <IconButton
                         size={"small"}
-                        onClick={addNewToleration}
+                        onClick={() => {
+                          dispatch(addNewToleration());
+                        }}
                         disabled={i !== tolerations.length - 1}
                       >
                         <AddIcon />
@@ -496,7 +500,7 @@ const Affinity = ({
                     <div className={classes.overlayAction}>
                       <IconButton
                         size={"small"}
-                        onClick={() => removeToleration(i)}
+                        onClick={() => dispatch(removeToleration(i))}
                         disabled={tolerations.length <= 1}
                       >
                         <RemoveIcon />
@@ -512,26 +516,4 @@ const Affinity = ({
   );
 };
 
-const mapState = (state: AppState) => {
-  const createTenant = state.tenants.createTenant;
-
-  return {
-    podAffinity: createTenant.fields.affinity.podAffinity,
-    nodeSelectorLabels: createTenant.fields.affinity.nodeSelectorLabels,
-    withPodAntiAffinity: createTenant.fields.affinity.withPodAntiAffinity,
-    keyValuePairs: createTenant.nodeSelectorPairs,
-    tolerations: createTenant.tolerations,
-  };
-};
-
-const connector = connect(mapState, {
-  setModalErrorSnackMessage,
-  updateAddField,
-  isPageValid,
-  setKeyValuePairs,
-  setTolerationInfo,
-  addNewToleration,
-  removeToleration,
-});
-
-export default withStyles(styles)(connector(Affinity));
+export default withStyles(styles)(Affinity);

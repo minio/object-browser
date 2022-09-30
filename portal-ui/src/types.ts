@@ -14,12 +14,19 @@
 // You should have received a copy of the GNU Affero General Public License
 
 import { ErrorResponseHandler } from "./common/types";
+import { SubnetInfo } from "./screens/Console/License/types";
 
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export interface snackBarMessage {
   message: string;
   detailedErrorMsg: string;
   type: "message" | "error";
+}
+
+export interface SRInfoStateType {
+  enabled: boolean;
+  curSite: boolean;
+  siteName: string;
 }
 
 export interface SystemState {
@@ -35,6 +42,7 @@ export interface SystemState {
   modalSnackBar: snackBarMessage;
   serverDiagnosticStatus: string;
   distributedSetup: boolean;
+  siteReplicationInfo: SRInfoStateType;
 }
 
 export const USER_LOGGED = "USER_LOGGED";
@@ -49,6 +57,8 @@ export const SET_ERROR_SNACK_MESSAGE = "SET_ERROR_SNACK_MESSAGE";
 export const SET_SNACK_MODAL_MESSAGE = "SET_SNACK_MODAL_MESSAGE";
 export const SET_MODAL_ERROR_MESSAGE = "SET_MODAL_ERROR_MESSAGE";
 export const GLOBAL_SET_DISTRIBUTED_SETUP = "GLOBAL/SET_DISTRIBUTED_SETUP";
+export const SET_SITE_REPLICATION_INFO = "SET_SITE_REPLICATION_INFO";
+export const SET_LICENSE_INFO = "SET_LICENSE_INFO";
 
 interface UserLoggedAction {
   type: typeof USER_LOGGED;
@@ -74,6 +84,7 @@ interface ServerIsLoading {
   type: typeof SERVER_IS_LOADING;
   isLoading: boolean;
 }
+
 interface SetLoadingProgress {
   type: typeof SET_LOADING_PROGRESS;
   loadingProgress: number;
@@ -109,6 +120,16 @@ interface SetDistributedSetup {
   distributedSetup: boolean;
 }
 
+interface SetSiteReplicationInfo {
+  type: typeof SET_SITE_REPLICATION_INFO;
+  siteReplicationInfo: SRInfoStateType;
+}
+
+interface SetLicenseInfo {
+  type: typeof SET_LICENSE_INFO;
+  licenseInfo: SubnetInfo;
+}
+
 export type SystemActionTypes =
   | UserLoggedAction
   | OperatorModeAction
@@ -121,4 +142,6 @@ export type SystemActionTypes =
   | SetErrorSnackMessage
   | SetModalSnackMessage
   | SetModalErrorMessage
-  | SetDistributedSetup;
+  | SetDistributedSetup
+  | SetSiteReplicationInfo
+  | SetLicenseInfo;

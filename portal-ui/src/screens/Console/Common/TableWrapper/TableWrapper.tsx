@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { Fragment, useState } from "react";
-import get from "lodash/get";
-import isString from "lodash/isString";
 import {
   Checkbox,
   Grid,
@@ -25,7 +23,10 @@ import {
   Popover,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { AutoSizer, Column, InfiniteLoader, Table } from "react-virtualized";
+import get from "lodash/get";
+import isString from "lodash/isString";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
@@ -33,7 +34,6 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import TableActionButton from "./TableActionButton";
 import CheckboxWrapper from "../FormComponents/CheckboxWrapper/CheckboxWrapper";
-import history from "../../../../history";
 import {
   checkboxIcons,
   radioIcons,
@@ -80,6 +80,7 @@ interface ISortConfig {
   currentSort: string;
   currentDirection: "ASC" | "DESC" | undefined;
 }
+
 interface TableWrapperProps {
   itemActions?: ItemActions[] | null;
   columns: IColumns[];
@@ -109,6 +110,7 @@ interface TableWrapperProps {
   }: {
     index: number;
   }) => "deleted" | "" | React.CSSProperties;
+  parentClassName?: string;
 }
 
 const borderColor = "#9c9c9c80";
@@ -170,7 +172,6 @@ const styles = () =>
       ".rowLine": {
         borderBottom: `1px solid ${borderColor}`,
         height: 40,
-        color: "#393939",
         fontSize: 14,
         transitionDuration: 0.3,
         "&:focus": {
@@ -328,6 +329,7 @@ const generateColumnsMap = (
     const disableSort = column.enableSort ? !column.enableSort : true;
 
     return (
+      // @ts-ignore
       <Column
         key={`col-tb-${index.toString()}`}
         dataKey={column.elementKey!}
@@ -462,7 +464,10 @@ const TableWrapper = ({
   disabled = false,
   onSelectAll,
   rowStyle,
+  parentClassName = "",
 }: TableWrapperProps) => {
+  const navigate = useNavigate();
+
   const [columnSelectorOpen, setColumnSelectorOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
 
@@ -483,7 +488,7 @@ const TableWrapper = ({
       }
 
       if (findView.to && !disabled) {
-        history.push(`${findView.to}/${valueClick}`);
+        navigate(`${findView.to}/${valueClick}`);
         return;
       }
 
@@ -552,7 +557,7 @@ const TableWrapper = ({
   };
 
   return (
-    <Grid item xs={12}>
+    <Grid item xs={12} className={parentClassName}>
       <Paper
         className={`${classes.paper} ${noBackground ? classes.noBackground : ""}
         ${disabled ? classes.disabled : ""} 
@@ -578,6 +583,7 @@ const TableWrapper = ({
           </div>
         )}
         {records && !isLoading && records.length > 0 ? (
+          // @ts-ignore
           <InfiniteLoader
             isRowLoaded={({ index }) => !!records[index]}
             loadMoreRows={
@@ -592,6 +598,7 @@ const TableWrapper = ({
             }
           >
             {({ onRowsRendered, registerChild }) => (
+              // @ts-ignore
               <AutoSizer>
                 {({ width, height }: any) => {
                   const optionsWidth = calculateOptionsSize(
@@ -608,6 +615,7 @@ const TableWrapper = ({
                       itemActions[0].type !== "view")
                   );
                   return (
+                    // @ts-ignore
                     <Table
                       ref={registerChild}
                       disableHeader={false}
@@ -656,6 +664,7 @@ const TableWrapper = ({
                       }}
                     >
                       {hasSelect && (
+                        // @ts-ignore
                         <Column
                           headerRenderer={() => (
                             <Fragment>
@@ -696,6 +705,7 @@ const TableWrapper = ({
                                 inputProps={{
                                   "aria-label": "secondary checkbox",
                                 }}
+                                className="TableCheckbox"
                                 checked={isSelected}
                                 onChange={onSelect}
                                 onClick={(e) => {
@@ -738,8 +748,8 @@ const TableWrapper = ({
                         sortConfig ? sortConfig.currentDirection : undefined
                       )}
                       {hasOptions && (
+                        // @ts-ignore
                         <Column
-                          headerRenderer={() => <Fragment>Options</Fragment>}
                           dataKey={idField}
                           width={optionsWidth}
                           headerClassName="optionsAlignment"
@@ -768,7 +778,7 @@ const TableWrapper = ({
         ) : (
           <Fragment>
             {!isLoading && (
-              <div>
+              <div id={"empty-results"}>
                 {customEmptyMessage !== ""
                   ? customEmptyMessage
                   : `There are no ${entityName} yet.`}

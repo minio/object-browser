@@ -14,100 +14,137 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Suspense } from "react";
+import React, { Fragment, Suspense, useEffect } from "react";
 import OperatorLogo from "../../../icons/OperatorLogo";
-import ConsoleLogo from "../../../icons/ConsoleLogo";
-import { VersionIcon } from "../../../icons";
+import DirectPVLogo from "../../../icons/DirectPVLogo";
+
+import { ConsoleLogo, VersionIcon } from "../../../icons";
+import ConsoleLogoWhite from "../../../icons/ConsoleLogoWhite"
 import { Box, IconButton } from "@mui/material";
-import { ChevronLeft } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useSelector } from "react-redux";
+import useApi from "../Common/Hooks/useApi";
+import {
+  selDirectPVMode,
+  selOpMode,
+} from "../../../systemSlice";
+import { AppState, useAppDispatch } from "../../../store";
+import MenuToggleIcon from "../../../icons/MenuToggleIcon";
 
 type MenuToggleProps = {
   isOpen: boolean;
-  isOperatorMode: boolean;
   onToggle: (nextState: boolean) => void;
 };
-const MenuToggle = ({ isOpen, isOperatorMode, onToggle }: MenuToggleProps) => {
+const MenuToggle = ({ isOpen, onToggle }: MenuToggleProps) => {
   const stateClsName = isOpen ? "wide" : "mini";
+
+  const dispatch = useAppDispatch();
+
+  const operatorMode = useSelector(selOpMode);
+
+  const directPVMode = useSelector(selDirectPVMode);
+
 
   return (
     <Box
-      className={`${stateClsName}`}
       sx={{
-        marginLeft: "26px",
-        marginTop: "28px",
-        marginRight: "8px",
-        display: "flex",
-        minHeight: "36px",
-
-        "&.mini": {
-          flexFlow: "column",
-          alignItems: "center",
-          margin: "auto",
-          marginTop: "28px",
-        },
-        "& .logo": {
-          background: "transparent",
-          "&.wide": {
-            flex: "1",
-            "& svg": {
-              fill: "white",
-              width: 120,
-            },
-          },
-          "&.mini": {
-            marginBottom: "5px",
-            flex: "1",
-            color: "#ffffff",
-            "& svg": {
-              width: 24,
-              fill: "rgba(255, 255, 255, 0.8)",
-            },
-          },
-        },
+        width: "100%",
       }}
     >
-      {isOpen ? (
-        <div className={`logo ${stateClsName}`}>
-          {isOperatorMode ? <OperatorLogo /> : <ConsoleLogo />}
-        </div>
-      ) : (
-        <div className={`logo ${stateClsName}`}>
-          <Suspense fallback={<div>...</div>}>
-            <VersionIcon />
-          </Suspense>
-        </div>
-      )}
-
-      <IconButton
+      <Box
         className={`${stateClsName}`}
         sx={{
+          marginLeft: "26px",
+          marginRight: "8px",
+          display: "flex",
+          alignItems: "center",
+          height: "83px",
+
           "&.mini": {
-            marginBottom: "10px",
-            "&:hover": {
-              background: "#081C42",
+            flexFlow: "column",
+            display: "flex",
+            justifyContent: "center",
+            gap: "3px",
+            alignItems: "center",
+            marginLeft: "auto",
+            marginRight: "auto",
+          },
+          "& .logo": {
+            background: "transparent",
+            "&.wide": {
+              flex: "1",
+              "& svg": {
+                fill: "white",
+                width: 167,
+              },
+            },
+            "&.mini": {
+              color: "#ffffff",
+              "& svg": {
+                width: 35,
+                fill: "rgba(255, 255, 255, 0.8)",
+              },
             },
           },
-
-          "&:hover": {
-            borderRadius: "50%",
-            background: "#073052",
-          },
-          "& svg": {
-            fill: "#ffffff",
-          },
         }}
-        onClick={() => {
-          if (isOpen) {
-            onToggle(false);
-          } else {
-            onToggle(true);
-          }
-        }}
-        size="small"
       >
-        {isOpen ? <ChevronLeft /> : <MenuIcon />}
-      </IconButton>
+        {isOpen ? (
+          <div className={`logo ${stateClsName}`}>
+            {!operatorMode && !directPVMode ? (
+              <Fragment>
+                <div
+                  style={{ marginLeft: "4px", width: 100, textAlign: "left" }}
+                >
+                  <ConsoleLogoWhite />
+                </div>
+              </Fragment>
+            ) : (
+              <Fragment>
+                {directPVMode ? <DirectPVLogo /> : <OperatorLogo />}
+              </Fragment>
+            )}
+          </div>
+        ) : (
+          <div className={`logo ${stateClsName}`}>
+            <Suspense fallback={<div>...</div>}>
+              <VersionIcon />
+            </Suspense>
+          </div>
+        )}
+
+        <IconButton
+          className={`${stateClsName}`}
+          sx={{
+            height: "30px",
+            width: "30px",
+            "&.mini": {
+              "&:hover": {
+                background: "#A4493D",
+              },
+            },
+
+            "&:hover": {
+              borderRadius: "50%",
+              background: "#A4493D",
+            },
+            "& svg": {
+              fill: "#ffffff",
+              height: "18px",
+              width: "18px",
+            },
+          }}
+          onClick={() => {
+            if (isOpen) {
+              onToggle(false);
+            } else {
+              onToggle(true);
+            }
+          }}
+          size="small"
+        >
+          {isOpen ? <MenuToggleIcon /> : <MenuIcon />}
+        </IconButton>
+      </Box>
     </Box>
   );
 };

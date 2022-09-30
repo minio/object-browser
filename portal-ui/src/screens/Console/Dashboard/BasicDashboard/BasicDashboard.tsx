@@ -17,11 +17,14 @@
 import React, { Fragment } from "react";
 import { Box } from "@mui/material";
 import {
+  ArrowRightIcon,
   BucketsIcon,
   DrivesIcon,
+  HealIcon,
   PrometheusErrorIcon,
   ServersIcon,
   TotalObjectsIcon,
+  UptimeIcon,
 } from "../../../../icons";
 import HelpBox from "../../../../common/HelpBox";
 import { calculateBytes, representationNumber } from "../../../../common/utils";
@@ -31,13 +34,22 @@ import groupBy from "lodash/groupBy";
 import ServersList from "./ServersList";
 import CounterCard from "./CounterCard";
 import ReportedUsage from "./ReportedUsage";
+import { DiagnosticsMenuIcon } from "../../../../icons/SidebarMenus";
+import RBIconButton from "../../Buckets/BucketDetails/SummaryItems/RBIconButton";
+import { Link } from "react-router-dom";
+import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
+import TimeStatItem from "../TimeStatItem";
 
 const BoxItem = ({ children }: { children: any }) => {
   return (
     <Box
       sx={{
         border: "1px solid #f1f1f1",
-        padding: "25px",
+        padding: {
+          md: "15px",
+          xs: "5px",
+        },
+        height: "136px",
         maxWidth: {
           sm: "100%",
         },
@@ -82,6 +94,8 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
   const usageValue = usage && usage.usage ? usage.usage.toString() : "0";
   const usageToRepresent = prettyUsage(usageValue);
 
+  const { lastScan = "n/a", lastHeal = "n/a", upTime = "n/a" } = usage || {};
+
   const serverList = getServersList(usage || null);
 
   let allDrivesArray: IDriveInfo[] = [];
@@ -115,8 +129,8 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
           gap: "27px",
           marginBottom: "40px",
           marginTop: "40px",
-          marginLeft: "60px",
-          marginRight: "60px",
+          marginLeft: "40px",
+          marginRight: "40px",
         }}
       >
         <Box>
@@ -126,7 +140,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
               title={"We can't retrieve advanced metrics at this time"}
               help={
                 <Fragment>
-                  MinIO Dashboard will display basic metrics as we couldn't
+                  Mantle SDS Dashboard will display basic metrics as we couldn't
                   connect to Prometheus successfully.
                   <br /> <br />
                   Please try again in a few minutes. If the problem persists,
@@ -148,28 +162,11 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                       fontSize: "14px",
                     }}
                   >
-                    MinIO Dashboard will display basic metrics as we couldn’t
+                    Mantle SDS Dashboard will display basic metrics as we couldn’t
                     connect to Prometheus successfully. Please try again in a
                     few minutes. If the problem persists, you can review your
                     configuration and confirm that Prometheus server is up and
                     running.
-                  </Box>
-                  <Box
-                    sx={{
-                      paddingTop: "20px",
-                      fontSize: "14px",
-                      "& a": {
-                        color: (theme) => theme.colors.link,
-                      },
-                    }}
-                  >
-                    <a
-                      href="https://docs.min.io/minio/baremetal/monitoring/metrics-alerts/collect-minio-metrics-using-prometheus.html?ref=con#minio-metrics-collect-using-prometheus"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Read more about Prometheus on our Docs site.
-                    </a>
                   </Box>
                 </Box>
               }
@@ -180,7 +177,6 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
         <Box
           sx={{
             display: "grid",
-            gridTemplateRows: "1fr .2fr auto",
             gridTemplateColumns: "1fr",
             gap: "40px",
           }}
@@ -188,13 +184,15 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
           <Box
             sx={{
               display: "grid",
-              gridTemplateRows: "1fr",
+              gridTemplateRows: "136px",
               gridTemplateColumns: {
-                lg: "1fr 1fr 1fr 1fr ",
-                sm: "1fr 1fr",
+                sm: "1fr 1fr 1fr",
                 xs: "1fr",
               },
-              gap: "40px",
+              gap: {
+                md: "20px",
+                xs: "20px",
+              },
             }}
           >
             <BoxItem>
@@ -202,6 +200,27 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                 label={"Buckets"}
                 icon={<BucketsIcon />}
                 counterValue={usage ? representationNumber(usage.buckets) : 0}
+                actions={
+                  <Link
+                    to={IAM_PAGES.BUCKETS}
+                    style={{
+                      zIndex: 999,
+                      textDecoration: "none",
+                      top: "40px",
+                      position: "relative",
+                      marginRight: "75px",
+                    }}
+                  >
+                    <RBIconButton
+                      tooltip={"Browse"}
+                      onClick={() => {}}
+                      text={"Browse"}
+                      icon={<ArrowRightIcon />}
+                      color={"primary"}
+                      variant={"outlined"}
+                    />
+                  </Link>
+                }
               />
             </BoxItem>
             <BoxItem>
@@ -211,6 +230,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                 counterValue={usage ? representationNumber(usage.objects) : 0}
               />
             </BoxItem>
+
             <BoxItem>
               <StatusCountCard
                 onlineCount={onlineServers.length}
@@ -227,15 +247,78 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                 icon={<DrivesIcon />}
               />
             </BoxItem>
+
+            <Box
+              sx={{
+                gridRowStart: "1",
+                gridRowEnd: "3",
+                gridColumnStart: "3",
+                border: "1px solid #f1f1f1",
+                padding: "15px",
+                display: "grid",
+                justifyContent: "stretch",
+              }}
+            >
+              <ReportedUsage
+                usageValue={usageValue}
+                total={usageToRepresent.total}
+                unit={usageToRepresent.unit}
+              />
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexFlow: "column",
+                  gap: "14px",
+                }}
+              >
+                <TimeStatItem
+                  icon={<HealIcon />}
+                  label={
+                    <Box>
+                      <Box
+                        sx={{
+                          display: {
+                            md: "inline",
+                            xs: "none",
+                          },
+                        }}
+                      >
+                        Time since last
+                      </Box>{" "}
+                      Heal Activity
+                    </Box>
+                  }
+                  value={lastHeal}
+                />
+                <TimeStatItem
+                  icon={<DiagnosticsMenuIcon />}
+                  label={
+                    <Box>
+                      <Box
+                        sx={{
+                          display: {
+                            md: "inline",
+                            xs: "none",
+                          },
+                        }}
+                      >
+                        Time since last
+                      </Box>{" "}
+                      Scan Activity
+                    </Box>
+                  }
+                  value={lastScan}
+                />
+                <TimeStatItem
+                  icon={<UptimeIcon />}
+                  label={"Uptime"}
+                  value={upTime}
+                />
+              </Box>
+            </Box>
           </Box>
 
-          <BoxItem>
-            <ReportedUsage
-              usageValue={usageValue}
-              total={usageToRepresent.total}
-              unit={usageToRepresent.unit}
-            />
-          </BoxItem>
           <Box
             sx={{
               display: "grid",

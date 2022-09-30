@@ -62,13 +62,6 @@ const styles = (theme: Theme) =>
     buttonSpacer: {
       marginRight: ".9rem",
     },
-    promptIcon: {
-      marginRight: ".1rem",
-      display: "flex",
-      alignItems: "center",
-      height: "2rem",
-      width: "2rem",
-    },
   });
 
 interface ICredentialsPromptProps {
@@ -81,10 +74,7 @@ interface ICredentialsPromptProps {
 
 const download = (filename: string, text: string) => {
   let element = document.createElement("a");
-  element.setAttribute(
-    "href",
-    "data:text/plain;charset=utf-8," + encodeURIComponent(text)
-  );
+  element.setAttribute("href", "data:text/plain;charset=utf-8," + text);
   element.setAttribute("download", filename);
 
   element.style.display = "none";
@@ -159,6 +149,18 @@ const CredentialsPrompt = ({
               </Grid>
             </React.Fragment>
           )}
+          {(consoleCreds === null || consoleCreds === undefined) && (
+            <>
+              <CredentialItem
+                label="Access Key"
+                value={newServiceAccount.accessKey || ""}
+              />
+              <CredentialItem
+                label="Secret Key"
+                value={newServiceAccount.secretKey || ""}
+              />
+            </>
+          )}
           {idp ? (
             <div className={classes.warningBlock}>
               Please Login via the configured external identity provider.
@@ -207,6 +209,14 @@ const CredentialsPrompt = ({
                       });
                       consoleExtras = cCreds[0];
                     }
+                  } else {
+                    consoleExtras = {
+                      url: newServiceAccount.url,
+                      accessKey: newServiceAccount.accessKey,
+                      secretKey: newServiceAccount.secretKey,
+                      api: "s3v4",
+                      path: "auto",
+                    };
                   }
 
                   download(

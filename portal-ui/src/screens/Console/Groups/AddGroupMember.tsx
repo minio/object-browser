@@ -6,8 +6,7 @@ import Grid from "@mui/material/Grid";
 import { Button } from "@mui/material";
 import api from "../../../common/api";
 import { ErrorResponseHandler } from "../../../common/types";
-import { setModalErrorSnackMessage } from "../../../actions";
-import { connect } from "react-redux";
+
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import {
@@ -17,6 +16,9 @@ import {
 } from "../Common/FormComponents/common/styleLibrary";
 import withStyles from "@mui/styles/withStyles";
 import { AddMembersToGroupIcon } from "../../../icons";
+import { encodeURLString } from "../../../common/utils";
+import { setModalErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
 type UserPickerModalProps = {
   classes?: any;
@@ -31,10 +33,6 @@ type UserPickerModalProps = {
 
 const styles = (theme: Theme) =>
   createStyles({
-    buttonContainer: {
-      textAlign: "right",
-      marginTop: "1rem",
-    },
     userSelector: {
       "& .MuiPaper-root": {
         padding: 0,
@@ -55,11 +53,12 @@ const AddGroupMember = ({
   open,
   onClose,
 }: UserPickerModalProps) => {
+  const dispatch = useAppDispatch();
   const [selectedUsers, setSelectedUsers] = useState(preSelectedUsers);
 
   function addMembersToGroup() {
     return api
-      .invoke("PUT", `/api/v1/group?name=${encodeURI(selectedGroup)}`, {
+      .invoke("PUT", `/api/v1/group/${encodeURLString(selectedGroup)}`, {
         group: selectedGroup,
         members: selectedUsers,
         status: groupStatus,
@@ -69,7 +68,7 @@ const AddGroupMember = ({
       })
       .catch((err: ErrorResponseHandler) => {
         onClose();
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   }
 
@@ -121,9 +120,4 @@ const AddGroupMember = ({
   );
 };
 
-const mapDispatchToProps = {
-  setModalErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-export default withStyles(styles)(connector(AddGroupMember));
+export default withStyles(styles)(AddGroupMember);

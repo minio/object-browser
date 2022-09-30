@@ -15,45 +15,31 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
-import withStyles from "@mui/styles/withStyles";
 import { Box, LinearProgress } from "@mui/material";
-import clsx from "clsx";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import { SubnetInfo } from "./types";
-import { AppState } from "../../../store";
 import { containerForHeader } from "../Common/FormComponents/common/styleLibrary";
 import PageHeader from "../Common/PageHeader/PageHeader";
-import LicenseModal from "./LicenseModal";
 import api from "../../../common/api";
-import {
-  ArrowRightLink,
-  HelpIconFilled,
-  LicenseIcon,
-  LoginMinIOLogo,
-} from "../../../icons";
-import { hasPermission } from "../../../common/SecureComponent";
-import {
-  CONSOLE_UI_RESOURCE,
-  IAM_PAGES,
-  IAM_PAGES_PERMISSIONS,
-} from "../../../common/SecureComponent/permissions";
+import { ArrowRightLink, HelpIconFilled, LoginMinIOLogo } from "../../../icons";
+import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
 import LicensePlans from "./LicensePlans";
 import { Link } from "react-router-dom";
 import PageLayout from "../Common/Layout/PageLayout";
 import RegistrationStatusBanner from "../Support/RegistrationStatusBanner";
+import makeStyles from "@mui/styles/makeStyles";
+import { selOpMode } from "../../../systemSlice";
+import withSuspense from "../Common/Components/withSuspense";
+import { getLicenseConsent } from "./utils";
 
-const mapState = (state: AppState) => ({
-  operatorMode: state.system.operatorMode,
-});
+const LicenseConsentModal = withSuspense(
+  React.lazy(() => import("./LicenseConsentModal"))
+);
 
-const connector = connect(mapState, null);
-
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     pageTitle: {
       backgroundColor: "rgb(250,250,252)",
@@ -66,7 +52,7 @@ const styles = (theme: Theme) =>
       fontSize: 16,
       fontWeight: "bold",
       "& ul": {
-        marginLeft: "-25px",
+        marginLeft: "-8px",
         listStyleType: "square",
         color: "#1C5A8D",
         fontSize: "16px",
@@ -89,10 +75,6 @@ const styles = (theme: Theme) =>
       marginTop: 10,
       marginBottom: 20,
     },
-    chooseFlavorText: {
-      color: "#000000",
-      fontSize: 14,
-    },
     link: {
       textDecoration: "underline !important",
       color: theme.palette.info.main,
@@ -112,37 +94,7 @@ const styles = (theme: Theme) =>
       color: "#1C5A8D",
       fontWeight: "bold",
     },
-    licenseInfo: {
-      position: "relative",
-    },
-    licenseInfoTitle: {
-      textTransform: "none",
-      color: "#999999",
-      fontSize: 11,
-    },
-    licenseInfoValue: {
-      textTransform: "none",
-      fontSize: 14,
-      fontWeight: "bold",
-    },
-    subnetSubTitle: {
-      fontSize: 14,
-    },
-    verifiedIcon: {
-      width: 96,
-      position: "absolute",
-      right: 0,
-      bottom: 29,
-    },
-    loadingLoginStrategy: {
-      textAlign: "center",
-    },
     ...containerForHeader(theme.spacing(4)),
-    mainContainer: {
-      border: "1px solid #EAEDEE",
-      padding: 40,
-      margin: 40,
-    },
     icon: {
       color: theme.palette.primary.main,
       fontSize: 16,
@@ -154,18 +106,14 @@ const styles = (theme: Theme) =>
         marginRight: 15,
       },
     },
-  });
+  })
+);
 
-interface ILicenseProps {
-  classes: any;
-  operatorMode: boolean;
-}
-
-const License = ({ classes, operatorMode }: ILicenseProps) => {
+const License = () => {
+  const classes = useStyles();
+  const operatorMode = useSelector(selOpMode);
   const [activateProductModal, setActivateProductModal] =
     useState<boolean>(false);
-
-  const [licenseModal, setLicenseModal] = useState<boolean>(false);
 
   const [licenseInfo, setLicenseInfo] = useState<SubnetInfo>();
   const [currentPlanID, setCurrentPlanID] = useState<number>(0);
@@ -175,47 +123,58 @@ const License = ({ classes, operatorMode }: ILicenseProps) => {
   useState<boolean>(false);
   const [clusterRegistered, setClusterRegistered] = useState<boolean>(false);
 
-  const getSubnetInfo = hasPermission(
-    CONSOLE_UI_RESOURCE,
-    IAM_PAGES_PERMISSIONS[IAM_PAGES.LICENSE],
-    true
-  );
+  const [isLicenseConsentOpen, setIsLicenseConsentOpen] =
+    useState<boolean>(false);
 
   const closeModalAndFetchLicenseInfo = () => {
     setActivateProductModal(false);
     fetchLicenseInfo();
   };
 
+  const isRegistered = licenseInfo && clusterRegistered;
+
+  const isAgplConsentDone = getLicenseConsent();
+
+  useEffect(() => {
+    const shouldConsent =
+      !isRegistered && !isAgplConsentDone && !initialLicenseLoading;
+
+    if (shouldConsent && !loadingLicenseInfo) {
+      setIsLicenseConsentOpen(true);
+    }
+  }, [
+    isRegistered,
+    isAgplConsentDone,
+    initialLicenseLoading,
+    loadingLicenseInfo,
+  ]);
+
   const fetchLicenseInfo = useCallback(() => {
     if (loadingLicenseInfo) {
       return;
     }
-    if (getSubnetInfo) {
-      setLoadingLicenseInfo(true);
-      api
-        .invoke("GET", `/api/v1/subnet/info`)
-        .then((res: SubnetInfo) => {
-          if (res) {
-            if (res.plan === "STANDARD") {
-              setCurrentPlanID(1);
-            } else if (res.plan === "ENTERPRISE") {
-              setCurrentPlanID(2);
-            } else {
-              setCurrentPlanID(1);
-            }
-            setLicenseInfo(res);
+    setLoadingLicenseInfo(true);
+    api
+      .invoke("GET", `/api/v1/subnet/info`)
+      .then((res: SubnetInfo) => {
+        if (res) {
+          if (res.plan === "STANDARD") {
+            setCurrentPlanID(1);
+          } else if (res.plan === "ENTERPRISE") {
+            setCurrentPlanID(2);
+          } else {
+            setCurrentPlanID(1);
           }
-          setClusterRegistered(true);
-          setLoadingLicenseInfo(false);
-        })
-        .catch(() => {
-          setClusterRegistered(false);
-          setLoadingLicenseInfo(false);
-        });
-    } else {
-      setLoadingLicenseInfo(false);
-    }
-  }, [loadingLicenseInfo, getSubnetInfo]);
+          setLicenseInfo(res);
+        }
+        setClusterRegistered(true);
+        setLoadingLicenseInfo(false);
+      })
+      .catch(() => {
+        setClusterRegistered(false);
+        setLoadingLicenseInfo(false);
+      });
+  }, [loadingLicenseInfo]);
 
   useEffect(() => {
     if (initialLicenseLoading) {
@@ -231,8 +190,6 @@ const License = ({ classes, operatorMode }: ILicenseProps) => {
       </Grid>
     );
   }
-
-  const isRegistered = licenseInfo && clusterRegistered;
 
   return (
     <Fragment>
@@ -386,106 +343,20 @@ const License = ({ classes, operatorMode }: ILicenseProps) => {
           activateProductModal={activateProductModal}
           closeModalAndFetchLicenseInfo={closeModalAndFetchLicenseInfo}
           licenseInfo={licenseInfo}
-          setLicenseModal={setLicenseModal}
           operatorMode={operatorMode}
           currentPlanID={currentPlanID}
           setActivateProductModal={setActivateProductModal}
         />
 
-        <Grid item xs={12}>
-          <Grid
-            container
-            marginTop="35px"
-            sx={{
-              border: "1px solid #eaeaea",
-              padding: "15px",
-            }}
-          >
-            <Grid item xs={12} lg={12}>
-              <Fragment>
-                <LicenseModal
-                  open={licenseModal}
-                  closeModal={() => setLicenseModal(false)}
-                />
-                <Box
-                  sx={{
-                    display: "flex",
-                    marginBottom: "15px",
-                    flexFlow: {
-                      sm: "row",
-                      xs: "column",
-                    },
-                    alignItems: {
-                      xs: "flex-start",
-                      sm: "center",
-                    },
-                  }}
-                >
-                  <Box>
-                    <LicenseIcon />
-                  </Box>
-                  <Box
-                    sx={{
-                      flex: 1,
-                      marginLeft: {
-                        sm: "15px",
-                        xs: "0",
-                      },
-                    }}
-                  >
-                    <div> GNU Affero General Public License</div>
-                    <div className={classes.licDet}>
-                      Version 3. 19 November 2007
-                    </div>
-                  </Box>
-                  <Box>
-                    <img src="/agpl-logo.svg" height={40} alt="agpl" />
-                  </Box>
-                </Box>
-
-                <Grid container>
-                  <Typography>
-                    The GNU Affero General Public License is a free, copyleft
-                    license for software and other kinds of works, specifically
-                    designed to ensure cooperation with the Community in the
-                    case of network server software.
-                  </Typography>
-                  <br />
-                  <Typography>
-                    The licenses for most software and other practical works are
-                    designed to take away your freedom to share and change the
-                    works. By contrast, our General Public Licenses are intended
-                    to guarantee your freedom to share and change all versions
-                    of a program--to make sure it remains free software for all
-                    its users.
-                  </Typography>
-                  <div className={classes.linkMore}>
-                    <Button
-                      variant="text"
-                      color="primary"
-                      size="small"
-                      className={clsx(classes.link, classes.linkButton)}
-                      onClick={() => setLicenseModal(true)}
-                    >
-                      Read more{" "}
-                      <ArrowRightLink
-                        style={{
-                          width: "13px",
-                          height: "8px",
-                          marginLeft: "5px",
-                          marginTop: "3px",
-                        }}
-                      />
-                    </Button>
-                  </div>
-                </Grid>
-              </Fragment>
-            </Grid>
-          </Grid>
-        </Grid>
+        <LicenseConsentModal
+          isOpen={isLicenseConsentOpen}
+          onClose={() => {
+            setIsLicenseConsentOpen(false);
+          }}
+        />
       </PageLayout>
     </Fragment>
   );
 };
 
-export default connector(withStyles(styles)(License));
+export default License;

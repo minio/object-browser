@@ -15,7 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
+import { useNavigate, useParams } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -27,10 +28,7 @@ import {
   TrashIcon,
   UsersIcon,
 } from "../../../icons";
-import {
-  setErrorSnackMessage,
-  setModalErrorSnackMessage,
-} from "../../../actions";
+
 import {
   actionsTray,
   containerForHeader,
@@ -44,10 +42,9 @@ import api from "../../../common/api";
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
 import ChangeUserGroups from "./ChangeUserGroups";
 import SetUserPolicies from "./SetUserPolicies";
-import history from "../../../history";
 import UserServiceAccountsPanel from "./UserServiceAccountsPanel";
 import ChangeUserPasswordModal from "../Account/ChangeUserPasswordModal";
-import DeleteUserString from "./DeleteUserString";
+import DeleteUser from "./DeleteUser";
 import ScreenTitle from "../Common/ScreenTitle/ScreenTitle";
 import PanelTitle from "../Common/PanelTitle/PanelTitle";
 import PageLayout from "../Common/Layout/PageLayout";
@@ -55,7 +52,16 @@ import VerticalTabs from "../Common/VerticalTabs/VerticalTabs";
 import FormSwitchWrapper from "../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
 import BackLink from "../../../common/BackLink";
 import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
-import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
+import { decodeURLString, encodeURLString } from "../../../common/utils";
+import { setModalErrorSnackMessage } from "../../../systemSlice";
+import {
+  CONSOLE_UI_RESOURCE,
+  IAM_PAGES,
+  IAM_SCOPES,
+} from "../../../common/SecureComponent/permissions";
+import { hasPermission } from "../../../common/SecureComponent";
+import { useAppDispatch } from "../../../store";
+import { policyDetailsSort } from "../../../utils/sortFunctions";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -71,10 +77,6 @@ const styles = (theme: Theme) =>
       fontSize: ".9rem",
       marginRight: ".5rem",
     },
-    breadcrumLink: {
-      textDecoration: "none",
-      color: "black",
-    },
     ...actionsTray,
     ...searchField,
     ...tableStyles,
@@ -83,15 +85,17 @@ const styles = (theme: Theme) =>
 
 interface IUserDetailsProps {
   classes: any;
-  match: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 interface IGroupItem {
   group: string;
 }
 
-const UserDetails = ({ classes, match }: IUserDetailsProps) => {
+const UserDetails = ({ classes }: IUserDetailsProps) => {
+  const dispatch = useAppDispatch();
+  const params = useParams();
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState<boolean>(false);
   const [addGroupOpen, setAddGroupOpen] = useState<boolean>(false);
   const [policyOpen, setPolicyOpen] = useState<boolean>(false);
@@ -106,7 +110,7 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [hasPolicy, setHasPolicy] = useState<boolean>(false);
 
-  const userName = match.params["userName"];
+  const userName = decodeURLString(params.userName || "");
 
   const changeUserPassword = () => {
     setChangeUserPasswordModalOpen(true);
@@ -116,30 +120,39 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
     setDeleteOpen(true);
   };
 
+  const viewGroup = hasPermission(CONSOLE_UI_RESOURCE, [
+    IAM_SCOPES.ADMIN_GET_GROUP,
+  ]);
+
   const getUserInformation = useCallback(() => {
     if (userName === "") {
       return null;
     }
     setLoading(true);
     api
-      .invoke("GET", `/api/v1/user?name=${encodeURIComponent(userName)}`)
+      .invoke("GET", `/api/v1/user/${encodeURLString(userName)}`)
       .then((res) => {
         setAddLoading(false);
         const memberOf = res.memberOf || [];
         setSelectedGroups(memberOf);
-        let currentGroups: IGroupItem[] = [];
-        for (let group of memberOf) {
-          currentGroups.push({
+
+        const currentGroups: IGroupItem[] = memberOf.map((group: string) => {
+          return {
             group: group,
-          });
-        }
+          };
+        });
+
         setCurrentGroups(currentGroups);
-        let currentPolicies: IPolicyItem[] = [];
-        for (let policy of res.policy) {
-          currentPolicies.push({
-            policy: policy,
-          });
-        }
+        const currentPolicies: IPolicyItem[] = res.policy.map(
+          (policy: string) => {
+            return {
+              policy: policy,
+            };
+          }
+        );
+
+        currentPolicies.sort(policyDetailsSort);
+
         setCurrentPolicies(currentPolicies);
         setEnabled(res.status === "enabled");
         setHasPolicy(res.hasPolicy);
@@ -148,9 +161,9 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
       .catch((err: ErrorResponseHandler) => {
         setAddLoading(false);
         setLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
-  }, [userName]);
+  }, [userName, dispatch]);
 
   const saveRecord = (isEnabled: boolean) => {
     if (addLoading) {
@@ -158,7 +171,7 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
     }
     setAddLoading(true);
     api
-      .invoke("PUT", `/api/v1/user?name=${encodeURIComponent(userName)}`, {
+      .invoke("PUT", `/api/v1/user/${encodeURLString(userName)}`, {
         status: isEnabled ? "enabled" : "disabled",
         groups: selectedGroups,
       })
@@ -167,7 +180,7 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
       })
       .catch((err: ErrorResponseHandler) => {
         setAddLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   };
 
@@ -182,12 +195,24 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
     }
   };
 
+  const groupViewAction = (group: any) => {
+    navigate(`${IAM_PAGES.GROUPS}/${encodeURLString(group.group)}`);
+  };
+
+  const groupTableActions = [
+    {
+      type: "view",
+      onClick: groupViewAction,
+      disableButtonFunction: () => !viewGroup,
+    },
+  ];
+
   return (
-    <React.Fragment>
+    <Fragment>
       <PageHeader
         label={
           <Fragment>
-            <BackLink label={"User"} to={IAM_PAGES.USERS} />
+            <BackLink label={"Users"} to={IAM_PAGES.USERS} />
           </Fragment>
         }
         actions={<React.Fragment></React.Fragment>}
@@ -214,9 +239,9 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
         />
       )}
       {deleteOpen && (
-        <DeleteUserString
+        <DeleteUser
           deleteOpen={deleteOpen}
-          userName={userName}
+          selectedUsers={[userName]}
           closeDeleteModalAndRefresh={(refresh: boolean) => {
             closeDeleteModalAndRefresh(refresh);
           }}
@@ -302,7 +327,7 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
                   </div>
                   <div className={classes.tableBlock}>
                     <TableWrapper
-                      // itemActions={userTableActions}
+                      itemActions={groupTableActions}
                       columns={[{ label: "Name", elementKey: "group" }]}
                       isLoading={loading}
                       records={currentGroups}
@@ -329,7 +354,7 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
                 label: "Policies",
               },
               content: (
-                <React.Fragment>
+                <Fragment>
                   <div className={classes.actionsTray}>
                     <PanelTitle>Policies</PanelTitle>
 
@@ -350,8 +375,10 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
                         {
                           type: "view",
                           onClick: (policy: IPolicyItem) => {
-                            history.push(
-                              `${IAM_PAGES.POLICIES}/${policy.policy}`
+                            navigate(
+                              `${IAM_PAGES.POLICIES}/${encodeURLString(
+                                policy.policy
+                              )}`
                             );
                           },
                         },
@@ -363,20 +390,14 @@ const UserDetails = ({ classes, match }: IUserDetailsProps) => {
                       idField="policy"
                     />
                   </div>
-                </React.Fragment>
+                </Fragment>
               ),
             }}
           </VerticalTabs>
         </Grid>
       </PageLayout>
-    </React.Fragment>
+    </Fragment>
   );
 };
 
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(UserDetails));
+export default withStyles(styles)(UserDetails);

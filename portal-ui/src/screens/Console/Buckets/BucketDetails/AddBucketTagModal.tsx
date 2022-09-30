@@ -15,8 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from "react";
-import get from "lodash/get";
-import { connect } from "react-redux";
+
 import { Button, Grid } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
@@ -26,20 +25,20 @@ import {
   modalStyleUtils,
   spacingUtils,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { setModalErrorSnackMessage } from "../../../../actions";
-import { AppState } from "../../../../store";
 import { ErrorResponseHandler } from "../../../../common/types";
 import InputBoxWrapper from "../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import ModalWrapper from "../../Common/ModalWrapper/ModalWrapper";
 import api from "../../../../common/api";
 import { AddNewTagIcon } from "../../../../icons";
+import { setModalErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 interface IBucketTagModal {
   modalOpen: boolean;
   currentTags: any;
   bucketName: string;
   onCloseAndUpdate: (refresh: boolean) => void;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
+
   classes: any;
 }
 
@@ -55,9 +54,10 @@ const AddBucketTagModal = ({
   currentTags,
   onCloseAndUpdate,
   bucketName,
-  setModalErrorSnackMessage,
+
   classes,
 }: IBucketTagModal) => {
+  const dispatch = useAppDispatch();
   const [newKey, setNewKey] = useState<string>("");
   const [newLabel, setNewLabel] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -83,7 +83,7 @@ const AddBucketTagModal = ({
         onCloseAndUpdate(true);
       })
       .catch((error: ErrorResponseHandler) => {
-        setModalErrorSnackMessage(error);
+        dispatch(setModalErrorSnackMessage(error));
         setIsSending(false);
       });
   };
@@ -151,14 +151,4 @@ const AddBucketTagModal = ({
   );
 };
 
-const mapStateToProps = ({ system }: AppState) => ({
-  distributedSetup: get(system, "distributedSetup", false),
-});
-
-const mapDispatchToProps = {
-  setModalErrorSnackMessage,
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-export default withStyles(styles)(connector(AddBucketTagModal));
+export default withStyles(styles)(AddBucketTagModal);

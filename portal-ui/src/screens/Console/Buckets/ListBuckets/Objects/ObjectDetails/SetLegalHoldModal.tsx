@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState, useEffect } from "react";
-import { connect } from "react-redux";
+import React, { useEffect, useState } from "react";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -27,13 +26,16 @@ import {
   modalStyleUtils,
   spacingUtils,
 } from "../../../../Common/FormComponents/common/styleLibrary";
-import { setModalErrorSnackMessage } from "../../../../../../actions";
+
 import { IFileInfo } from "./types";
 import { ErrorResponseHandler } from "../../../../../../common/types";
 import ModalWrapper from "../../../../Common/ModalWrapper/ModalWrapper";
 import FormSwitchWrapper from "../../../../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
 import api from "../../../../../../common/api";
-import { encodeFileName } from "../../../../../../common/utils";
+import { encodeURLString } from "../../../../../../common/utils";
+
+import { setModalErrorSnackMessage } from "../../../../../../systemSlice";
+import { useAppDispatch } from "../../../../../../store";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -49,7 +51,6 @@ interface ISetRetentionProps {
   objectName: string;
   bucketName: string;
   actualInfo: IFileInfo;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const SetLegalHoldModal = ({
@@ -59,8 +60,8 @@ const SetLegalHoldModal = ({
   objectName,
   bucketName,
   actualInfo,
-  setModalErrorSnackMessage,
 }: ISetRetentionProps) => {
+  const dispatch = useAppDispatch();
   const [legalHoldEnabled, setLegalHoldEnabled] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const versionId = actualInfo.version_id;
@@ -77,7 +78,7 @@ const SetLegalHoldModal = ({
     api
       .invoke(
         "PUT",
-        `/api/v1/buckets/${bucketName}/objects/legalhold?prefix=${encodeFileName(
+        `/api/v1/buckets/${bucketName}/objects/legalhold?prefix=${encodeURLString(
           objectName
         )}&version_id=${versionId}`,
         { status: legalHoldEnabled ? "enabled" : "disabled" }
@@ -87,7 +88,7 @@ const SetLegalHoldModal = ({
         closeModalAndRefresh(true);
       })
       .catch((error: ErrorResponseHandler) => {
-        setModalErrorSnackMessage(error);
+        dispatch(setModalErrorSnackMessage(error));
         setIsSaving(false);
       });
   };
@@ -155,10 +156,4 @@ const SetLegalHoldModal = ({
   );
 };
 
-const mapDispatchToProps = {
-  setModalErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(SetLegalHoldModal));
+export default withStyles(styles)(SetLegalHoldModal);

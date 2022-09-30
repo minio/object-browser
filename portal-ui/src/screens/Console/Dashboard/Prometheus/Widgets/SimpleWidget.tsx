@@ -22,9 +22,11 @@ import withStyles from "@mui/styles/withStyles";
 import api from "../../../../../common/api";
 import { widgetDetailsToPanel } from "../utils";
 import { IDashboardPanel } from "../types";
-import { setErrorSnackMessage } from "../../../../../actions";
+
 import { ErrorResponseHandler } from "../../../../../common/types";
 import Loader from "../../../Common/Loader/Loader";
+import { setErrorSnackMessage } from "../../../../../systemSlice";
+import { useAppDispatch } from "../../../../../store";
 
 interface ISimpleWidget {
   classes: any;
@@ -34,8 +36,9 @@ interface ISimpleWidget {
   timeStart: any;
   timeEnd: any;
   propLoading: boolean;
-  displayErrorMessage: any;
+
   apiPrefix: string;
+  renderFn?: undefined | null | ((arg: Record<string, any>) => any);
 }
 
 const styles = (theme: Theme) =>
@@ -69,9 +72,10 @@ const SimpleWidget = ({
   timeStart,
   timeEnd,
   propLoading,
-  displayErrorMessage,
   apiPrefix,
+  renderFn,
 }: ISimpleWidget) => {
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<string>("");
 
@@ -108,12 +112,21 @@ const SimpleWidget = ({
           setLoading(false);
         })
         .catch((err: ErrorResponseHandler) => {
-          displayErrorMessage(err);
+          dispatch(setErrorSnackMessage(err));
           setLoading(false);
         });
     }
-  }, [loading, panelItem, timeEnd, timeStart, displayErrorMessage, apiPrefix]);
+  }, [loading, panelItem, timeEnd, timeStart, dispatch, apiPrefix]);
 
+  if (renderFn) {
+    return renderFn({
+      valueToRender: data,
+      loading,
+      title,
+      id: panelItem.id,
+      iconWidget: iconWidget,
+    });
+  }
   return (
     <Fragment>
       {loading && (
@@ -133,7 +146,7 @@ const SimpleWidget = ({
 };
 
 const connector = connect(null, {
-  displayErrorMessage: setErrorSnackMessage,
+  setErrorSnackMessage: setErrorSnackMessage,
 });
 
 export default withStyles(styles)(connector(SimpleWidget));

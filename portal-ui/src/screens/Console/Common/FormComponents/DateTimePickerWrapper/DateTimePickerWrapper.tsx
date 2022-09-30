@@ -40,6 +40,8 @@ interface IDateTimePicker {
   id: string;
   disabled?: boolean;
   noInputIcon?: boolean;
+  classNamePrefix?: string;
+  openPickerIcon?: any;
 }
 
 const styles = (theme: Theme) =>
@@ -170,6 +172,8 @@ const styles = (theme: Theme) =>
         borderTop: "#F0F3F5 1px solid",
       },
       "& .MuiClockPicker-arrowSwitcher": {
+        marginRight: 10,
+        marginTop: -1,
         "& > div": {
           width: 0,
         },
@@ -180,6 +184,8 @@ const styles = (theme: Theme) =>
           width: 255,
           height: 255,
           backgroundColor: "#fff",
+          marginTop: 30,
+          marginBottom: 14,
           border: "#F0F3F5 3px solid",
           "& > div:nth-child(2)": {
             backgroundColor: "#B4B5B4",
@@ -235,6 +241,8 @@ const DateTimePickerWrapper = ({
   id,
   disabled = false,
   noInputIcon = false,
+  classNamePrefix = "",
+  openPickerIcon,
 }: IDateTimePicker) => {
   let adornment = {};
 
@@ -258,13 +266,17 @@ const DateTimePickerWrapper = ({
     };
   }
 
-  let classOverriden = "";
+  const classOverridden = `${classNamePrefix}date-time-input  ${
+    forSearchBlock ? classes.dateSelectorOverride : ""
+  } ${
+    forFilterContained && !forSearchBlock
+      ? classes.dateSelectorFilterOverride
+      : ""
+  }`;
 
-  if (forSearchBlock) {
-    classOverriden = classes.dateSelectorOverride;
-  } else if (forFilterContained) {
-    classOverriden = classes.dateSelectorFilterOverride;
-  }
+  const clsName = forSearchBlock
+    ? classes.parentDateOverride
+    : classes.dateSelectorFormOverride;
 
   const inputItem = (
     <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -273,14 +285,13 @@ const DateTimePickerWrapper = ({
         onChange={onChange}
         InputProps={{
           ...adornment,
-          className: classOverriden,
+          className: classOverridden,
+        }}
+        components={{
+          OpenPickerIcon: openPickerIcon,
         }}
         label=""
-        className={
-          forSearchBlock
-            ? classes.parentDateOverride
-            : classes.dateSelectorFormOverride
-        }
+        className={clsName}
         disabled={disabled}
         renderInput={(props) => (
           <TextField id={id} variant="standard" {...props} disabled />
@@ -297,15 +308,19 @@ const DateTimePickerWrapper = ({
     return inputItem;
   }
 
+  const containerCls = !forFilterContained ? classes.fieldContainer : "";
   return (
     <Fragment>
       <Grid
         item
         xs={12}
-        className={!forFilterContained ? classes.fieldContainer : ""}
+        className={`${containerCls} ${classNamePrefix}input-field-container `}
       >
         {label !== "" && (
-          <InputLabel htmlFor={id} className={classes.inputLabel}>
+          <InputLabel
+            htmlFor={id}
+            className={`${classes.inputLabel} ${classNamePrefix}input-label`}
+          >
             <span>
               {label}
               {required ? "*" : ""}
@@ -322,7 +337,11 @@ const DateTimePickerWrapper = ({
           </InputLabel>
         )}
 
-        <div className={classes.textBoxContainer}>{inputItem}</div>
+        <div
+          className={`${classes.textBoxContainer} ${classNamePrefix}input-wrapper  `}
+        >
+          {inputItem}
+        </div>
       </Grid>
     </Fragment>
   );

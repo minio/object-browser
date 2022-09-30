@@ -174,7 +174,6 @@ export const radioIcons = {
 export const containerForHeader = (bottomSpacing: any) => ({
   container: {
     position: "relative" as const,
-    maxWidth: 1180,
     padding: "20px 35px 0",
     "& h6": {
       color: "#777777",
@@ -228,7 +227,6 @@ export const actionsTray = {
       marginLeft: 15,
     },
     height: 40,
-    maxWidth: 1185,
     marginBottom: 15,
     justifyContent: "flex-start" as const,
     "& > *": {
@@ -344,6 +342,17 @@ export const predefinedList = {
       display: "none",
     },
   },
+  includesActionButton: {
+    paddingRight: 45,
+    position: "relative" as const,
+  },
+  overlayShareOption: {
+    position: "absolute" as const,
+    width: 45,
+    right: 0,
+    top: "50%",
+    transform: "translate(0, -50%)",
+  },
 };
 
 export const objectBrowserCommon = {
@@ -389,6 +398,9 @@ export const objectBrowserCommon = {
     paddingRight: "10px",
     display: "flex",
     alignItems: "center",
+    "@media (max-width: 1060px)": {
+      display: "none",
+    },
   },
   smallLabel: {
     color: "#9C9C9C",
@@ -398,9 +410,20 @@ export const objectBrowserCommon = {
     marginLeft: 10,
     fontSize: 14,
     color: "#969FA8",
+    "@media (max-width: 600px)": {
+      marginLeft: 0,
+      "& span": {
+        marginBottom: 10,
+        display: "flex",
+        flexDirection: "column",
+      },
+    },
   },
   detailsSpacer: {
     marginRight: 18,
+    "@media (max-width: 600px)": {
+      marginRight: 0,
+    },
   },
   breadcrumbsList: {
     textOverflow: "ellipsis" as const,
@@ -411,8 +434,38 @@ export const objectBrowserCommon = {
     textAlign: "left" as const,
     marginLeft: 15,
     marginRight: 10,
+    width: 0, // WA to avoid overflow if child elements in flexbox list.**
+  },
+  breadcrumbsSecond: {
+    display: "none" as const,
+    marginTop: 15,
+    marginBottom: 5,
+    justifyContent: "flex-start" as const,
+    "& > div": {
+      fontSize: 12,
+      fontWeight: "normal",
+      flexDirection: "row" as const,
+      flexWrap: "nowrap" as const,
+    },
+    "@media (max-width: 1060px)": {
+      display: "flex" as const,
+    },
+  },
+  overrideShowDeleted: {
+    "@media (max-width: 600px)": {
+      flexDirection: "row" as const,
+    },
+  },
+  actionsSection: {
+    display: "flex",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 15,
   },
 };
+
+// ** According to W3 spec, default minimum values for flex width flex-grow is "auto" (https://drafts.csswg.org/css-flexbox/#min-size-auto). So in this case we need to enforce the use of an absolute width.
+// "The preferred width of a box element child containing text content is currently the text without line breaks, leading to very unintuitive width and flex calculations → declare a width on a box element child with more than a few words (ever wonder why flexbox demos are all “1,2,3”?)"
 
 export const selectorsCommon = {
   multiSelectTable: {
@@ -565,19 +618,15 @@ export const logsCommon = {
 export const widgetCommon = {
   singleValueContainer: {
     height: 200,
-    maxWidth: 1185,
-    border: "#eef1f4 2px solid",
+    border: "#eaeaea 1px solid",
     backgroundColor: "#fff",
-    borderRadius: 10,
-    width: "100%",
+    borderRadius: "3px",
     padding: 16,
   },
   titleContainer: {
     color: "#404143",
-    fontSize: 14,
-    textTransform: "uppercase" as const,
-    fontWeight: 800,
-    borderBottom: "#eef1f4 1px solid",
+    fontSize: 16,
+    fontWeight: 600,
     paddingBottom: 14,
     marginBottom: 5,
     display: "flex" as const,
@@ -652,7 +701,6 @@ export const widgetContainerCommon = {
     flexDirection: "row" as const,
     justifyContent: "flex-start" as const,
     flexWrap: "wrap" as const,
-    maxWidth: 1180,
   },
 };
 
@@ -746,6 +794,16 @@ export const wizardCommon = {
     display: "flex" as const,
     alignItems: "center" as const,
     justifyContent: "flex-start" as const,
+  },
+  multiContainerStackNarrow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: "8px",
+    "@media (max-width: 750px)": {
+      flexFlow: "column",
+      flexDirection: "column",
+    },
   },
   sizeFactorContainer: {
     marginLeft: 8,
@@ -1027,7 +1085,6 @@ export const commonDashboardInfocard: any = {
   cardContainer: {
     borderRadius: 10,
     boxShadow: "0 0 15px #00000029",
-    maxWidth: 1185,
     marginBottom: 30,
   },
   cardHeader: {
@@ -1209,7 +1266,7 @@ export const deleteDialogStyles = {
     justifyContent: "space-between",
   },
   titleText: {
-    fontSize: "1rem",
+    fontSize: 20,
     fontWeight: 600,
     display: "flex",
     alignItems: "center",
@@ -1303,7 +1360,7 @@ export const modalStyleUtils: any = {
 
 export const textStyleUtils: any = {
   textMuted: {
-    color: "#8399AB",
+    color: "#F0F0F0",
   },
 };
 
@@ -1366,6 +1423,9 @@ export const detailsPanel: any = {
       "&:last-of-type": {
         borderBottom: 0,
       },
+      "&::before": {
+        content: "' '",
+      },
     },
   },
 };
@@ -1381,6 +1441,9 @@ export const objectBrowserExtras = {
   },
   titleSpacer: {
     marginLeft: 10,
+    "@media (max-width: 600px)": {
+      marginLeft: 0,
+    },
   },
 };
 

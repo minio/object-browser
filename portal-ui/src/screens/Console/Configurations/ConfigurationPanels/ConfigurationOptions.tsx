@@ -29,23 +29,15 @@ import {
 import PageHeader from "../../Common/PageHeader/PageHeader";
 import HelpBox from "../../../../common/HelpBox";
 import { SettingsIcon } from "../../../../icons";
-import { Link, Redirect, Route, Router, Switch } from "react-router-dom";
-import history from "../../../../history";
+import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import VerticalTabs from "../../Common/VerticalTabs/VerticalTabs";
 import PageLayout from "../../Common/Layout/PageLayout";
-import get from "lodash/get";
 import ScreenTitle from "../../Common/ScreenTitle/ScreenTitle";
-
-import withSuspense from "../../Common/Components/withSuspense";
+import ConfigurationForm from "./ConfigurationForm";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
-
-const ConfigurationForm = withSuspense(
-  React.lazy(() => import("./ConfigurationForm"))
-);
 
 interface IConfigurationOptions {
   classes: any;
-  match: any;
 }
 
 const styles = (theme: Theme) =>
@@ -68,16 +60,15 @@ const getRoutePath = (path: string) => {
   return `${IAM_PAGES.SETTINGS}/${path}`;
 };
 
-const ConfigurationOptions = ({ classes, match }: IConfigurationOptions) => {
-  const configurationName = get(match, "url", "");
-  let selConfigTab = configurationName.substring(
-    configurationName.lastIndexOf("/") + 1
-  );
-  selConfigTab = selConfigTab === "settings" ? "region" : selConfigTab;
+const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
+  const { pathname = "" } = useLocation();
+
+  let selConfigTab = pathname.substring(pathname.lastIndexOf("/") + 1);
+  selConfigTab = selConfigTab === "settings" ? "compression" : selConfigTab;
 
   return (
     <Fragment>
-      <PageHeader label={"Settings"} />
+      <PageHeader label={"Configurations"} />
 
       <PageLayout>
         <Grid item xs={12}>
@@ -90,21 +81,19 @@ const ConfigurationOptions = ({ classes, match }: IConfigurationOptions) => {
               selectedTab={selConfigTab}
               isRouteTabs
               routes={
-                <Router history={history}>
-                  <Switch>
-                    {configurationElements.map((element) => (
-                      <Route
-                        exact
-                        key={`configItem-${element.configuration_label}`}
-                        path={`${IAM_PAGES.SETTINGS}/${element.configuration_id}`}
-                        component={ConfigurationForm}
-                      />
-                    ))}
-                    <Route exact path={IAM_PAGES.SETTINGS}>
-                      <Redirect to={`${IAM_PAGES.SETTINGS}/region`} />
-                    </Route>
-                  </Switch>
-                </Router>
+                <Routes>
+                  {configurationElements.map((element) => (
+                    <Route
+                      key={`configItem-${element.configuration_label}`}
+                      path={`${element.configuration_id}`}
+                      element={<ConfigurationForm />}
+                    />
+                  ))}
+                  <Route
+                    path={"/"}
+                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/compression`} />}
+                  />
+                </Routes>
               }
             >
               {configurationElements.map((element) => {
@@ -124,23 +113,12 @@ const ConfigurationOptions = ({ classes, match }: IConfigurationOptions) => {
         </Grid>
         <Grid item xs={12} sx={{ paddingTop: "15px" }}>
           <HelpBox
-            title={"Learn more about SETTINGS"}
+            title={"Learn more about Configurations"}
             iconComponent={<SettingsIcon />}
             help={
               <Fragment>
-                MinIO supports a variety of configurations ranging from
+                Mantle SDS supports a variety of configurations ranging from
                 encryption, compression, region, notifications, etc.
-                <br />
-                <br />
-                You can learn more at our{" "}
-                <a
-                  href="https://docs.min.io/minio/baremetal/reference/minio-cli/minio-mc-admin/mc-admin.config.html?ref=con#id4"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  documentation
-                </a>
-                .
               </Fragment>
             }
           />

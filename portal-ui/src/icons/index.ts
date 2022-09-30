@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+export { default as MoneyIcon } from "./MoneyIcon"
 export { default as EditorThemeSwitchIcon } from "./EditorThemeSwitchIcon";
 export { default as FileLockIcon } from "./FileLockIcon";
 export { default as FileXlsIcon } from "./FileXlsIcon";
@@ -183,3 +183,22 @@ export { default as BackIcon } from "./BackIcon";
 export { default as DeleteNonCurrentIcon } from "./DeleteNonCurrentIcon";
 export { default as FilterIcon } from "./FilterIcon";
 export { default as EditTenantIcon } from "./EditTenantIcon";
+export { default as SuccessIcon } from "./SuccessIcon";
+export { default as NetworkGetIcon } from "./NetworkGetIcon";
+export { default as NetworkPutIcon } from "./NetworkPutIcon";
+export { default as RemoveAllIcon } from "./RemoveAllIcon";
+export { default as CancelledIcon } from "./CancelledIcon";
+export { default as EditTagIcon } from "./EditTagIcon";
+export { default as LinkIcon } from "./LinkIcon";
+export { default as AlertIcon } from "./AlertIcon";
+export { default as InfoIcon } from "./InfoIcon";
+export { default as ConsoleAgpl } from "./ConsoleAgpl";
+export { default as ConsoleStandard } from "./ConsoleStandard";
+export { default as ConsoleEnterprise } from "./ConsoleEnterprise";
+export { default as AGPLV3LightLogo } from "./AGPLV3LightLogo";
+export { default as AGPLV3Logo } from "./AGPLV3Logo";
+export { default as EnterpriseLightLogo } from "./EnterpriseLightLogo";
+export { default as StandardLightLogo } from "./StandardLightLogo";
+export { default as AGPLV3DarkLogo } from "./AGPLV3DarkLogo";
+export { default as LDAPIcon } from "./LDAPIcon";
+export { default as OIDCIcon } from "./OIDCIcon";

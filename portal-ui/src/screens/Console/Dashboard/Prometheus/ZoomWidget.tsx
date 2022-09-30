@@ -15,11 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment } from "react";
-import { connect } from "react-redux";
+
 import ModalWrapper from "../../Common/ModalWrapper/ModalWrapper";
 import { IDashboardPanel } from "./types";
 import { componentToUse } from "./widgetUtils";
-import { closeZoomPage } from "../actions";
+import { closeZoomPage } from "../dashboardSlice";
+import { useAppDispatch } from "../../../../store";
 
 interface IZoomWidget {
   widgetRender: number;
@@ -28,16 +29,16 @@ interface IZoomWidget {
   timeStart: any;
   timeEnd: any;
   apiPrefix: string;
-  onCloseAction: typeof closeZoomPage;
 }
+
 const ZoomWidget = ({
   value,
   modalOpen,
   timeStart,
   timeEnd,
   apiPrefix,
-  onCloseAction,
 }: IZoomWidget) => {
+  const dispatch = useAppDispatch();
   if (!value) {
     return null;
   }
@@ -46,7 +47,7 @@ const ZoomWidget = ({
     <ModalWrapper
       title={value.title}
       onClose={() => {
-        onCloseAction();
+        dispatch(closeZoomPage());
       }}
       modalOpen={modalOpen}
       wideLimit={false}
@@ -59,8 +60,4 @@ const ZoomWidget = ({
   );
 };
 
-const connector = connect(null, {
-  onCloseAction: closeZoomPage,
-});
-
-export default connector(ZoomWidget);
+export default ZoomWidget;

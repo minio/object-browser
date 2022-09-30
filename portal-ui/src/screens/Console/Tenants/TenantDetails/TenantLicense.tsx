@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -24,21 +24,17 @@ import {
   containerForHeader,
   tenantDetailsStyles,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { ITenant } from "../ListTenants/types";
 import { SubnetInfo } from "../../License/types";
-import { setErrorSnackMessage } from "../../../../actions";
-import { AppState } from "../../../../store";
-import { setTenantDetailsLoad } from "../actions";
+import { AppState, useAppDispatch } from "../../../../store";
 import { ErrorResponseHandler } from "../../../../common/types";
 import SubnetLicenseTenant from "./SubnetLicenseTenant";
 import api from "../../../../common/api";
 import Loader from "../../Common/Loader/Loader";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import { setTenantDetailsLoad } from "../tenantsSlice";
 
 interface ITenantLicense {
   classes: any;
-  loadingTenant: boolean;
-  tenant: ITenant | null;
-  setTenantDetailsLoad: typeof setTenantDetailsLoad;
 }
 
 const styles = (theme: Theme) =>
@@ -50,12 +46,14 @@ const styles = (theme: Theme) =>
     ...containerForHeader(theme.spacing(4)),
   });
 
-const TenantLicense = ({
-  classes,
-  tenant,
-  loadingTenant,
-  setTenantDetailsLoad,
-}: ITenantLicense) => {
+const TenantLicense = ({ classes }: ITenantLicense) => {
+  const dispatch = useAppDispatch();
+
+  const loadingTenant = useSelector(
+    (state: AppState) => state.tenants.loadingTenant
+  );
+  const tenant = useSelector((state: AppState) => state.tenants.tenantInfo);
+
   const [licenseInfo, setLicenseInfo] = useState<SubnetInfo>();
   const [loadingLicenseInfo, setLoadingLicenseInfo] = useState<boolean>(true);
   const [loadingActivateProduct, setLoadingActivateProduct] =
@@ -74,12 +72,12 @@ const TenantLicense = ({
       )
       .then(() => {
         setLoadingActivateProduct(false);
-        setTenantDetailsLoad(true);
+        dispatch(setTenantDetailsLoad(true));
         setLoadingLicenseInfo(true);
       })
       .catch((err: ErrorResponseHandler) => {
         setLoadingActivateProduct(false);
-        setErrorSnackMessage(err);
+        dispatch(setErrorSnackMessage(err));
       });
   };
 
@@ -125,14 +123,4 @@ const TenantLicense = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  loadingTenant: state.tenants.tenantDetails.loadingTenant,
-  tenant: state.tenants.tenantDetails.tenantInfo,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-  setTenantDetailsLoad,
-});
-
-export default withStyles(styles)(connector(TenantLicense));
+export default withStyles(styles)(TenantLicense);

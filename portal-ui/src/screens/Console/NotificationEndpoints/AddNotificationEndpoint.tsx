@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import get from "lodash/get";
 import Grid from "@mui/material/Grid";
 import { Theme } from "@mui/material/styles";
@@ -24,28 +24,32 @@ import withStyles from "@mui/styles/withStyles";
 import { Button } from "@mui/material";
 
 import api from "../../../common/api";
-import { serverNeedsRestart, setErrorSnackMessage } from "../../../actions";
 import {
   notificationEndpointsFields,
   notifyMysql,
   notifyPostgres,
   removeEmptyFields,
+  servicesList,
 } from "./utils";
 import {
   modalBasic,
   settingsCommon,
 } from "../Common/FormComponents/common/styleLibrary";
-import { servicesList } from "./utils";
 import { ErrorResponseHandler } from "../../../common/types";
 
 import { IElementValue } from "../Configurations/types";
 import PageHeader from "../Common/PageHeader/PageHeader";
-import history from "../../../history";
 
 import withSuspense from "../Common/Components/withSuspense";
 import BackLink from "../../../common/BackLink";
 import PageLayout from "../Common/Layout/PageLayout";
 import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
+import {
+  setErrorSnackMessage,
+  setServerNeedsRestart,
+} from "../../../systemSlice";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAppDispatch } from "../../../store";
 
 const ConfMySql = withSuspense(
   React.lazy(() => import("./CustomForms/ConfMySql"))
@@ -103,24 +107,22 @@ const styles = (theme: Theme) =>
   });
 
 interface IAddNotificationEndpointProps {
-  match: any;
   saveAndRefresh: any;
-  serverNeedsRestart: typeof serverNeedsRestart;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
   classes: any;
 }
 
 const AddNotificationEndpoint = ({
-  match,
   saveAndRefresh,
-  serverNeedsRestart,
   classes,
-  setErrorSnackMessage,
 }: IAddNotificationEndpointProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
+
   //Local States
   const [valuesArr, setValueArr] = useState<IElementValue[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
-  const service = match.params["service"];
+  const service = params.service || "";
   //Effects
 
   useEffect(() => {
@@ -132,22 +134,15 @@ const AddNotificationEndpoint = ({
         .invoke("PUT", `/api/v1/configs/${service}`, payload)
         .then(() => {
           setSaving(false);
-          serverNeedsRestart(true);
-          history.push(IAM_PAGES.NOTIFICATIONS_ENDPOINTS);
+          dispatch(setServerNeedsRestart(true));
+          navigate(IAM_PAGES.NOTIFICATIONS_ENDPOINTS);
         })
         .catch((err: ErrorResponseHandler) => {
           setSaving(false);
-          setErrorSnackMessage(err);
+          dispatch(setErrorSnackMessage(err));
         });
     }
-  }, [
-    saving,
-    serverNeedsRestart,
-    service,
-    valuesArr,
-    saveAndRefresh,
-    setErrorSnackMessage,
-  ]);
+  }, [saving, service, valuesArr, saveAndRefresh, dispatch, navigate]);
 
   //Fetch Actions
   const submitForm = (event: React.FormEvent) => {
@@ -156,7 +151,7 @@ const AddNotificationEndpoint = ({
   };
 
   const onValueChange = useCallback(
-    (newValue) => {
+    (newValue: IElementValue[]) => {
       setValueArr(newValue);
     },
     [setValueArr]
@@ -249,11 +244,4 @@ const AddNotificationEndpoint = ({
   );
 };
 
-const mapDispatchToProps = {
-  serverNeedsRestart,
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default connector(withStyles(styles)(AddNotificationEndpoint));
+export default withStyles(styles)(AddNotificationEndpoint);

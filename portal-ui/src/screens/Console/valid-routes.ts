@@ -38,27 +38,28 @@ import {
   MonitoringMenuIcon,
   PerformanceMenuIcon,
   ProfileMenuIcon,
-  SupportMenuIcon,
-  TraceMenuIcon,
   UsersMenuIcon,
 } from "../../icons/SidebarMenus";
 import { hasPermission } from "../../common/SecureComponent";
-import WatchIcon from "../../icons/WatchIcon";
 import RegisterMenuIcon from "../../icons/SidebarMenus/RegisterMenuIcon";
 import {
+  ClustersIcon,
   DocumentationIcon,
   LambdaIcon,
   LicenseIcon,
   RecoverIcon,
+  StorageIcon,
   TenantsOutlineIcon,
-  TiersIcon,
+  MoneyIcon,
 } from "../../icons";
 import SettingsIcon from "../../icons/SettingsIcon";
 import React from "react";
+import LicenseBadge from "./Menu/LicenseBadge";
 
 export const validRoutes = (
   features: string[] | null | undefined,
-  operatorMode: boolean
+  operatorMode: boolean,
+  directPVMode: boolean
 ) => {
   const ldapIsEnabled = (features && features.includes("ldap-idp")) || false;
   let consoleMenus: IMenuItem[] = [
@@ -112,148 +113,33 @@ export const validRoutes = (
       to: IAM_PAGES.POLICIES,
       icon: AccessMenuIcon,
     },
-
     {
       name: "Monitoring",
-      id: "tools",
-      icon: MonitoringMenuIcon,
-      children: [
-        {
-          name: "Metrics",
-          id: "monitorMetrics",
-          to: IAM_PAGES.DASHBOARD,
-          icon: MetricsMenuIcon,
-          component: NavLink,
-        },
-        {
-          name: "Logs ",
-          id: "monitorLogs",
-          to: IAM_PAGES.TOOLS_LOGS,
-          icon: LogsMenuIcon,
-          component: NavLink,
-        },
-        {
-          name: "Audit",
-          id: "monitorAudit",
-          to: IAM_PAGES.TOOLS_AUDITLOGS,
-          icon: AuditLogsMenuIcon,
-          component: NavLink,
-        },
-        {
-          name: "Trace",
-          id: "monitorTrace",
-          to: IAM_PAGES.TOOLS_TRACE,
-          icon: TraceMenuIcon,
-          component: NavLink,
-        },
-        {
-          name: "Watch",
-          id: "watch",
-          component: NavLink,
-          icon: WatchIcon,
-          to: IAM_PAGES.TOOLS_WATCH,
-        },
-        {
-          name: "Drives",
-          id: "monitorDrives",
-          to: IAM_PAGES.TOOLS_HEAL,
-          icon: DrivesMenuIcon,
-          component: NavLink,
-        },
-      ],
-    },
-    {
-      name: "Support",
-      id: "support",
-      icon: SupportMenuIcon,
-      children: [
-        {
-          name: "Register",
-          id: "register",
-          component: NavLink,
-          icon: RegisterMenuIcon,
-          to: IAM_PAGES.REGISTER_SUPPORT,
-        },
-        {
-          name: "Health",
-          id: "diagnostics",
-          component: NavLink,
-          icon: HealthMenuIcon,
-          to: IAM_PAGES.TOOLS_DIAGNOSTICS,
-        },
-        {
-          name: "Performance",
-          id: "performance",
-          component: NavLink,
-          icon: PerformanceMenuIcon,
-          to: IAM_PAGES.TOOLS_SPEEDTEST,
-        },
-        {
-          name: "Profile",
-          id: "profile",
-          component: NavLink,
-          icon: ProfileMenuIcon,
-          to: IAM_PAGES.PROFILE,
-        },
-
-        // {
-        //   name: "Call Home",
-        //   id: "callhome",
-        //   component: NavLink,
-        //   icon: CallHomeMenuIcon,
-        //   to: IAM_PAGES.CALL_HOME,
-        // },
-        {
-          name: "Inspect",
-          id: "inspectObjects",
-          to: IAM_PAGES.SUPPORT_INSPECT,
-          icon: InspectMenuIcon,
-          component: NavLink,
-        },
-      ],
+      id: "monitorMetrics",
+      to: IAM_PAGES.DASHBOARD,
+      icon: MetricsMenuIcon,
+      component: NavLink,
     },
     {
       component: NavLink,
-      to: IAM_PAGES.LICENSE,
-      name: "License",
-      id: "license",
-      icon: LicenseIcon,
-      forceDisplay: true,
+      to: IAM_PAGES.NOTIFICATIONS_ENDPOINTS,
+      name: "Notifications",
+      icon: LambdaIcon,
+      id: "lambda",
     },
     {
-      name: "Settings",
-      id: "settings",
+      component: NavLink,
+      to: IAM_PAGES.TIERS,
+      name: "Billing",
+      icon: MoneyIcon,
+      id: "billing",
+    },
+    {
+      component: NavLink,
+      to: IAM_PAGES.SETTINGS,
+      name: "Configurations",
+      id: "configurations",
       icon: SettingsIcon,
-      children: [
-        {
-          component: NavLink,
-          to: IAM_PAGES.SETTINGS,
-          name: "Configurations",
-          id: "configurations",
-          icon: SettingsIcon,
-        },
-        {
-          component: NavLink,
-          to: IAM_PAGES.NOTIFICATIONS_ENDPOINTS,
-          name: "Notifications",
-          icon: LambdaIcon,
-          id: "lambda",
-        },
-        {
-          component: NavLink,
-          to: IAM_PAGES.TIERS,
-          name: "Tiers",
-          icon: TiersIcon,
-          id: "tiers",
-        },
-        {
-          component: NavLink,
-          to: IAM_PAGES.SITE_REPLICATION,
-          name: "Site Replication",
-          icon: RecoverIcon,
-          id: "sitereplication",
-        },
-      ],
     },
     {
       type: "item",
@@ -269,7 +155,7 @@ export const validRoutes = (
           | React.MouseEvent<HTMLDivElement>
       ) => {
         e.preventDefault();
-        window.open("https://docs.min.io/?ref=con", "_blank");
+        window.open("https://developer.mantleblockchain.com/docs", "_blank");
       },
     },
   ];
@@ -298,6 +184,16 @@ export const validRoutes = (
     {
       group: "Operator",
       type: "item",
+      id: "Register",
+      component: NavLink,
+      to: IAM_PAGES.REGISTER_SUPPORT,
+      name: "Register",
+      icon: RegisterMenuIcon,
+      forceDisplay: true,
+    },
+    {
+      group: "Operator",
+      type: "item",
       id: "Documentation",
       component: NavLink,
       to: IAM_PAGES.DOCUMENTATION,
@@ -316,35 +212,101 @@ export const validRoutes = (
     },
   ];
 
-  const allowedItems = (operatorMode ? operatorMenus : consoleMenus).filter(
-    (item: IMenuItem) => {
-      if (item.children && item.children.length > 0) {
-        const c = item.children?.filter((childItem: IMenuItem) => {
-          return (
-            ((childItem.customPermissionFnc
-              ? childItem.customPermissionFnc()
-              : hasPermission(
-                  CONSOLE_UI_RESOURCE,
-                  IAM_PAGES_PERMISSIONS[childItem.to ?? ""]
-                )) ||
-              childItem.forceDisplay) &&
-            !childItem.fsHidden
-          );
-        });
-        return c.length > 0;
-      }
+  let directPVMenus: IMenuItem[] = [
+    {
+      group: "Storage",
+      type: "item",
+      id: "StoragePVCs",
+      component: NavLink,
+      to: IAM_PAGES.DIRECTPV_STORAGE,
+      name: "PVCs",
+      icon: ClustersIcon,
+      forceDisplay: true,
+    },
+    {
+      name: "Drives",
+      type: "item",
+      id: "drives",
+      component: NavLink,
+      icon: DrivesMenuIcon,
+      to: IAM_PAGES.DIRECTPV_DRIVES,
+      forceDisplay: true,
+    },
+    {
+      name: "Volumes",
+      type: "item",
+      id: "volumes",
+      component: NavLink,
+      icon: StorageIcon,
+      to: IAM_PAGES.DIRECTPV_VOLUMES,
+      forceDisplay: true,
+    },
+    {
+      group: "DirectPV",
+      type: "item",
+      id: "License",
+      component: NavLink,
+      to: IAM_PAGES.LICENSE,
+      name: "License",
+      icon: LicenseIcon,
+      forceDisplay: true,
+    },
+    {
+      group: "DirectPV",
+      type: "item",
+      id: "Documentation",
+      component: NavLink,
+      to: IAM_PAGES.DOCUMENTATION,
+      name: "Documentation",
+      icon: DocumentationIcon,
+      forceDisplay: true,
+      onClick: (
+        e:
+          | React.MouseEvent<HTMLLIElement>
+          | React.MouseEvent<HTMLAnchorElement>
+          | React.MouseEvent<HTMLDivElement>
+      ) => {
+        e.preventDefault();
+        window.open("https://docs.min.io/?ref=op", "_blank");
+      },
+    },
+  ];
 
-      const res =
-        ((item.customPermissionFnc
-          ? item.customPermissionFnc()
-          : hasPermission(
-              CONSOLE_UI_RESOURCE,
-              IAM_PAGES_PERMISSIONS[item.to ?? ""]
-            )) ||
-          item.forceDisplay) &&
-        !item.fsHidden;
-      return res;
+  let menus = consoleMenus;
+
+  if (directPVMode) {
+    menus = directPVMenus;
+  } else if (operatorMode) {
+    menus = operatorMenus;
+  }
+
+  const allowedItems = menus.filter((item: IMenuItem) => {
+    if (item.children && item.children.length > 0) {
+      const c = item.children?.filter((childItem: IMenuItem) => {
+        return (
+          ((childItem.customPermissionFnc
+            ? childItem.customPermissionFnc()
+            : hasPermission(
+                CONSOLE_UI_RESOURCE,
+                IAM_PAGES_PERMISSIONS[childItem.to ?? ""]
+              )) ||
+            childItem.forceDisplay) &&
+          !childItem.fsHidden
+        );
+      });
+      return c.length > 0;
     }
-  );
+
+    const res =
+      ((item.customPermissionFnc
+        ? item.customPermissionFnc()
+        : hasPermission(
+            CONSOLE_UI_RESOURCE,
+            IAM_PAGES_PERMISSIONS[item.to ?? ""]
+          )) ||
+        item.forceDisplay) &&
+      !item.fsHidden;
+    return res;
+  });
   return allowedItems;
 };

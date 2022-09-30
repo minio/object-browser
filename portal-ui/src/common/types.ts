@@ -50,6 +50,11 @@ export interface IVolumeConfiguration {
   labels?: any;
 }
 
+export interface IDomainsRequest {
+  console?: string;
+  minio?: string[];
+}
+
 export interface ITenantCreator {
   name: string;
   service_name: string;
@@ -74,6 +79,7 @@ export interface ITenantCreator {
   logSearchConfiguration?: LogSearchConfiguration;
   prometheusConfiguration?: PrometheusConfiguration;
   affinity?: AffinityConfiguration;
+  domains?: IDomainsRequest;
 }
 
 export interface ImageRegistry {
@@ -443,10 +449,31 @@ export interface AffinityConfiguration {
 export interface ErrorResponseHandler {
   errorMessage: string;
   detailedError: string;
+  statusCode?: number;
 }
 
 export interface IRetentionConfig {
   mode: string;
   unit: string;
   validity: number;
+}
+
+export interface IBytesCalc {
+  total: number;
+  unit: string;
+}
+
+export interface IEmbeddedCustomButton {
+  backgroundColor?: string;
+  textColor?: string;
+  hoverColor?: string;
+  hoverText?: string;
+  activeColor?: string;
+  activeText?: string;
+}
+
+export interface IEmbeddedCustomStyles {
+  backgroundColor: string;
+  fontColor: string;
+  buttonStyles: IEmbeddedCustomButton;
 }

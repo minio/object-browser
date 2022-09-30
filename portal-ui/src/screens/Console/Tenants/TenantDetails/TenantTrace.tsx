@@ -15,8 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useState } from "react";
-import { connect } from "react-redux";
-import get from "lodash/get";
+import { useParams } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -24,18 +23,11 @@ import {
   containerForHeader,
   tenantDetailsStyles,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { ITenant } from "../ListTenants/types";
-import { setErrorSnackMessage } from "../../../../actions";
-import { AppState } from "../../../../store";
 import { LinearProgress } from "@mui/material";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
 
 interface ITenantTrace {
   classes: any;
-  match: any;
-  tenant: ITenant | null;
-
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -50,9 +42,8 @@ const styles = (theme: Theme) =>
     ...containerForHeader(theme.spacing(4)),
   });
 
-const TenantTrace = ({ classes, match }: ITenantTrace) => {
-  const tenantName = match.params["tenantName"];
-  const tenantNamespace = match.params["tenantNamespace"];
+const TenantTrace = ({ classes }: ITenantTrace) => {
+  const { tenantName, tenantNamespace } = useParams();
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -67,7 +58,9 @@ const TenantTrace = ({ classes, match }: ITenantTrace) => {
       <iframe
         className={classes.iframeStyle}
         title={"metrics"}
-        src={`/api/proxy/${tenantNamespace}/${tenantName}${IAM_PAGES.TOOLS_TRACE}?cp=y`}
+        src={`/api/proxy/${tenantNamespace || ""}/${tenantName || ""}${
+          IAM_PAGES.TOOLS_TRACE
+        }?cp=y`}
         onLoad={() => {
           setLoading(false);
         }}
@@ -76,31 +69,4 @@ const TenantTrace = ({ classes, match }: ITenantTrace) => {
   );
 };
 
-const mapState = (state: AppState) => ({
-  loadingTenant: state.tenants.tenantDetails.loadingTenant,
-  selectedTenant: state.tenants.tenantDetails.currentTenant,
-  tenant: state.tenants.tenantDetails.tenantInfo,
-  logEnabled: get(state.tenants.tenantDetails.tenantInfo, "logEnabled", false),
-  monitoringEnabled: get(
-    state.tenants.tenantDetails.tenantInfo,
-    "monitoringEnabled",
-    false
-  ),
-  encryptionEnabled: get(
-    state.tenants.tenantDetails.tenantInfo,
-    "encryptionEnabled",
-    false
-  ),
-  adEnabled: get(state.tenants.tenantDetails.tenantInfo, "idpAdEnabled", false),
-  oidcEnabled: get(
-    state.tenants.tenantDetails.tenantInfo,
-    "idpOidcEnabled",
-    false
-  ),
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(TenantTrace));
+export default withStyles(styles)(TenantTrace);

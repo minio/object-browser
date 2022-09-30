@@ -14,29 +14,28 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import React, { Fragment, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import { Button, LinearProgress } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import api from "../../../../common/api";
-import { setModalErrorSnackMessage } from "../../../../actions";
 import {
   fieldBasic,
   modalStyleUtils,
 } from "../../Common/FormComponents/common/styleLibrary";
 import { ErrorResponseHandler } from "../../../../common/types";
-import ModalWrapper from "../../Common/ModalWrapper/ModalWrapper";
 import CodeMirrorWrapper from "../../Common/FormComponents/CodeMirrorWrapper/CodeMirrorWrapper";
-import { EditYamlIcon } from "../../../../icons";
+import { setModalErrorSnackMessage } from "../../../../systemSlice";
+import { AppState, useAppDispatch } from "../../../../store";
+import { getTenantAsync } from "../thunks/tenantDetailsAsync";
+import SectionTitle from "../../Common/SectionTitle";
 
 const styles = (theme: Theme) =>
   createStyles({
-    buttonContainer: {
-      textAlign: "right",
-    },
     errorState: {
       color: "#b53b4b",
       fontSize: 14,
@@ -62,21 +61,17 @@ interface ITenantYAML {
 
 interface ITenantYAMLProps {
   classes: any;
-  open: boolean;
-  closeModalAndRefresh: (refresh: boolean) => void;
-  tenant: string;
-  namespace: string;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
-const TenantYAML = ({
-  classes,
-  open,
-  closeModalAndRefresh,
-  tenant,
-  namespace,
-  setModalErrorSnackMessage,
-}: ITenantYAMLProps) => {
+const TenantYAML = ({ classes }: ITenantYAMLProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const tenant = useSelector((state: AppState) => state.tenants.currentTenant);
+  const namespace = useSelector(
+    (state: AppState) => state.tenants.currentNamespace
+  );
+
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [tenantYaml, setTenantYaml] = useState<string>("");
@@ -95,8 +90,9 @@ const TenantYAML = ({
       })
       .then((res) => {
         setAddLoading(false);
-        closeModalAndRefresh(true);
+        dispatch(getTenantAsync());
         setErrorMessage("");
+        navigate(`/namespaces/${namespace}/tenants/${tenant}/summary`);
       })
       .catch((err: ErrorResponseHandler) => {
         setAddLoading(false);
@@ -104,7 +100,6 @@ const TenantYAML = ({
       });
   };
 
-  // check the permissions for creating bucket
   useEffect(() => {
     api
       .invoke("GET", `/api/v1/namespaces/${namespace}/tenants/${tenant}/yaml`)
@@ -114,23 +109,16 @@ const TenantYAML = ({
       })
       .catch((err: ErrorResponseHandler) => {
         setLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
-  }, [tenant, namespace, setModalErrorSnackMessage]);
+  }, [tenant, namespace, dispatch]);
 
   useEffect(() => {}, []);
 
   const validSave = tenantYaml.trim() !== "";
 
   return (
-    <ModalWrapper
-      modalOpen={open}
-      onClose={() => {
-        closeModalAndRefresh(false);
-      }}
-      title={`YAML`}
-      titleIcon={<EditYamlIcon />}
-    >
+    <Fragment>
       {addLoading ||
         (loading && (
           <Grid item xs={12}>
@@ -150,9 +138,11 @@ const TenantYAML = ({
           }}
         >
           <Grid container>
-            <Grid item xs={12} className={classes.codeMirrorContainer}>
+            <Grid item xs={12}>
+              <SectionTitle>Tenant Specification</SectionTitle>
+            </Grid>
+            <Grid item xs={12}>
               <CodeMirrorWrapper
-                label={`Tenant Specification`}
                 value={tenantYaml}
                 mode={"yaml"}
                 onBeforeChange={(editor, data, value) => {
@@ -161,14 +151,16 @@ const TenantYAML = ({
                 editorHeight={"550px"}
               />
             </Grid>
-            <Grid item xs={12} className={classes.modalButtonBar}>
+            <Grid item xs={12} style={{ textAlign: "right", paddingTop: 16 }}>
               <Button
                 type="button"
                 variant="outlined"
                 color="primary"
                 disabled={addLoading}
                 onClick={() => {
-                  closeModalAndRefresh(false);
+                  navigate(
+                    `/namespaces/${namespace}/tenants/${tenant}/summary`
+                  );
                 }}
               >
                 Cancel
@@ -178,6 +170,7 @@ const TenantYAML = ({
                 variant="contained"
                 color="primary"
                 disabled={addLoading || !validSave}
+                style={{ marginLeft: 8 }}
               >
                 Save
               </Button>
@@ -185,14 +178,8 @@ const TenantYAML = ({
           </Grid>
         </form>
       )}
-    </ModalWrapper>
+    </Fragment>
   );
 };
 
-const mapDispatchToProps = {
-  setModalErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(TenantYAML));
+export default withStyles(styles)(TenantYAML);

@@ -16,7 +16,7 @@
 
 import * as constants from "./constants";
 import { Selector } from "testcafe";
-
+import { IAM_PAGES } from "../../src/common/SecureComponent/permissions";
 //----------------------------------------------------
 // Buttons
 //----------------------------------------------------
@@ -69,7 +69,8 @@ export const startNewDiagnosticButton = Selector("#start-new-diagnostic");
 export const downloadButton = Selector("button:enabled").withText("Download");
 export const startButton = Selector("button:enabled").withText("Start");
 export const stopButton = Selector("button:enabled").withText("Stop");
-
+export const assignPoliciesButton =
+  Selector("button:enabled").withText("Assign Policies");
 //----------------------------------------------------
 // Links
 //----------------------------------------------------
@@ -103,7 +104,7 @@ export const bucketsAccessReadWriteInput = Selector(
 ).withText("readwrite");
 export const uploadInput = Selector("input").withAttribute("type", "file");
 export const createPolicyName = Selector("#policy-name");
-export const createPolicyTextfield = Selector(".cm-content");
+export const createPolicyTextfield = Selector(".w-tc-editor-text");
 export const usersAccessKeyInput = Selector("#accesskey-input");
 export const usersSecretKeyInput = Selector("#standard-multiline-static");
 export const groupNameInput = Selector("#group-name");
@@ -158,33 +159,9 @@ export const settingsWindow = Selector("#settings-container");
 //----------------------------------------------------
 // Settings page vertical tabs
 //----------------------------------------------------
-export const settingsRegionTab = Selector(".MuiTab-root").withAttribute(
-  "href",
-  "/settings/configurations/region"
-);
-export const settingsCacheTab = Selector(".MuiTab-root").withAttribute(
-  "href",
-  "/settings/configurations/cache"
-);
 export const settingsCompressionTab = Selector(".MuiTab-root").withAttribute(
   "href",
   "/settings/configurations/compression"
-);
-export const settingsApiTab = Selector(".MuiTab-root").withAttribute(
-  "href",
-  "/settings/configurations/api"
-);
-export const settingsHealTab = Selector(".MuiTab-root").withAttribute(
-  "href",
-  "/settings/configurations/heal"
-);
-export const settingsScannerTab = Selector(".MuiTab-root").withAttribute(
-  "href",
-  "/settings/configurations/scanner"
-);
-export const settingsEtcdTab = Selector(".MuiTab-root").withAttribute(
-  "href",
-  "/settings/configurations/etcd"
 );
 export const settingsOpenIdTab = Selector(".MuiTab-root").withAttribute(
   "href",
@@ -194,14 +171,6 @@ export const settingsLdapTab = Selector(".MuiTab-root").withAttribute(
   "href",
   "/settings/configurations/identity_ldap"
 );
-export const settingsLoggerWebhookTab = Selector(".MuiTab-root").withAttribute(
-  "href",
-  "/settings/configurations/logger_webhook"
-);
-export const settingsAuditWebhookTab = Selector(".MuiTab-root").withAttribute(
-  "href",
-  "/settings/configurations/audit_webhook"
-);
 
 //----------------------------------------------------
 // Log window
@@ -209,3 +178,26 @@ export const settingsAuditWebhookTab = Selector(".MuiTab-root").withAttribute(
 export const logWindow = Selector('[data-test-id="logs-list-container"]');
 //Node selector
 export const nodeSelector = Selector('[data-test-id="node-selector"]');
+//----------------------------------------------------
+// User Details
+//----------------------------------------------------
+export const userPolicies = Selector(".MuiTab-root").withText("Policies");
+//----------------------------------------------------
+// Rewind Options
+//----------------------------------------------------
+export const rewindButton = Selector("button").withAttribute(
+  "id",
+  "rewind-objects-list"
+);
+export const rewindToInput = Selector("input").withAttribute(
+  "id",
+  "rewind-selector"
+);
+export const rewindDataButton = Selector("button").withAttribute(
+  "id",
+  "rewind-apply-button"
+);
+export const locationEmpty = Selector("div").withAttribute(
+  "id",
+  "empty-results"
+);

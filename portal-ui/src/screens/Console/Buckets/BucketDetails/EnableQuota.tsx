@@ -15,19 +15,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
 import { Button, LinearProgress } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import Grid from "@mui/material/Grid";
 import {
+  calculateBytes,
   getBytes,
   k8sScalarUnitsExcluding,
-  units,
 } from "../../../../common/utils";
 import { BucketQuota } from "../types";
-import { setModalErrorSnackMessage } from "../../../../actions";
+
 import { ErrorResponseHandler } from "../../../../common/types";
 import {
   formFieldStyles,
@@ -39,6 +38,9 @@ import ModalWrapper from "../../Common/ModalWrapper/ModalWrapper";
 import api from "../../../../common/api";
 import { BucketQuotaIcon } from "../../../../icons";
 import InputUnitMenu from "../../Common/FormComponents/InputUnitMenu/InputUnitMenu";
+
+import { setModalErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -53,7 +55,6 @@ interface IEnableQuotaProps {
   cfg: BucketQuota | null;
   selectedBucket: string;
   closeModalAndRefresh: () => void;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const EnableQuota = ({
@@ -63,39 +64,40 @@ const EnableQuota = ({
   cfg,
   selectedBucket,
   closeModalAndRefresh,
-  setModalErrorSnackMessage,
 }: IEnableQuotaProps) => {
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState<boolean>(false);
   const [quotaEnabled, setQuotaEnabled] = useState<boolean>(false);
   const [quotaSize, setQuotaSize] = useState<string>("1");
-  const [quotaUnit, setQuotaUnit] = useState<string>("TiB");
+  const [quotaUnit, setQuotaUnit] = useState<string>("Ti");
+  const [validInput, setValidInput] = useState<boolean>(false);
 
   useEffect(() => {
     if (enabled) {
       setQuotaEnabled(true);
       if (cfg) {
-        setQuotaSize(`${cfg.quota}`);
-        setQuotaUnit(`Gi`);
+        const unitCalc = calculateBytes(cfg.quota, true, false, true);
 
-        let maxUnit = "B";
-        let maxQuota = cfg.quota;
-
-        for (let i = 0; i < units.length; i++) {
-          if (cfg.quota % Math.pow(1024, i) === 0) {
-            maxQuota = cfg.quota / Math.pow(1024, i);
-            maxUnit = units[i];
-          } else {
-            break;
-          }
-        }
-        setQuotaSize(`${maxQuota}`);
-        setQuotaUnit(maxUnit);
+        setQuotaSize(unitCalc.total.toString());
+        setQuotaUnit(unitCalc.unit);
+        setValidInput(true);
       }
     }
   }, [enabled, cfg]);
 
+  useEffect(() => {
+    const valRegExp = /^\d*(?:\.\d{1,2})?$/;
+
+    if (!quotaEnabled) {
+      setValidInput(true);
+      return;
+    }
+
+    setValidInput(valRegExp.test(quotaSize));
+  }, [quotaEnabled, quotaSize]);
+
   const enableBucketEncryption = () => {
-    if (loading) {
+    if (loading || !validInput) {
       return;
     }
     let req = {
@@ -112,7 +114,7 @@ const EnableQuota = ({
       })
       .catch((err: ErrorResponseHandler) => {
         setLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   };
 
@@ -156,11 +158,13 @@ const EnableQuota = ({
                         id="quota_size"
                         name="quota_size"
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          if (e.target.validity.valid) {
-                            setQuotaSize(e.target.value);
+                          setQuotaSize(e.target.value);
+                          if (!e.target.validity.valid) {
+                            setValidInput(false);
+                          } else {
+                            setValidInput(true);
                           }
                         }}
-                        pattern={"[0-9]*"}
                         label="Quota"
                         value={quotaSize}
                         required
@@ -176,6 +180,7 @@ const EnableQuota = ({
                             disabled={false}
                           />
                         }
+                        error={!validInput ? "Please enter a valid quota" : ""}
                       />
                     </Grid>
                   </Grid>
@@ -200,7 +205,7 @@ const EnableQuota = ({
               type="submit"
               variant="contained"
               color="primary"
-              disabled={loading}
+              disabled={loading || !validInput}
             >
               Save
             </Button>
@@ -216,8 +221,4 @@ const EnableQuota = ({
   );
 };
 
-const connector = connect(null, {
-  setModalErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(EnableQuota));
+export default withStyles(styles)(EnableQuota);

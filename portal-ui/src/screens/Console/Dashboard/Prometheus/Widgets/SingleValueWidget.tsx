@@ -24,8 +24,9 @@ import Loader from "../../../Common/Loader/Loader";
 import { widgetCommon } from "../../../Common/FormComponents/common/styleLibrary";
 import { splitSizeMetric, widgetDetailsToPanel } from "../utils";
 import { IDashboardPanel } from "../types";
-import { setErrorSnackMessage } from "../../../../../actions";
 import { ErrorResponseHandler } from "../../../../../common/types";
+import { setErrorSnackMessage } from "../../../../../systemSlice";
+import { useAppDispatch } from "../../../../../store";
 
 interface ISingleValueWidget {
   title: string;
@@ -33,9 +34,10 @@ interface ISingleValueWidget {
   timeStart: any;
   timeEnd: any;
   propLoading: boolean;
-  displayErrorMessage: any;
+
   classes: any;
   apiPrefix: string;
+  renderFn?: (arg: Record<string, any>) => any;
 }
 
 const styles = (theme: Theme) =>
@@ -75,10 +77,11 @@ const SingleValueWidget = ({
   timeStart,
   timeEnd,
   propLoading,
-  displayErrorMessage,
   classes,
   apiPrefix,
+  renderFn,
 }: ISingleValueWidget) => {
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<string>("");
 
@@ -115,11 +118,17 @@ const SingleValueWidget = ({
           setLoading(false);
         })
         .catch((err: ErrorResponseHandler) => {
-          displayErrorMessage(err);
+          dispatch(setErrorSnackMessage(err));
           setLoading(false);
         });
     }
-  }, [loading, panelItem, timeEnd, timeStart, displayErrorMessage, apiPrefix]);
+  }, [loading, panelItem, timeEnd, timeStart, dispatch, apiPrefix]);
+
+  const valueToRender = splitSizeMetric(data);
+
+  if (renderFn) {
+    return renderFn({ valueToRender, loading, title, id: panelItem.id });
+  }
   return (
     <div className={classes.containerAlignment}>
       {loading && (
@@ -138,7 +147,7 @@ const SingleValueWidget = ({
 };
 
 const connector = connect(null, {
-  displayErrorMessage: setErrorSnackMessage,
+  setErrorSnackMessage: setErrorSnackMessage,
 });
 
 export default withStyles(styles)(connector(SingleValueWidget));

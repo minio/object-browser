@@ -17,16 +17,18 @@
 import React, { useState } from "react";
 import { DialogContentText } from "@mui/material";
 import { Theme } from "@mui/material/styles";
-import { connect } from "react-redux";
+
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { modalBasic } from "../../../../Common/FormComponents/common/styleLibrary";
-import { setErrorSnackMessage } from "../../../../../../actions";
+
 import { ErrorResponseHandler } from "../../../../../../common/types";
-import { encodeFileName } from "../../../../../../common/utils";
+import { encodeURLString } from "../../../../../../common/utils";
 import api from "../../../../../../common/api";
 import ConfirmDialog from "../../../../Common/ModalWrapper/ConfirmDialog";
 import RecoverIcon from "../../../../../../icons/RecoverIcon";
+import { setErrorSnackMessage } from "../../../../../../systemSlice";
+import { useAppDispatch } from "../../../../../../store";
 
 interface IRestoreFileVersion {
   classes: any;
@@ -35,7 +37,6 @@ interface IRestoreFileVersion {
   versionID: string;
   objectPath: string;
   onCloseAndUpdate: (refresh: boolean) => void;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -51,6 +52,7 @@ const RestoreFileVersion = ({
   restoreOpen,
   onCloseAndUpdate,
 }: IRestoreFileVersion) => {
+  const dispatch = useAppDispatch();
   const [restoreLoading, setRestoreLoading] = useState<boolean>(false);
 
   const restoreVersion = () => {
@@ -59,7 +61,7 @@ const RestoreFileVersion = ({
     api
       .invoke(
         "PUT",
-        `/api/v1/buckets/${bucketName}/objects/restore?prefix=${encodeFileName(
+        `/api/v1/buckets/${bucketName}/objects/restore?prefix=${encodeURLString(
           objectPath
         )}&version_id=${versionID}`
       )
@@ -68,7 +70,7 @@ const RestoreFileVersion = ({
         onCloseAndUpdate(true);
       })
       .catch((error: ErrorResponseHandler) => {
-        setErrorSnackMessage(error);
+        dispatch(setErrorSnackMessage(error));
         setRestoreLoading(false);
       });
   };
@@ -101,12 +103,4 @@ const RestoreFileVersion = ({
   );
 };
 
-const mapStateToProps = null;
-
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-export default withStyles(styles)(connector(RestoreFileVersion));
+export default withStyles(styles)(RestoreFileVersion);

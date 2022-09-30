@@ -16,7 +16,7 @@
 
 import React, { Fragment, useEffect, useState } from "react";
 import get from "lodash/get";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { withStyles } from "@mui/styles";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
@@ -28,50 +28,66 @@ import {
   buttonsStyles,
   containerForHeader,
   hrClass,
-  tableStyles,
-  spacingUtils,
-  textStyleUtils,
-  objectBrowserExtras,
   objectBrowserCommon,
+  objectBrowserExtras,
+  spacingUtils,
+  tableStyles,
+  textStyleUtils,
 } from "../../../../Common/FormComponents/common/styleLibrary";
 import { IFileInfo } from "./types";
 import { download } from "../utils";
 import api from "../../../../../../common/api";
 import { ErrorResponseHandler } from "../../../../../../common/types";
+
 import {
-  setErrorSnackMessage,
-  setSnackBarMessage,
-} from "../../../../../../actions";
-import {
-  decodeFileName,
-  encodeFileName,
+  decodeURLString,
+  encodeURLString,
   niceBytesInt,
 } from "../../../../../../common/utils";
 import ScreenTitle from "../../../../Common/ScreenTitle/ScreenTitle";
 import RestoreFileVersion from "./RestoreFileVersion";
-import {
-  completeObject,
-  setLoadingObjectInfo,
-  setLoadingVersions,
-  setNewObject,
-  setSelectedVersion,
-  updateProgress,
-} from "../../../../ObjectBrowser/actions";
 
-import { AppState } from "../../../../../../store";
-import { DeleteNonCurrentIcon, VersionsIcon } from "../../../../../../icons";
-import VirtualizedList from "../../../../Common/VirtualizedList/VirtualizedList";
+import { AppState, useAppDispatch } from "../../../../../../store";
+import {
+  DeleteIcon,
+  DeleteNonCurrentIcon,
+  SelectMultipleIcon,
+  VersionsIcon,
+} from "../../../../../../icons";
 import FileVersionItem from "./FileVersionItem";
 import SelectWrapper from "../../../../Common/FormComponents/SelectWrapper/SelectWrapper";
 import PreviewFileModal from "../Preview/PreviewFileModal";
 import RBIconButton from "../../../BucketDetails/SummaryItems/RBIconButton";
 import DeleteNonCurrent from "../ListObjects/DeleteNonCurrent";
 import BrowserBreadcrumbs from "../../../../ObjectBrowser/BrowserBreadcrumbs";
+import DeleteSelectedVersions from "./DeleteSelectedVersions";
+import {
+  selDistSet,
+  setErrorSnackMessage,
+} from "../../../../../../systemSlice";
+import {
+  makeid,
+  storeCallForObjectWithID,
+} from "../../../../ObjectBrowser/transferManager";
+import {
+  cancelObjectInList,
+  completeObject,
+  failObject,
+  setLoadingObjectInfo,
+  setLoadingVersions,
+  setNewObject,
+  setSelectedVersion,
+  updateProgress,
+} from "../../../../ObjectBrowser/objectBrowserSlice";
+import { List, ListRowProps } from "react-virtualized";
 
 const styles = (theme: Theme) =>
   createStyles({
     versionsContainer: {
       padding: 10,
+      "@media (max-width: 799px)": {
+        minHeight: 800,
+      },
     },
     noBottomBorder: {
       borderBottom: 0,
@@ -80,6 +96,9 @@ const styles = (theme: Theme) =>
       flexGrow: 1,
       height: "calc(100% - 120px)",
       overflow: "auto",
+      "@media (max-width: 799px)": {
+        height: 600,
+      },
     },
     screenTitleContainer: {
       position: "relative",
@@ -93,6 +112,11 @@ const styles = (theme: Theme) =>
         height: "40px",
         bottom: 0,
       },
+      "@media (max-width: 799px)": {
+        "&::before": {
+          display: "none",
+        },
+      },
     },
     sortByLabel: {
       color: "#838383",
@@ -100,6 +124,9 @@ const styles = (theme: Theme) =>
       whiteSpace: "nowrap",
       marginRight: 12,
       fontSize: 14,
+      "@media (max-width: 600px)": {
+        display: "none",
+      },
     },
     ...hrClass,
     ...buttonsStyles,
@@ -114,20 +141,8 @@ const styles = (theme: Theme) =>
 
 interface IVersionsNavigatorProps {
   classes: any;
-  distributedSetup: boolean;
   internalPaths: string;
   bucketName: string;
-  searchVersions: string;
-  loadingVersions: boolean;
-  selectedVersion: string;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  setSnackBarMessage: typeof setSnackBarMessage;
-  setNewObject: typeof setNewObject;
-  updateProgress: typeof updateProgress;
-  completeObject: typeof completeObject;
-  setSelectedVersion: typeof setSelectedVersion;
-  setLoadingVersions: typeof setLoadingVersions;
-  setLoadingObjectInfo: typeof setLoadingObjectInfo;
 }
 
 const emptyFile: IFileInfo = {
@@ -144,20 +159,22 @@ const emptyFile: IFileInfo = {
 
 const VersionsNavigator = ({
   classes,
-  distributedSetup,
-  setErrorSnackMessage,
-  setNewObject,
-  updateProgress,
-  searchVersions,
-  loadingVersions,
-  selectedVersion,
-  completeObject,
   internalPaths,
   bucketName,
-  setSelectedVersion,
-  setLoadingVersions,
-  setLoadingObjectInfo,
 }: IVersionsNavigatorProps) => {
+  const dispatch = useAppDispatch();
+
+  const searchVersions = useSelector(
+    (state: AppState) => state.objectBrowser.searchVersions
+  );
+  const loadingVersions = useSelector(
+    (state: AppState) => state.objectBrowser.loadingVersions
+  );
+  const selectedVersion = useSelector(
+    (state: AppState) => state.objectBrowser.selectedVersion
+  );
+
+  const distributedSetup = useSelector(selDistSet);
   const [shareFileModalOpen, setShareFileModalOpen] = useState<boolean>(false);
   const [actualInfo, setActualInfo] = useState<IFileInfo | null>(null);
   const [objectToShare, setObjectToShare] = useState<IFileInfo | null>(null);
@@ -168,12 +185,21 @@ const VersionsNavigator = ({
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const [deleteNonCurrentOpen, setDeleteNonCurrentOpen] =
     useState<boolean>(false);
+  const [selectEnabled, setSelectEnabled] = useState<boolean>(false);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [delSelectedVOpen, setDelSelectedVOpen] = useState<boolean>(false);
 
   // calculate object name to display
   let objectNameArray: string[] = [];
   if (actualInfo) {
     objectNameArray = actualInfo.name.split("/");
   }
+
+  useEffect(() => {
+    if (!loadingVersions && !actualInfo) {
+      dispatch(setLoadingVersions(true));
+    }
+  }, [loadingVersions, actualInfo, dispatch]);
 
   useEffect(() => {
     if (loadingVersions && internalPaths !== "") {
@@ -186,31 +212,33 @@ const VersionsNavigator = ({
         )
         .then((res: IFileInfo[]) => {
           const result = get(res, "objects", []);
+
+          const decodedInternalPaths = decodeURLString(internalPaths);
+
+          // Filter the results prefixes as API can return more files than expected.
+          const filteredPrefixes = result.filter(
+            (item: IFileInfo) => item.name === decodedInternalPaths
+          );
+
           if (distributedSetup) {
             setActualInfo(
-              result.find((el: IFileInfo) => el.is_latest) || emptyFile
+              filteredPrefixes.find((el: IFileInfo) => el.is_latest) ||
+                emptyFile
             );
-            setVersions(result);
+            setVersions(filteredPrefixes);
           } else {
-            setActualInfo(result[0]);
+            setActualInfo(filteredPrefixes[0]);
             setVersions([]);
           }
 
-          setLoadingVersions(false);
+          dispatch(setLoadingVersions(false));
         })
-        .catch((error: ErrorResponseHandler) => {
-          setErrorSnackMessage(error);
-          setLoadingVersions(false);
+        .catch((err: ErrorResponseHandler) => {
+          dispatch(setErrorSnackMessage(err));
+          dispatch(setLoadingVersions(false));
         });
     }
-  }, [
-    setLoadingVersions,
-    loadingVersions,
-    bucketName,
-    internalPaths,
-    setErrorSnackMessage,
-    distributedSetup,
-  ]);
+  }, [loadingVersions, bucketName, internalPaths, dispatch, distributedSetup]);
 
   const shareObject = () => {
     setShareFileModalOpen(true);
@@ -223,32 +251,53 @@ const VersionsNavigator = ({
   };
 
   const downloadObject = (object: IFileInfo) => {
-    const identityDownload = encodeFileName(
+    const identityDownload = encodeURLString(
       `${bucketName}-${object.name}-${new Date().getTime()}-${Math.random()}`
     );
 
-    setNewObject({
-      bucketName,
-      done: false,
-      instanceID: identityDownload,
-      percentage: 0,
-      prefix: object.name,
-      type: "download",
-      waitingForFile: true,
-    });
-
-    download(
+    const downloadCall = download(
       bucketName,
       internalPaths,
       object.version_id,
       parseInt(object.size || "0"),
+      null,
       (progress) => {
-        updateProgress(identityDownload, progress);
+        dispatch(
+          updateProgress({
+            instanceID: identityDownload,
+            progress: progress,
+          })
+        );
       },
       () => {
-        completeObject(identityDownload);
+        dispatch(completeObject(identityDownload));
+      },
+      (msg: string) => {
+        dispatch(failObject({ instanceID: identityDownload, msg }));
+      },
+      () => {
+        dispatch(cancelObjectInList(identityDownload));
       }
     );
+    const ID = makeid(8);
+    storeCallForObjectWithID(ID, downloadCall);
+    dispatch(
+      setNewObject({
+        ID,
+        bucketName,
+        done: false,
+        instanceID: identityDownload,
+        percentage: 0,
+        prefix: object.name,
+        type: "download",
+        waitingForFile: true,
+        failed: false,
+        cancelled: false,
+        errorMessage: "",
+      })
+    );
+
+    downloadCall.send();
   };
 
   const onShareItem = (item: IFileInfo) => {
@@ -271,7 +320,7 @@ const VersionsNavigator = ({
   };
 
   const onGlobalClick = (item: IFileInfo) => {
-    setSelectedVersion(item.version_id || "");
+    dispatch(setSelectedVersion(item.version_id || ""));
   };
 
   const filteredRecords = versions.filter((version) => {
@@ -286,8 +335,8 @@ const VersionsNavigator = ({
     setRestoreVersion("");
 
     if (reloadObjectData) {
-      setLoadingVersions(true);
-      setLoadingObjectInfo(true);
+      dispatch(setLoadingVersions(true));
+      dispatch(setLoadingObjectInfo(true));
     }
   };
 
@@ -295,9 +344,20 @@ const VersionsNavigator = ({
     setDeleteNonCurrentOpen(false);
 
     if (reloadAfterDelete) {
-      setLoadingVersions(true);
-      setSelectedVersion("");
-      setLoadingObjectInfo(true);
+      dispatch(setLoadingVersions(true));
+      dispatch(setSelectedVersion(""));
+      dispatch(setLoadingObjectInfo(true));
+    }
+  };
+
+  const closeSelectedVersions = (reloadOnComplete: boolean) => {
+    setDelSelectedVOpen(false);
+
+    if (reloadOnComplete) {
+      dispatch(setLoadingVersions(true));
+      dispatch(setSelectedVersion(""));
+      dispatch(setLoadingObjectInfo(true));
+      setSelectedItems([]);
     }
   };
 
@@ -335,21 +395,49 @@ const VersionsNavigator = ({
     }
   });
 
-  const renderVersion = (elementIndex: number) => {
-    const item = filteredRecords[elementIndex];
-    const versOrd = versions.length - versions.indexOf(item);
+  const onCheckVersion = (selectedVersion: string) => {
+    if (selectedItems.includes(selectedVersion)) {
+      const filteredItems = selectedItems.filter(
+        (element) => element !== selectedVersion
+      );
 
+      setSelectedItems(filteredItems);
+
+      return;
+    }
+
+    const cloneState = [...selectedItems];
+    cloneState.push(selectedVersion);
+
+    setSelectedItems(cloneState);
+  };
+
+  const rowRenderer = ({
+    key, // Unique key within array of rows
+    index, // Index of row within collection
+    isScrolling, // The List is currently being scrolled
+    isVisible, // This row is visible within the List (eg it is not an overscanned row)
+    style, // Style object to be applied to row (to position it)
+  }: ListRowProps) => {
+    const versOrd = versions.length - index;
     return (
       <FileVersionItem
+        style={style}
+        key={key}
         fileName={actualInfo?.name || ""}
-        versionInfo={item}
+        versionInfo={filteredRecords[index]}
         index={versOrd}
         onDownload={onDownloadItem}
         onRestore={onRestoreItem}
         onShare={onShareItem}
         onPreview={onPreviewItem}
         globalClick={onGlobalClick}
-        isSelected={selectedVersion === item.version_id}
+        isSelected={selectedVersion === filteredRecords[index].version_id}
+        checkable={selectEnabled}
+        onCheck={onCheckVersion}
+        isChecked={selectedItems.includes(
+          filteredRecords[index].version_id || ""
+        )}
       />
     );
   };
@@ -402,6 +490,15 @@ const VersionsNavigator = ({
           selectedObject={internalPaths}
         />
       )}
+      {delSelectedVOpen && (
+        <DeleteSelectedVersions
+          selectedBucket={bucketName}
+          selectedObject={decodeURLString(internalPaths)}
+          deleteOpen={delSelectedVOpen}
+          selectedVersions={selectedItems}
+          closeDeleteModalAndRefresh={closeSelectedVersions}
+        />
+      )}
       <Grid container className={classes.versionsContainer}>
         {!actualInfo && (
           <Grid item xs={12}>
@@ -414,7 +511,7 @@ const VersionsNavigator = ({
             <Grid item xs={12}>
               <BrowserBreadcrumbs
                 bucketName={bucketName}
-                internalPaths={decodeFileName(internalPaths)}
+                internalPaths={decodeURLString(internalPaths)}
                 existingFiles={[]}
                 hidePathButton={true}
               />
@@ -452,6 +549,32 @@ const VersionsNavigator = ({
                 actions={
                   <Fragment>
                     <RBIconButton
+                      id={"select-multiple-versions"}
+                      tooltip={"Select Multiple Versions"}
+                      onClick={() => {
+                        setSelectEnabled(!selectEnabled);
+                      }}
+                      text={""}
+                      icon={<SelectMultipleIcon />}
+                      color="primary"
+                      variant={selectEnabled ? "contained" : "outlined"}
+                      style={{ marginRight: 8 }}
+                    />
+                    {selectEnabled && (
+                      <RBIconButton
+                        id={"delete-multiple-versions"}
+                        tooltip={"Delete Selected Versions"}
+                        onClick={() => {
+                          setDelSelectedVOpen(true);
+                        }}
+                        text={""}
+                        icon={<DeleteIcon />}
+                        color="secondary"
+                        style={{ marginRight: 8 }}
+                        disabled={selectedItems.length === 0}
+                      />
+                    )}
+                    <RBIconButton
                       id={"delete-non-current"}
                       tooltip={"Delete Non Current Versions"}
                       onClick={() => {
@@ -487,10 +610,20 @@ const VersionsNavigator = ({
             </Grid>
             <Grid item xs={12} className={classes.versionsVirtualPanel}>
               {actualInfo.version_id && actualInfo.version_id !== "null" && (
-                <VirtualizedList
-                  rowRenderFunction={renderVersion}
-                  totalItems={filteredRecords.length}
-                  defaultHeight={108}
+                // @ts-ignore
+                <List
+                  style={{
+                    width: "100%",
+                  }}
+                  containerStyle={{
+                    width: "100%",
+                    maxWidth: "100%",
+                  }}
+                  width={1}
+                  height={800}
+                  rowCount={filteredRecords.length}
+                  rowHeight={108}
+                  rowRenderer={rowRenderer}
                 />
               )}
             </Grid>
@@ -501,24 +634,4 @@ const VersionsNavigator = ({
   );
 };
 
-const mapStateToProps = ({ system, objectBrowser }: AppState) => ({
-  distributedSetup: get(system, "distributedSetup", false),
-  searchVersions: objectBrowser.searchVersions,
-  loadingVersions: objectBrowser.loadingVersions,
-  selectedVersion: objectBrowser.selectedVersion,
-});
-
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-  setSnackBarMessage,
-  setNewObject,
-  updateProgress,
-  completeObject,
-  setSelectedVersion,
-  setLoadingVersions,
-  setLoadingObjectInfo,
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-export default connector(withStyles(styles)(VersionsNavigator));
+export default withStyles(styles)(VersionsNavigator);

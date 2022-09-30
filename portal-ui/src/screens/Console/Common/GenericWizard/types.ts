@@ -15,11 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export interface IWizardButton {
-  label: string;
-  type: string;
+  label?: string;
+  type?: string;
   action?: (nextFunction: (to: string | number) => void) => void;
   enabled?: boolean;
   toPage?: number;
+  componentRender?: React.ReactNode;
 }
 
 export interface IWizardElement {

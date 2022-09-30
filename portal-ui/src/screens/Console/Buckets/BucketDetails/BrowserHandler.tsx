@@ -15,140 +15,148 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { Grid, IconButton, Tooltip } from "@mui/material";
-import get from "lodash/get";
-import { AppState } from "../../../../store";
+import { AppState, useAppDispatch } from "../../../../store";
 import { containerForHeader } from "../../Common/FormComponents/common/styleLibrary";
-import {
-  setSearchObjects,
-  setVersionsModeEnabled,
-  setSearchVersions,
-} from "../../ObjectBrowser/actions";
+
 import ListObjects from "../ListBuckets/Objects/ListObjects/ListObjects";
 import PageHeader from "../../Common/PageHeader/PageHeader";
 import SettingsIcon from "../../../../icons/SettingsIcon";
-import { BucketInfo } from "../types";
-import { setErrorSnackMessage } from "../../../../actions";
+
 import { SecureComponent } from "../../../../common/SecureComponent";
 import {
+  IAM_PAGES,
   IAM_PERMISSIONS,
   IAM_ROLES,
   IAM_SCOPES,
-  IAM_PAGES,
 } from "../../../../common/SecureComponent/permissions";
-import SearchBox from "../../Common/SearchBox";
 import BackLink from "../../../../common/BackLink";
-
-interface IBrowserHandlerProps {
-  versionsMode: boolean;
-  match: any;
-  history: any;
-  classes: any;
-  setVersionsModeEnabled: typeof setVersionsModeEnabled;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  bucketInfo: BucketInfo | null;
-  searchObjects: string;
-  versionedFile: string;
-  searchVersions: string;
-  setSearchObjects: typeof setSearchObjects;
-  setSearchVersions: typeof setSearchVersions;
-}
+import {
+  setSearchObjects,
+  setSearchVersions,
+  setVersionsModeEnabled,
+} from "../../ObjectBrowser/objectBrowserSlice";
+import SearchBox from "../../Common/SearchBox";
+import { selFeatures } from "../../consoleSlice";
+import AutoColorIcon from "../../Common/Components/AutoColorIcon";
 
 const styles = (theme: Theme) =>
   createStyles({
-    breadcrumLink: {
-      textDecoration: "none",
-      color: "black",
-    },
-    backToBuckets: {
-      color: "#000",
-      fontSize: 14,
-      padding: 0,
-      marginTop: -8,
-    },
     ...containerForHeader(theme.spacing(4)),
   });
 
-const BrowserHandler = ({
-  versionsMode,
-  match,
-  history,
-  classes,
-  setVersionsModeEnabled,
-  searchObjects,
-  setSearchObjects,
-  setSearchVersions,
-  versionedFile,
-  searchVersions,
-}: IBrowserHandlerProps) => {
-  const bucketName = match.params["bucketName"];
-  const internalPaths = get(match.params, "subpaths", "");
+const BrowserHandler = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
+  const location = useLocation();
+
+  const versionsMode = useSelector(
+    (state: AppState) => state.objectBrowser.versionsMode
+  );
+  const searchObjects = useSelector(
+    (state: AppState) => state.objectBrowser.searchObjects
+  );
+  const versionedFile = useSelector(
+    (state: AppState) => state.objectBrowser.versionedFile
+  );
+  const searchVersions = useSelector(
+    (state: AppState) => state.objectBrowser.searchVersions
+  );
+
+  const features = useSelector(selFeatures);
+
+  const bucketName = params.bucketName || "";
+  const pathSegment = location.pathname.split("/browse/");
+
+  const internalPaths = pathSegment.length === 2 ? pathSegment[1] : "";
+
+  const obOnly = !!features?.includes("object-browser-only");
 
   useEffect(() => {
-    setVersionsModeEnabled(false);
-  }, [internalPaths, setVersionsModeEnabled]);
+    dispatch(setVersionsModeEnabled({ status: false }));
+  }, [internalPaths, dispatch]);
 
   const openBucketConfiguration = () => {
-    history.push(`/buckets/${bucketName}/admin`);
+    navigate(`/buckets/${bucketName}/admin`);
   };
+
+  const searchBar = (
+    <Fragment>
+      {!versionsMode ? (
+        <SecureComponent
+          scopes={[IAM_SCOPES.S3_LIST_BUCKET]}
+          resource={bucketName}
+          errorProps={{ disabled: true }}
+        >
+          <SearchBox
+            placeholder={"Start typing to filter objects in the bucket"}
+            onChange={(value) => {
+              dispatch(setSearchObjects(value));
+            }}
+            value={searchObjects}
+          />
+        </SecureComponent>
+      ) : (
+        <Fragment>
+          <SearchBox
+            placeholder={`Start typing to filter versions of ${versionedFile}`}
+            onChange={(value) => {
+              dispatch(setSearchVersions(value));
+            }}
+            value={searchVersions}
+          />
+        </Fragment>
+      )}
+    </Fragment>
+  );
 
   return (
     <Fragment>
-      <PageHeader
-        label={<BackLink label={"Buckets"} to={IAM_PAGES.BUCKETS} />}
-        actions={
-          <SecureComponent
-            scopes={IAM_PERMISSIONS[IAM_ROLES.BUCKET_ADMIN]}
-            resource={bucketName}
-            errorProps={{ disabled: true }}
-          >
-            <Tooltip title={"Configure Bucket"}>
-              <IconButton
-                color="primary"
-                aria-label="Configure Bucket"
-                component="span"
-                onClick={openBucketConfiguration}
-                size="large"
-              >
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
-          </SecureComponent>
-        }
-        middleComponent={
-          <Fragment>
-            {!versionsMode ? (
-              <SecureComponent
-                scopes={[IAM_SCOPES.S3_LIST_BUCKET]}
-                resource={bucketName}
-                errorProps={{ disabled: true }}
-              >
-                <SearchBox
-                  placeholder={"Start typing to filter objects in the bucket"}
-                  onChange={(value) => {
-                    setSearchObjects(value);
-                  }}
-                  value={searchObjects}
-                />
-              </SecureComponent>
-            ) : (
-              <Fragment>
-                <SearchBox
-                  placeholder={`Start typing to filter versions of ${versionedFile}`}
-                  onChange={(value) => {
-                    setSearchVersions(value);
-                  }}
-                  value={searchVersions}
-                />
-              </Fragment>
-            )}
-          </Fragment>
-        }
-      />
+      {!obOnly ? (
+        <PageHeader
+          label={<BackLink label={"Buckets"} to={IAM_PAGES.BUCKETS} />}
+          actions={
+            <SecureComponent
+              scopes={IAM_PERMISSIONS[IAM_ROLES.BUCKET_ADMIN]}
+              resource={bucketName}
+              errorProps={{ disabled: true }}
+            >
+              <Tooltip title={"Configure Bucket"}>
+                <IconButton
+                  color="primary"
+                  aria-label="Configure Bucket"
+                  component="span"
+                  onClick={openBucketConfiguration}
+                  size="large"
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+            </SecureComponent>
+          }
+          middleComponent={searchBar}
+        />
+      ) : (
+        <Grid
+          container
+          sx={{
+            padding: "20px 32px 0",
+          }}
+        >
+          <Grid>
+            <AutoColorIcon marginRight={30} marginTop={10} />
+          </Grid>
+          <Grid item xs>
+            {searchBar}
+          </Grid>
+        </Grid>
+      )}
       <Grid>
         <ListObjects />
       </Grid>
@@ -156,22 +164,4 @@ const BrowserHandler = ({
   );
 };
 
-const mapStateToProps = ({ objectBrowser, buckets }: AppState) => ({
-  versionsMode: get(objectBrowser, "versionsMode", false),
-  bucketToRewind: get(objectBrowser, "rewind.bucketToRewind", ""),
-  bucketInfo: buckets.bucketDetails.bucketInfo,
-  searchObjects: objectBrowser.searchObjects,
-  versionedFile: objectBrowser.versionedFile,
-  searchVersions: objectBrowser.searchVersions,
-});
-
-const mapDispatchToProps = {
-  setVersionsModeEnabled,
-  setErrorSnackMessage,
-  setSearchObjects,
-  setSearchVersions,
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-export default withStyles(styles)(connector(BrowserHandler));
+export default withStyles(styles)(BrowserHandler);

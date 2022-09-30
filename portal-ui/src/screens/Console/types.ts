@@ -18,10 +18,19 @@ export interface ISessionPermissions {
   [key: string]: string[];
 }
 
+export interface IAllowResources {
+  conditionOperator: string;
+  prefixes: string[];
+  resource: string;
+}
+
 export interface ISessionResponse {
   status: string;
   features: string[];
   operator: boolean;
+  directPV?: boolean;
   distributedMode: boolean;
   permissions: ISessionPermissions;
+  allowResources: IAllowResources[] | null;
+  customStyles?: string | null;
 }

@@ -15,7 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
+import { useNavigate } from "react-router-dom";
 import get from "lodash/get";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
@@ -23,19 +24,17 @@ import withStyles from "@mui/styles/withStyles";
 import Grid from "@mui/material/Grid";
 import { Policy, PolicyList } from "./types";
 import { AddIcon, IAMPoliciesIcon } from "../../../icons";
-import { setErrorSnackMessage } from "../../../actions";
+
 import {
   actionsTray,
   containerForHeader,
   searchField,
-  tableStyles,
 } from "../Common/FormComponents/common/styleLibrary";
 import { ErrorResponseHandler } from "../../../common/types";
 
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
 import PageHeader from "../Common/PageHeader/PageHeader";
 import api from "../../../common/api";
-import history from "../../../history";
 import HelpBox from "../../../common/HelpBox";
 import PageLayout from "../Common/Layout/PageLayout";
 import {
@@ -44,15 +43,17 @@ import {
   IAM_SCOPES,
 } from "../../../common/SecureComponent/permissions";
 import {
-  SecureComponent,
   hasPermission,
+  SecureComponent,
 } from "../../../common/SecureComponent";
 import SearchBox from "../Common/SearchBox";
 
 import withSuspense from "../Common/Components/withSuspense";
 import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
+import { encodeURLString } from "../../../common/utils";
+import { setErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
-const AddPolicy = withSuspense(React.lazy(() => import("./AddPolicy")));
 const DeletePolicy = withSuspense(React.lazy(() => import("./DeletePolicy")));
 
 const styles = (theme: Theme) =>
@@ -63,27 +64,22 @@ const styles = (theme: Theme) =>
       ...searchField.searchField,
       maxWidth: 380,
     },
-    tableBlock: {
-      ...tableStyles.tableBlock,
-      marginTop: 15,
-    },
     ...containerForHeader(theme.spacing(4)),
   });
 
 interface IPoliciesProps {
   classes: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
-const ListPolicies = ({ classes, setErrorSnackMessage }: IPoliciesProps) => {
+const ListPolicies = ({ classes }: IPoliciesProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [records, setRecords] = useState<Policy[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [addScreenOpen, setAddScreenOpen] = useState<boolean>(false);
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [selectedPolicy, setSelectedPolicy] = useState<string>("");
   const [filterPolicies, setFilterPolicies] = useState<string>("");
-  const [policyEdit, setPolicyEdit] = useState<any>(null);
-
   const viewPolicy = hasPermission(CONSOLE_UI_RESOURCE, [
     IAM_SCOPES.ADMIN_GET_POLICY,
   ]);
@@ -125,24 +121,16 @@ const ListPolicies = ({ classes, setErrorSnackMessage }: IPoliciesProps) => {
           })
           .catch((err: ErrorResponseHandler) => {
             setLoading(false);
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
           });
       } else {
         setLoading(false);
       }
     }
-  }, [loading, setLoading, setRecords, setErrorSnackMessage, displayPolicies]);
+  }, [loading, setLoading, setRecords, dispatch, displayPolicies]);
 
   const fetchRecords = () => {
     setLoading(true);
-  };
-
-  const closeAddModalAndRefresh = (refresh: boolean) => {
-    setAddScreenOpen(false);
-
-    if (refresh) {
-      fetchRecords();
-    }
   };
 
   const closeDeleteModalAndRefresh = (refresh: boolean) => {
@@ -159,7 +147,7 @@ const ListPolicies = ({ classes, setErrorSnackMessage }: IPoliciesProps) => {
   };
 
   const viewAction = (policy: any) => {
-    history.push(`${IAM_PAGES.POLICIES}/${policy.name}`);
+    navigate(`${IAM_PAGES.POLICIES}/${encodeURLString(policy.name)}`);
   };
 
   const tableActions = [
@@ -182,13 +170,6 @@ const ListPolicies = ({ classes, setErrorSnackMessage }: IPoliciesProps) => {
 
   return (
     <React.Fragment>
-      {addScreenOpen && (
-        <AddPolicy
-          open={addScreenOpen}
-          closeModalAndRefresh={closeAddModalAndRefresh}
-          policyEdit={policyEdit}
-        />
-      )}
       {deleteOpen && (
         <DeletePolicy
           deleteOpen={deleteOpen}
@@ -198,90 +179,85 @@ const ListPolicies = ({ classes, setErrorSnackMessage }: IPoliciesProps) => {
       )}
       <PageHeader label="IAM Policies" />
       <PageLayout className={classes.pageContainer}>
-        <Grid item xs={12} className={classes.actionsTray}>
-          <SearchBox
-            onChange={setFilterPolicies}
-            placeholder="Search Policies"
-            overrideClass={classes.searchField}
-            value={filterPolicies}
-          />
+        <Grid container spacing={1}>
+          <Grid item xs={12} className={classes.actionsTray}>
+            <SearchBox
+              onChange={setFilterPolicies}
+              placeholder="Search Policies"
+              overrideClass={classes.searchField}
+              value={filterPolicies}
+            />
 
-          <SecureComponent
-            scopes={[IAM_SCOPES.ADMIN_CREATE_POLICY]}
-            resource={CONSOLE_UI_RESOURCE}
-            errorProps={{ disabled: true }}
-          >
-            <RBIconButton
-              tooltip={"Create Policy"}
-              text={"Create Policy"}
-              variant="contained"
-              color="primary"
-              icon={<AddIcon />}
-              onClick={() => {
-                setAddScreenOpen(true);
-                setPolicyEdit(null);
-              }}
+            <SecureComponent
+              scopes={[IAM_SCOPES.ADMIN_CREATE_POLICY]}
+              resource={CONSOLE_UI_RESOURCE}
+              errorProps={{ disabled: true }}
+            >
+              <RBIconButton
+                tooltip={"Create Policy"}
+                text={"Create Policy"}
+                variant="contained"
+                color="primary"
+                icon={<AddIcon />}
+                onClick={() => {
+                  navigate(`${IAM_PAGES.POLICY_ADD}`);
+                }}
+              />
+            </SecureComponent>
+          </Grid>
+          <Grid item xs={12} className={classes.tableBlock}>
+            <SecureComponent
+              scopes={[IAM_SCOPES.ADMIN_LIST_USER_POLICIES]}
+              resource={CONSOLE_UI_RESOURCE}
+              errorProps={{ disabled: true }}
+            >
+              <TableWrapper
+                itemActions={tableActions}
+                columns={[{ label: "Name", elementKey: "name" }]}
+                isLoading={loading}
+                records={filteredRecords}
+                entityName="Policies"
+                idField="name"
+              />
+            </SecureComponent>
+          </Grid>
+          <Grid item xs={12}>
+            <HelpBox
+              title={"Learn more about IAM POLICIES"}
+              iconComponent={<IAMPoliciesIcon />}
+              help={
+                <Fragment>
+                  MinIO uses Policy-Based Access Control (PBAC) to define the
+                  authorized actions and resources to which an authenticated
+                  user has access. Each policy describes one or more actions and
+                  conditions that outline the permissions of a user or group of
+                  users.
+                  <br />
+                  <br />
+                  MinIO PBAC is built for compatibility with AWS IAM policy
+                  syntax, structure, and behavior. The MinIO documentation makes
+                  a best-effort to cover IAM-specific behavior and
+                  functionality. Consider deferring to the IAM documentation for
+                  more complete documentation on AWS IAM-specific topics.
+                  <br />
+                  <br />
+                  You can learn more at our{" "}
+                  <a
+                    href="https://docs.min.io/minio/baremetal/security/minio-identity-management/policy-based-access-control.html?ref=con"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    documentation
+                  </a>
+                  .
+                </Fragment>
+              }
             />
-          </SecureComponent>
-        </Grid>
-        <Grid item xs={12} className={classes.tableBlock}>
-          <SecureComponent
-            scopes={[IAM_SCOPES.ADMIN_LIST_USER_POLICIES]}
-            resource={CONSOLE_UI_RESOURCE}
-            errorProps={{ disabled: true }}
-          >
-            <TableWrapper
-              itemActions={tableActions}
-              columns={[{ label: "Name", elementKey: "name" }]}
-              isLoading={loading}
-              records={filteredRecords}
-              entityName="Policies"
-              idField="name"
-            />
-          </SecureComponent>
-        </Grid>
-        <Grid item xs={12}>
-          <HelpBox
-            title={"Learn more about IAM POLICIES"}
-            iconComponent={<IAMPoliciesIcon />}
-            help={
-              <Fragment>
-                MinIO uses Policy-Based Access Control (PBAC) to define the
-                authorized actions and resources to which an authenticated user
-                has access. Each policy describes one or more actions and
-                conditions that outline the permissions of a user or group of
-                users.
-                <br />
-                <br />
-                MinIO PBAC is built for compatibility with AWS IAM policy
-                syntax, structure, and behavior. The MinIO documentation makes a
-                best-effort to cover IAM-specific behavior and functionality.
-                Consider deferring to the IAM documentation for more complete
-                documentation on AWS IAM-specific topics.
-                <br />
-                <br />
-                You can learn more at our{" "}
-                <a
-                  href="https://docs.min.io/minio/baremetal/security/minio-identity-management/policy-based-access-control.html?ref=con"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  documentation
-                </a>
-                .
-              </Fragment>
-            }
-          />
+          </Grid>
         </Grid>
       </PageLayout>
     </React.Fragment>
   );
 };
 
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(ListPolicies));
+export default withStyles(styles)(ListPolicies);

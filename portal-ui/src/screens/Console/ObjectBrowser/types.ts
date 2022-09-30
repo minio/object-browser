@@ -22,6 +22,7 @@ export const OBJECT_MANAGER_NEW_OBJECT = "OBJECT_MANAGER/NEW_OBJECT";
 export const OBJECT_MANAGER_UPDATE_PROGRESS_OBJECT =
   "OBJECT_MANAGER/UPDATE_PROGRESS_OBJECT";
 export const OBJECT_MANAGER_COMPLETE_OBJECT = "OBJECT_MANAGER/COMPLETE_OBJECT";
+export const OBJECT_MANAGER_ERROR_IN_OBJECT = "OBJECT_MANAGER/ERROR_IN_OBJECT";
 export const OBJECT_MANAGER_DELETE_FROM_OBJECT_LIST =
   "OBJECT_MANAGER/DELETE_FROM_OBJECT_LIST";
 export const OBJECT_MANAGER_CLEAN_LIST = "OBJECT_MANAGER/CLEAN_LIST";
@@ -30,6 +31,7 @@ export const OBJECT_MANAGER_OPEN_LIST = "OBJECT_MANAGER/OPEN_LIST";
 export const OBJECT_MANAGER_CLOSE_LIST = "OBJECT_MANAGER/CLOSE_LIST";
 export const OBJECT_MANAGER_SET_SEARCH_OBJECT =
   "OBJECT_MANAGER/SET_SEARCH_OBJECT";
+export const OBJECT_MANAGER_CANCEL_OBJECT = "OBJECT_MANAGER/CANCEL_OBJECT";
 
 export const BUCKET_BROWSER_VERSIONS_MODE_ENABLED =
   "BUCKET_BROWSER/VERSIONS_MODE_ENABLED";
@@ -45,6 +47,7 @@ export const BUCKET_BROWSER_OBJECT_DETAILS_STATE =
   "BUCKET_BROWSER/OBJECT_DETAILS_STATE";
 export const BUCKET_BROWSER_SET_SELECTED_OBJECT =
   "BUCKET_BROWSER/SET_SELECTED_OBJECT";
+export const BUCKET_BROWSER_SET_SIMPLE_PATH = "BUCKET_BROWSER/SET_SIMPLE_PATH";
 
 export interface Route {
   route: string;
@@ -72,6 +75,7 @@ export interface ObjectBrowserState {
   showDeleted: boolean;
   objectDetailsOpen: boolean;
   selectedInternalPaths: string | null;
+  simplePath: string | null;
 }
 
 export interface ObjectBrowserReducer {
@@ -81,16 +85,21 @@ export interface ObjectBrowserReducer {
 export interface ObjectManager {
   objectsToManage: IFileItem[];
   managerOpen: boolean;
+  newItems: boolean;
 }
 
 export interface IFileItem {
   type: "download" | "upload";
+  ID: string;
   instanceID: string;
   bucketName: string;
   prefix: string;
   percentage: number;
   done: boolean;
   waitingForFile: boolean;
+  failed: boolean;
+  cancelled: boolean;
+  errorMessage: string;
 }
 
 interface RewindSetEnabled {
@@ -147,6 +156,12 @@ interface OMCloseList {
   type: typeof OBJECT_MANAGER_CLOSE_LIST;
 }
 
+interface OMSetObjectError {
+  type: typeof OBJECT_MANAGER_ERROR_IN_OBJECT;
+  status: boolean;
+  instanceID: string;
+}
+
 interface SetSearchObjects {
   type: typeof OBJECT_MANAGER_SET_SEARCH_OBJECT;
   searchString: string;
@@ -192,6 +207,16 @@ interface SetObjectManagerLoading {
   status: boolean;
 }
 
+interface CancelObjectInManager {
+  type: typeof OBJECT_MANAGER_CANCEL_OBJECT;
+  instanceID: string;
+}
+
+interface SetBrowserPath {
+  type: typeof BUCKET_BROWSER_SET_SIMPLE_PATH;
+  path: string;
+}
+
 export type ObjectBrowserActionTypes =
   | RewindSetEnabled
   | RewindReset
@@ -204,6 +229,7 @@ export type ObjectBrowserActionTypes =
   | OMToggleList
   | OMOpenList
   | OMCloseList
+  | OMSetObjectError
   | SetSearchObjects
   | SetSearchVersions
   | SetSelectedversion
@@ -212,4 +238,6 @@ export type ObjectBrowserActionTypes =
   | SetLoadingObjectInfo
   | SetObjectDetailsState
   | SetSelectedObject
-  | SetObjectManagerLoading;
+  | SetObjectManagerLoading
+  | CancelObjectInManager
+  | SetBrowserPath;

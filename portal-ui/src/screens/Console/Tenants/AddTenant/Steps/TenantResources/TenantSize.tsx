@@ -15,13 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import { SelectChangeEvent } from "@mui/material";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import { AppState } from "../../../../../../store";
-import { isPageValid, updateAddField } from "../../../actions";
+import { AppState, useAppDispatch } from "../../../../../../store";
 import {
   formFieldStyles,
   modalBasic,
@@ -36,9 +35,8 @@ import {
   niceBytes,
 } from "../../../../../../common/utils";
 import { clearValidationError } from "../../../utils";
-import { ecListTransform, Opts } from "../../../ListTenants/utils";
-import { IResourcesSize } from "../../../ListTenants/types";
-import { ICapacity, IErasureCodeCalc } from "../../../../../../common/types";
+import { ecListTransform } from "../../../ListTenants/utils";
+import { ICapacity } from "../../../../../../common/types";
 import { commonFormValidation } from "../../../../../../utils/validationFunctions";
 import api from "../../../../../../common/api";
 import InputBoxWrapper from "../../../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
@@ -46,35 +44,15 @@ import SelectWrapper from "../../../../Common/FormComponents/SelectWrapper/Selec
 import TenantSizeResources from "./TenantSizeResources";
 import InputUnitMenu from "../../../../Common/FormComponents/InputUnitMenu/InputUnitMenu";
 import { IMkEnvs } from "./utils";
+import { isPageValid, updateAddField } from "../../createTenantSlice";
 
 interface ITenantSizeProps {
   classes: any;
-  updateAddField: typeof updateAddField;
-  isPageValid: typeof isPageValid;
-  volumeSize: string;
-  sizeFactor: string;
-  drivesPerServer: string;
-  nodes: string;
-  memoryNode: string;
-  ecParity: string;
-  ecParityChoices: Opts[];
-  cleanECChoices: string[];
-  resourcesSize: IResourcesSize;
-  distribution: any;
-  ecParityCalc: IErasureCodeCalc;
-  limitSize: any;
-  selectedStorageClass: string;
-  untouchedECField: boolean;
   formToRender?: IMkEnvs;
-  selectedStorageType: string;
 }
 
 const styles = (theme: Theme) =>
   createStyles({
-    compositeFieldContainer: {
-      display: "flex",
-      alignItems: "center",
-    },
     compositeAddOn: {
       marginLeft: 10,
       "& div": {
@@ -91,27 +69,57 @@ const styles = (theme: Theme) =>
     ...wizardCommon,
   });
 
-const TenantSize = ({
-  classes,
-  updateAddField,
-  isPageValid,
-  volumeSize,
-  sizeFactor,
-  drivesPerServer,
-  nodes,
-  memoryNode,
-  ecParity,
-  ecParityChoices,
-  cleanECChoices,
-  resourcesSize,
-  distribution,
-  ecParityCalc,
-  limitSize,
-  selectedStorageClass,
-  untouchedECField,
-  formToRender,
-  selectedStorageType,
-}: ITenantSizeProps) => {
+const TenantSize = ({ classes, formToRender }: ITenantSizeProps) => {
+  const dispatch = useAppDispatch();
+
+  const volumeSize = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.volumeSize
+  );
+  const sizeFactor = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.sizeFactor
+  );
+  const drivesPerServer = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.drivesPerServer
+  );
+  const nodes = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.nodes
+  );
+  const memoryNode = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.memoryNode
+  );
+  const ecParity = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.ecParity
+  );
+  const ecParityChoices = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.ecParityChoices
+  );
+  const cleanECChoices = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.cleanECChoices
+  );
+  const resourcesSize = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.resourcesSize
+  );
+  const distribution = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.distribution
+  );
+  const ecParityCalc = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.ecParityCalc
+  );
+  const untouchedECField = useSelector(
+    (state: AppState) => state.createTenant.fields.tenantSize.untouchedECField
+  );
+  const limitSize = useSelector(
+    (state: AppState) => state.createTenant.limitSize
+  );
+  const selectedStorageClass = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.nameTenant.selectedStorageClass
+  );
+  const selectedStorageType = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.nameTenant.selectedStorageType
+  );
+
   const [validationErrors, setValidationErrors] = useState<any>({});
   const [errorFlag, setErrorFlag] = useState<boolean>(false);
   const [nodeError, setNodeError] = useState<string>("");
@@ -119,9 +127,15 @@ const TenantSize = ({
   // Common
   const updateField = useCallback(
     (field: string, value: any) => {
-      updateAddField("tenantSize", field, value);
+      dispatch(
+        updateAddField({
+          pageName: "tenantSize",
+          field: field,
+          value: value,
+        })
+      );
     },
-    [updateAddField]
+    [dispatch]
   );
 
   const cleanValidation = (fieldName: string) => {
@@ -244,14 +258,17 @@ const TenantSize = ({
       },
     ]);
 
-    isPageValid(
-      "tenantSize",
-      !("nodes" in commonValidation) &&
-        !("volume_size" in commonValidation) &&
-        !("drivesps" in commonValidation) &&
-        distribution.error === "" &&
-        ecParityCalc.error === 0 &&
-        ecParity !== ""
+    dispatch(
+      isPageValid({
+        pageName: "tenantSize",
+        valid:
+          !("nodes" in commonValidation) &&
+          !("volume_size" in commonValidation) &&
+          !("drivesps" in commonValidation) &&
+          distribution.error === "" &&
+          ecParityCalc.error === 0 &&
+          ecParity !== "",
+      })
     );
 
     setValidationErrors(commonValidation);
@@ -265,7 +282,7 @@ const TenantSize = ({
     resourcesSize,
     limitSize,
     selectedStorageClass,
-    isPageValid,
+    dispatch,
     errorFlag,
     nodeError,
     drivesPerServer,
@@ -287,12 +304,17 @@ const TenantSize = ({
           })
           .catch((err: any) => {
             updateField("ecparityChoices", []);
-            isPageValid("tenantSize", false);
+            dispatch(
+              isPageValid({
+                pageName: "tenantSize",
+                valid: false,
+              })
+            );
             updateField("ecParity", "");
           });
       }
     }
-  }, [distribution, isPageValid, updateField, nodes, untouchedECField]);
+  }, [distribution, dispatch, updateField, nodes, untouchedECField]);
 
   /* End Validation of pages */
 
@@ -403,32 +425,4 @@ const TenantSize = ({
   );
 };
 
-const mapState = (state: AppState) => {
-  const tenantSize = state.tenants.createTenant.fields.tenantSize;
-  return {
-    volumeSize: tenantSize.volumeSize,
-    sizeFactor: tenantSize.sizeFactor,
-    drivesPerServer: tenantSize.drivesPerServer,
-    nodes: tenantSize.nodes,
-    memoryNode: tenantSize.memoryNode,
-    ecParity: tenantSize.ecParity,
-    ecParityChoices: tenantSize.ecParityChoices,
-    cleanECChoices: tenantSize.cleanECChoices,
-    resourcesSize: tenantSize.resourcesSize,
-    distribution: tenantSize.distribution,
-    ecParityCalc: tenantSize.ecParityCalc,
-    untouchedECField: tenantSize.untouchedECField,
-    limitSize: state.tenants.createTenant.limitSize,
-    selectedStorageClass:
-      state.tenants.createTenant.fields.nameTenant.selectedStorageClass,
-    selectedStorageType:
-      state.tenants.createTenant.fields.nameTenant.selectedStorageType,
-  };
-};
-
-const connector = connect(mapState, {
-  updateAddField,
-  isPageValid,
-});
-
-export default withStyles(styles)(connector(TenantSize));
+export default withStyles(styles)(TenantSize);

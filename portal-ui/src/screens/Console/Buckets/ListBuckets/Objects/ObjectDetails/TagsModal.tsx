@@ -14,55 +14,79 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useState, Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import get from "lodash/get";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Box, Button, Grid } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import { setModalErrorSnackMessage } from "../../../../../../actions";
-import { AppState } from "../../../../../../store";
 import { ErrorResponseHandler } from "../../../../../../common/types";
 import InputBoxWrapper from "../../../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import ModalWrapper from "../../../../Common/ModalWrapper/ModalWrapper";
 import api from "../../../../../../common/api";
-import { encodeFileName } from "../../../../../../common/utils";
+import { encodeURLString } from "../../../../../../common/utils";
 import {
   formFieldStyles,
   modalStyleUtils,
   spacingUtils,
 } from "../../../../Common/FormComponents/common/styleLibrary";
-import { TagsIcon } from "../../../../../../icons";
+import {
+  AddNewTagIcon,
+  DisabledIcon,
+  EditTagIcon,
+} from "../../../../../../icons";
 import { IFileInfo } from "./types";
 import { IAM_SCOPES } from "../../../../../../common/SecureComponent/permissions";
 import { SecureComponent } from "../../../../../../common/SecureComponent";
 import Chip from "@mui/material/Chip";
 import CloseIcon from "@mui/icons-material/Close";
+import {
+  selDistSet,
+  setModalErrorSnackMessage,
+} from "../../../../../../systemSlice";
+import { useAppDispatch } from "../../../../../../store";
 
 interface ITagModal {
   modalOpen: boolean;
   bucketName: string;
   actualInfo: IFileInfo;
   onCloseAndUpdate: (refresh: boolean) => void;
-  distributedSetup: boolean;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
   classes: any;
 }
 
 const styles = (theme: Theme) =>
   createStyles({
-    pathLabel: {
-      marginTop: 0,
-      marginBottom: 32,
-    },
     newTileHeader: {
       fontSize: 18,
       fontWeight: "bold",
       color: "#000",
-      margin: "20px 0",
+      margin: "35px 0",
       paddingBottom: 15,
-      borderBottom: "#E2E2E2 2px solid",
+      display: "flex",
+      alignItems: "center",
+      "& > svg": {
+        marginRight: 10,
+      },
+    },
+    tagsForLabel: {
+      fontSize: 16,
+      margin: "20px 0 30px",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      width: "100%",
+    },
+    currentTagsContainer: {
+      fontSize: 14,
+      fontWeight: "normal",
+    },
+    noTagsForObject: {
+      color: "#858585",
+    },
+    deleteTag: {
+      color: "#C83B51",
+      marginLeft: 5,
     },
     ...formFieldStyles,
     ...modalStyleUtils,
@@ -73,11 +97,11 @@ const AddTagModal = ({
   modalOpen,
   onCloseAndUpdate,
   bucketName,
-  distributedSetup,
   actualInfo,
-  setModalErrorSnackMessage,
   classes,
 }: ITagModal) => {
+  const dispatch = useAppDispatch();
+  const distributedSetup = useSelector(selDistSet);
   const [newKey, setNewKey] = useState<string>("");
   const [newLabel, setNewLabel] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -85,7 +109,7 @@ const AddTagModal = ({
   const [deleteKey, setDeleteKey] = useState<string>("");
   const [deleteLabel, setDeleteLabel] = useState<string>("");
 
-  const selectedObject = encodeFileName(actualInfo.name);
+  const selectedObject = encodeURLString(actualInfo.name);
   const currentTags = actualInfo.tags;
   const currTagKeys = Object.keys(currentTags || {});
 
@@ -117,7 +141,7 @@ const AddTagModal = ({
         setIsSending(false);
       })
       .catch((error: ErrorResponseHandler) => {
-        setModalErrorSnackMessage(error);
+        dispatch(setModalErrorSnackMessage(error));
         setIsSending(false);
       });
   };
@@ -139,7 +163,7 @@ const AddTagModal = ({
         setIsSending(false);
       })
       .catch((error: ErrorResponseHandler) => {
-        setModalErrorSnackMessage(error);
+        dispatch(setModalErrorSnackMessage(error));
         setIsSending(false);
       });
   };
@@ -156,24 +180,43 @@ const AddTagModal = ({
     setDeleteEnabled(false);
   };
 
+  const tagsFor = (plural: boolean) => (
+    <div className={classes.tagsForLabel}>
+      Tag{plural ? "s" : ""} for: <strong>{currentItem}</strong>
+    </div>
+  );
+
   return (
     <Fragment>
       <ModalWrapper
         modalOpen={modalOpen}
-        title={deleteEnabled ? `Delete Tag` : `Edit Tags for ${currentItem}`}
+        title={
+          deleteEnabled ? (
+            <span style={{ color: "#C83B51" }}>Delete Tag</span>
+          ) : (
+            `Edit Tags`
+          )
+        }
         onClose={() => {
           onCloseAndUpdate(true);
         }}
-        titleIcon={<TagsIcon />}
+        titleIcon={
+          deleteEnabled ? (
+            <DisabledIcon style={{ fill: "#C83B51" }} />
+          ) : (
+            <EditTagIcon />
+          )
+        }
       >
         {deleteEnabled ? (
           <Fragment>
             <Grid container>
+              {tagsFor(false)}
               Are you sure you want to delete the tag{" "}
-              <b className={classes.wrapText}>
+              <b className={classes.deleteTag}>
                 {deleteKey} : {deleteLabel}
               </b>{" "}
-              from {currentItem}?
+              ?
               <Grid item xs={12} className={classes.modalButtonBar}>
                 <Button
                   type="button"
@@ -181,15 +224,16 @@ const AddTagModal = ({
                   color="primary"
                   onClick={cancelDelete}
                 >
-                  No
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
                   variant="outlined"
                   color="secondary"
                   onClick={deleteTagProcess}
+                  id={"deleteTag"}
                 >
-                  Yes
+                  Delete Tag
                 </Button>
               </Grid>
             </Grid>
@@ -204,44 +248,56 @@ const AddTagModal = ({
                 sx={{
                   display: "flex",
                   flexFlow: "column",
+                  width: "100%",
                 }}
               >
-                <strong>Current Tags:</strong>
-                {currTagKeys.length === 0 ? "No Tags for this object" : ""}
-                <Box>
-                  {currTagKeys.map((tagKey: string, index: number) => {
-                    const tag = get(currentTags, `${tagKey}`, "");
-                    if (tag !== "") {
-                      return (
-                        <SecureComponent
-                          key={`chip-${index}`}
-                          scopes={[IAM_SCOPES.S3_DELETE_OBJECT_TAGGING]}
-                          resource={bucketName}
-                          matchAll
-                          errorProps={{
-                            deleteIcon: null,
-                            onDelete: null,
-                          }}
-                        >
-                          <Chip
-                            style={{
-                              textTransform: "none",
-                              marginRight: "5px",
+                {tagsFor(true)}
+                <div className={classes.currentTagsContainer}>
+                  Current Tags:
+                  <br />
+                  {currTagKeys.length === 0 ? (
+                    <span className={classes.noTagsForObject}>
+                      There are no tags for this object
+                    </span>
+                  ) : (
+                    <Fragment />
+                  )}
+                  <Box sx={{ marginTop: "5px", marginBottom: "15px" }}>
+                    {currTagKeys.map((tagKey: string, index: number) => {
+                      const tag = get(currentTags, `${tagKey}`, "");
+                      if (tag !== "") {
+                        return (
+                          <SecureComponent
+                            key={`chip-${index}`}
+                            scopes={[IAM_SCOPES.S3_DELETE_OBJECT_TAGGING]}
+                            resource={bucketName}
+                            matchAll
+                            errorProps={{
+                              deleteIcon: null,
+                              onDelete: null,
                             }}
-                            size="small"
-                            label={`${tagKey} : ${tag}`}
-                            color="primary"
-                            deleteIcon={<CloseIcon />}
-                            onDelete={() => {
-                              onDeleteTag(tagKey, tag);
-                            }}
-                          />
-                        </SecureComponent>
-                      );
-                    }
-                    return null;
-                  })}
-                </Box>
+                          >
+                            <Chip
+                              style={{
+                                textTransform: "none",
+                                marginRight: "5px",
+                                marginBottom: "5px",
+                              }}
+                              size="small"
+                              label={`${tagKey} : ${tag}`}
+                              color="primary"
+                              deleteIcon={<CloseIcon />}
+                              onDelete={() => {
+                                onDeleteTag(tagKey, tag);
+                              }}
+                            />
+                          </SecureComponent>
+                        );
+                      }
+                      return null;
+                    })}
+                  </Box>
+                </div>
               </Box>
             </SecureComponent>
             <SecureComponent
@@ -251,7 +307,7 @@ const AddTagModal = ({
             >
               <Grid container>
                 <Grid item xs={12} className={classes.newTileHeader}>
-                  Add New Tag
+                  <AddNewTagIcon /> Add New Tag
                 </Grid>
                 <Grid item xs={12} className={classes.formFieldRow}>
                   <InputBoxWrapper
@@ -296,8 +352,9 @@ const AddTagModal = ({
                       isSending
                     }
                     onClick={addTagProcess}
+                    id="saveTag"
                   >
-                    Save new Tag
+                    Save
                   </Button>
                 </Grid>
               </Grid>
@@ -309,14 +366,4 @@ const AddTagModal = ({
   );
 };
 
-const mapStateToProps = ({ system }: AppState) => ({
-  distributedSetup: get(system, "distributedSetup", false),
-});
-
-const mapDispatchToProps = {
-  setModalErrorSnackMessage,
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-export default withStyles(styles)(connector(AddTagModal));
+export default withStyles(styles)(AddTagModal);

@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { ITenant } from "../ListTenants/types";
 import {
   ICertificateInfo,
   ISecurityContext,
@@ -33,10 +32,8 @@ import {
   wizardCommon,
 } from "../../Common/FormComponents/common/styleLibrary";
 import React, { Fragment, useEffect, useState } from "react";
-import { setErrorSnackMessage } from "../../../../actions";
-import { connect } from "react-redux";
-import { AppState } from "../../../../store";
-import { setTenantDetailsLoad } from "../actions";
+import { useSelector } from "react-redux";
+import { AppState, useAppDispatch } from "../../../../store";
 import api from "../../../../common/api";
 import { ErrorResponseHandler } from "../../../../common/types";
 
@@ -57,34 +54,18 @@ import {
 import ConfirmDialog from "../../Common/ModalWrapper/ConfirmDialog";
 import TLSCertificate from "../../Common/TLSCertificate/TLSCertificate";
 import SectionTitle from "../../Common/SectionTitle";
+import { setErrorSnackMessage } from "../../../../systemSlice";
 
 interface ITenantEncryption {
   classes: any;
-  loadingTenant: boolean;
-  tenant: ITenant | null;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  setTenantDetailsLoad: typeof setTenantDetailsLoad;
 }
 
 const styles = (theme: Theme) =>
   createStyles({
     ...tenantDetailsStyles,
     ...spacingUtils,
-    loaderAlign: {
-      textAlign: "center",
-    },
-    title: {
-      marginTop: 35,
-    },
     bold: { fontWeight: "bold" },
     italic: { fontStyle: "italic" },
-    paperContainer: {
-      padding: "15px 15px 15px 50px",
-    },
-    certificateInfo: {
-      height: "auto",
-      margin: 5,
-    },
     fileItem: {
       marginRight: 10,
       display: "flex",
@@ -96,18 +77,6 @@ const styles = (theme: Theme) =>
         flexFlow: "column",
       },
     },
-    certInputRow: {
-      display: "flex",
-      alignItems: "center",
-      borderBottom: "1px solid #eaeaea",
-      marginBottom: 8,
-    },
-    caCertsRow: {
-      borderBottom: "1px solid #eaeaea",
-      display: "flex",
-      alignItems: "center",
-      marginBottom: 8,
-    },
     ...containerForHeader(theme.spacing(4)),
     ...createTenantCommon,
     ...formFieldStyles,
@@ -115,11 +84,11 @@ const styles = (theme: Theme) =>
     ...wizardCommon,
   });
 
-const TenantEncryption = ({
-  classes,
-  tenant,
-  setErrorSnackMessage,
-}: ITenantEncryption) => {
+const TenantEncryption = ({ classes }: ITenantEncryption) => {
+  const dispatch = useAppDispatch();
+
+  const tenant = useSelector((state: AppState) => state.tenants.tenantInfo);
+
   const [encryptionEnabled, setEncryptionEnabled] = useState<boolean>(false);
   const [encryptionType, setEncryptionType] = useState<string>("vault");
   const [replicas, setReplicas] = useState<string>("2");
@@ -128,6 +97,7 @@ const TenantEncryption = ({
     useState<boolean>(false);
   const [securityContext, setSecurityContext] = useState<ISecurityContext>({
     fsGroup: "1000",
+    fsGroupChangePolicy: "Always",
     runAsGroup: "1000",
     runAsNonRoot: true,
     runAsUser: "1000",
@@ -657,7 +627,7 @@ const TenantEncryption = ({
           .catch((err: ErrorResponseHandler) => {
             setUpdatingEncryption(false);
             setConfirmOpen(false);
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
           });
       }
     } else {
@@ -675,7 +645,7 @@ const TenantEncryption = ({
           })
           .catch((err: ErrorResponseHandler) => {
             setUpdatingEncryption(false);
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
           });
       }
     }
@@ -683,28 +653,28 @@ const TenantEncryption = ({
 
   return (
     <React.Fragment>
+      {confirmOpen && (
+        <ConfirmDialog
+          isOpen={confirmOpen}
+          title={
+            encryptionEnabled
+              ? "Enable encryption at rest for tenant?"
+              : "Disable encryption at rest for tenant?"
+          }
+          confirmText={encryptionEnabled ? "Enable" : "Disable"}
+          cancelText="Cancel"
+          onClose={() => setConfirmOpen(false)}
+          onConfirm={updateEncryptionConfiguration}
+          confirmationContent={
+            <DialogContentText>
+              {encryptionEnabled
+                ? "Data will be encrypted using and external KMS"
+                : "Current encrypted information will not be accessible"}
+            </DialogContentText>
+          }
+        />
+      )}
       <Grid container spacing={1}>
-        {confirmOpen && (
-          <ConfirmDialog
-            isOpen={confirmOpen}
-            title={
-              encryptionEnabled
-                ? "Enable encryption at rest for tenant?"
-                : "Disable encryption at rest for tenant?"
-            }
-            confirmText={encryptionEnabled ? "Enable" : "Disable"}
-            cancelText="Cancel"
-            onClose={() => setConfirmOpen(false)}
-            onConfirm={updateEncryptionConfiguration}
-            confirmationContent={
-              <DialogContentText>
-                {encryptionEnabled
-                  ? "Data will be encrypted using and external KMS"
-                  : "Current encrypted information will not be accessible"}
-              </DialogContentText>
-            }
-          />
-        )}
         <Grid item xs>
           <h1 className={classes.sectionTitle}>Encryption</h1>
         </Grid>
@@ -1808,17 +1778,4 @@ const TenantEncryption = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  loadingTenant: state.tenants.tenantDetails.loadingTenant,
-  selectedTenant: state.tenants.tenantDetails.currentTenant,
-  tenant: state.tenants.tenantDetails.tenantInfo,
-});
-
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-  setTenantDetailsLoad,
-};
-
-const connector = connect(mapState, mapDispatchToProps);
-
-export default withStyles(styles)(connector(TenantEncryption));
+export default withStyles(styles)(TenantEncryption);

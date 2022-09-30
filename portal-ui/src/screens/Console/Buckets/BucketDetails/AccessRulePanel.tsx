@@ -15,14 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
-import withStyles from "@mui/styles/withStyles";
 import { Paper } from "@mui/material";
-import { AppState } from "../../../../store";
-import { setErrorSnackMessage } from "../../../../actions";
-import { ISessionResponse } from "../../types";
 import { ErrorResponseHandler } from "../../../../common/types";
 import TableWrapper from "../../Common/TableWrapper/TableWrapper";
 import api from "../../../../common/api";
@@ -36,16 +33,19 @@ import {
   searchField,
   tableStyles,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { BucketInfo } from "../types";
 import { IAM_SCOPES } from "../../../../common/SecureComponent/permissions";
 import PanelTitle from "../../Common/PanelTitle/PanelTitle";
 import {
-  SecureComponent,
   hasPermission,
+  SecureComponent,
 } from "../../../../common/SecureComponent";
 
 import withSuspense from "../../Common/Components/withSuspense";
 import RBIconButton from "./SummaryItems/RBIconButton";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import makeStyles from "@mui/styles/makeStyles";
+import { selBucketDetailsLoading } from "./bucketDetailsSlice";
+import { useAppDispatch } from "../../../../store";
 
 const AddAccessRuleModal = withSuspense(
   React.lazy(() => import("./AddAccessRule"))
@@ -57,7 +57,7 @@ const EditAccessRuleModal = withSuspense(
   React.lazy(() => import("./EditAccessRule"))
 );
 
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     "@global": {
       ".rowLine:hover  .iconFileElm": {
@@ -67,41 +67,21 @@ const styles = (theme: Theme) =>
         backgroundImage: "url(/images/ob_folder_filled.svg)",
       },
     },
-    listButton: {
-      marginLeft: "10px",
-      align: "right",
-    },
     ...tableStyles,
     ...actionsTray,
     ...searchField,
     ...objectBrowserCommon,
     ...containerForHeader(theme.spacing(4)),
-  });
+  })
+);
 
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-  loadingBucket: state.buckets.bucketDetails.loadingBucket,
-  bucketInfo: state.buckets.bucketDetails.bucketInfo,
-});
+const AccessRule = () => {
+  const dispatch = useAppDispatch();
+  const classes = useStyles();
+  const params = useParams();
 
-const connector = connect(mapState, { setErrorSnackMessage });
+  const loadingBucket = useSelector(selBucketDetailsLoading);
 
-interface IAccessRuleProps {
-  session: ISessionResponse;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  classes: any;
-  match: any;
-  loadingBucket: boolean;
-  bucketInfo: BucketInfo | null;
-}
-
-const AccessRule = ({
-  classes,
-  match,
-  setErrorSnackMessage,
-  loadingBucket,
-  bucketInfo,
-}: IAccessRuleProps) => {
   const [loadingAccessRules, setLoadingAccessRules] = useState<boolean>(true);
   const [accessRules, setAccessRules] = useState([]);
   const [addAccessRuleOpen, setAddAccessRuleOpen] = useState<boolean>(false);
@@ -112,7 +92,7 @@ const AccessRule = ({
   const [accessRuleToEdit, setAccessRuleToEdit] = useState<string>("");
   const [initialAccess, setInitialAccess] = useState<string>("");
 
-  const bucketName = match.params["bucketName"];
+  const bucketName = params.bucketName || "";
 
   const displayAccessRules = hasPermission(bucketName, [
     IAM_SCOPES.S3_GET_BUCKET_POLICY,
@@ -162,19 +142,14 @@ const AccessRule = ({
             setLoadingAccessRules(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
             setLoadingAccessRules(false);
           });
       } else {
         setLoadingAccessRules(false);
       }
     }
-  }, [
-    loadingAccessRules,
-    setErrorSnackMessage,
-    displayAccessRules,
-    bucketName,
-  ]);
+  }, [loadingAccessRules, dispatch, displayAccessRules, bucketName]);
 
   const closeAddAccessRuleModal = () => {
     setAddAccessRuleOpen(false);
@@ -264,4 +239,4 @@ const AccessRule = ({
   );
 };
 
-export default withStyles(styles)(connector(AccessRule));
+export default AccessRule;

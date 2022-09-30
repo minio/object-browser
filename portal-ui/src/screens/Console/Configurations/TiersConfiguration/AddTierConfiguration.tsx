@@ -15,14 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
+import { useNavigate, useParams } from "react-router-dom";
 import get from "lodash/get";
 import Grid from "@mui/material/Grid";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { Box, Button } from "@mui/material";
-import { setErrorSnackMessage } from "../../../../actions";
 import {
   fileInputStyles,
   formFieldStyles,
@@ -46,6 +46,8 @@ import PageLayout from "../../Common/Layout/PageLayout";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
 
 import RegionSelectWrapper from "./RegionSelectWrapper";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -73,18 +75,14 @@ const styles = (theme: Theme) =>
   });
 
 interface IAddNotificationEndpointProps {
-  setErrorSnackMessage: typeof setErrorSnackMessage;
   classes: any;
-  match: any;
-  history: any;
 }
 
-const AddTierConfiguration = ({
-  classes,
-  setErrorSnackMessage,
-  match,
-  history,
-}: IAddNotificationEndpointProps) => {
+const AddTierConfiguration = ({ classes }: IAddNotificationEndpointProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
+
   //Local States
   const [saving, setSaving] = useState<boolean>(false);
 
@@ -107,7 +105,7 @@ const AddTierConfiguration = ({
 
   const [titleSelection, setTitleSelection] = useState<string>("");
 
-  const type = get(match, "params.service", "s3");
+  const type = get(params, "service", "s3");
 
   // Validations
   const [isFormValid, setIsFormValid] = useState<boolean>(true);
@@ -187,11 +185,11 @@ const AddTierConfiguration = ({
         .then(() => {
           setSaving(false);
 
-          history.push(IAM_PAGES.TIERS);
+          navigate(IAM_PAGES.TIERS);
         })
         .catch((err: ErrorResponseHandler) => {
           setSaving(false);
-          setErrorSnackMessage(err);
+          dispatch(setErrorSnackMessage(err));
         });
     }
   }, [
@@ -201,15 +199,15 @@ const AddTierConfiguration = ({
     bucket,
     encodedCreds,
     endpoint,
-    history,
     name,
     prefix,
     region,
     saving,
     secretKey,
-    setErrorSnackMessage,
+    dispatch,
     storageClass,
     type,
+    navigate,
   ]);
 
   useEffect(() => {
@@ -498,7 +496,7 @@ const AddTierConfiguration = ({
                     label={"Region"}
                     id="region"
                     name="region"
-                    type={type}
+                    type={type as "azure" | "s3" | "minio" | "gcs"}
                   />
                   {type === s3ServiceName ||
                     (type === minioServiceName && (
@@ -533,10 +531,4 @@ const AddTierConfiguration = ({
   );
 };
 
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(AddTierConfiguration));
+export default withStyles(styles)(AddTierConfiguration);

@@ -15,16 +15,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
+import { useLocation, useNavigate } from "react-router-dom";
 import get from "lodash/get";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import { Box, Button, LinearProgress } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import api from "../../../../common/api";
 import ConfTargetGeneric from "../ConfTargetGeneric";
-import { serverNeedsRestart, setErrorSnackMessage } from "../../../../actions";
+
 import {
   fieldBasic,
   settingsCommon,
@@ -39,6 +40,14 @@ import {
 } from "../../Configurations/types";
 import { ErrorResponseHandler } from "../../../../common/types";
 import ResetConfigurationModal from "./ResetConfigurationModal";
+import {
+  setErrorSnackMessage,
+  setServerNeedsRestart,
+  setSnackBarMessage,
+} from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
+import Loader from "../../Common/Loader/Loader";
+import EndpointDisplay from "./EndpointDisplay";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -52,30 +61,36 @@ const styles = (theme: Theme) =>
   });
 
 interface IAddNotificationEndpointProps {
-  serverNeedsRestart: typeof serverNeedsRestart;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
   selectedConfiguration: IConfigurationElement;
   classes: any;
-  history: any;
   className?: string;
 }
 
 const EditConfiguration = ({
-  serverNeedsRestart,
   selectedConfiguration,
-  setErrorSnackMessage,
   classes,
-  history,
   className = "",
 }: IAddNotificationEndpointProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { pathname = "" } = useLocation();
+
+  let selConfigTab = pathname.substring(pathname.lastIndexOf("/") + 1);
+  selConfigTab = selConfigTab === "settings" ? "compression" : selConfigTab;
+
   //Local States
   const [valuesObj, setValueObj] = useState<IElementValue[]>([]);
   const [saving, setSaving] = useState<boolean>(false);
   const [loadingConfig, setLoadingConfig] = useState<boolean>(true);
   const [configValues, setConfigValues] = useState<IElementValue[]>([]);
+  const [configSubsysList, setConfigSubsysList] = useState<any>([]);
   const [resetConfigurationOpen, setResetConfigurationOpen] =
     useState<boolean>(false);
-  //Effects
+
+  useEffect(() => {
+    setLoadingConfig(true);
+  }, [selConfigTab]);
+
   useEffect(() => {
     if (loadingConfig) {
       const configId = get(selectedConfiguration, "configuration_id", false);
@@ -84,20 +99,21 @@ const EditConfiguration = ({
         api
           .invoke("GET", `/api/v1/configs/${configId}`)
           .then((res) => {
-            const keyVals = get(res, "key_values", []);
+            setConfigSubsysList(res);
+            const keyVals = get(res[0], "key_values", []);
             setConfigValues(keyVals);
             setLoadingConfig(false);
           })
           .catch((err: ErrorResponseHandler) => {
             setLoadingConfig(false);
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
           });
 
         return;
       }
       setLoadingConfig(false);
     }
-  }, [loadingConfig, selectedConfiguration, setErrorSnackMessage]);
+  }, [loadingConfig, selectedConfiguration, dispatch]);
 
   useEffect(() => {
     if (saving) {
@@ -112,23 +128,17 @@ const EditConfiguration = ({
         )
         .then((res) => {
           setSaving(false);
-          serverNeedsRestart(res.restart);
-
-          history.push("/settings");
+          dispatch(setServerNeedsRestart(res.restart));
+          if (!res.restart) {
+            dispatch(setSnackBarMessage("Configuration saved successfully"));
+          }
         })
         .catch((err: ErrorResponseHandler) => {
           setSaving(false);
-          setErrorSnackMessage(err);
+          dispatch(setErrorSnackMessage(err));
         });
     }
-  }, [
-    saving,
-    history,
-    serverNeedsRestart,
-    selectedConfiguration,
-    valuesObj,
-    setErrorSnackMessage,
-  ]);
+  }, [saving, dispatch, selectedConfiguration, valuesObj, navigate]);
 
   //Fetch Actions
   const submitForm = (event: React.FormEvent) => {
@@ -137,7 +147,7 @@ const EditConfiguration = ({
   };
 
   const onValueChange = useCallback(
-    (newValue) => {
+    (newValue: IElementValue[]) => {
       setValueObj(newValue);
     },
     [setValueObj]
@@ -145,7 +155,7 @@ const EditConfiguration = ({
 
   const continueReset = (restart: boolean) => {
     setResetConfigurationOpen(false);
-    serverNeedsRestart(restart);
+    dispatch(setServerNeedsRestart(restart));
     if (restart) {
       setLoadingConfig(true);
     }
@@ -161,8 +171,8 @@ const EditConfiguration = ({
         />
       )}
       {loadingConfig ? (
-        <Grid item xs={12}>
-          <LinearProgress />
+        <Grid item xs={12} sx={{ textAlign: "center", paddingTop: "15px" }}>
+          <Loader />
         </Grid>
       ) : (
         <Box
@@ -189,6 +199,13 @@ const EditConfiguration = ({
                 onChange={onValueChange}
                 defaultVals={configValues}
               />
+              {(selectedConfiguration.configuration_id === "logger_webhook" ||
+                selectedConfiguration.configuration_id === "audit_webhook") && (
+                <EndpointDisplay
+                  classes={classes}
+                  configSubsysList={configSubsysList}
+                />
+              )}
             </Grid>
             <Grid
               item
@@ -235,11 +252,4 @@ const EditConfiguration = ({
   );
 };
 
-const mapDispatchToProps = {
-  serverNeedsRestart,
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default connector(withStyles(styles)(EditConfiguration));
+export default withStyles(styles)(EditConfiguration);

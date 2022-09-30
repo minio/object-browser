@@ -14,38 +14,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Theme } from "@mui/material/styles";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import { AppState } from "../../../../store";
+import { AppState, useAppDispatch } from "../../../../store";
 import OperatorLogo from "../../../../icons/OperatorLogo";
 import ConsoleLogo from "../../../../icons/ConsoleLogo";
-import { IFileItem } from "../../ObjectBrowser/types";
-import { toggleList } from "../../ObjectBrowser/actions";
-import { ObjectManagerIcon } from "../../../../icons";
+import DirectPVLogo from "../../../../icons/DirectPVLogo";
 
-interface IPageHeader {
-  classes: any;
-  sidebarOpen?: boolean;
-  operatorMode?: boolean;
-  label: any;
-  actions?: any;
-  managerObjects?: IFileItem[];
-  toggleList: typeof toggleList;
-  middleComponent?: React.ReactNode;
-  features: string[];
-}
+import { CircleIcon, ObjectManagerIcon } from "../../../../icons";
+import { Box } from "@mui/material";
+import { toggleList } from "../../ObjectBrowser/objectBrowserSlice";
+import { selFeatures } from "../../consoleSlice";
+import { selDirectPVMode, selOpMode } from "../../../../systemSlice";
 
 const styles = (theme: Theme) =>
   createStyles({
     headerContainer: {
       width: "100%",
-      minHeight: 79,
+      minHeight: 83,
       display: "flex",
       backgroundColor: "#fff",
       left: 0,
@@ -55,13 +46,6 @@ const styles = (theme: Theme) =>
       display: "flex",
       justifyContent: "flex-start",
       alignItems: "center",
-    },
-    labelStyle: {
-      color: "#000",
-      fontSize: 18,
-      fontWeight: 700,
-      marginLeft: 21,
-      marginTop: 8,
     },
     rightMenu: {
       textAlign: "right",
@@ -78,19 +62,75 @@ const styles = (theme: Theme) =>
       justifyContent: "center",
       alignItems: "center",
     },
+    indicator: {
+      position: "absolute",
+      display: "block",
+      width: 15,
+      height: 15,
+      top: 0,
+      right: 2,
+      marginTop: -16,
+      transitionDuration: "0.2s",
+      color: "#32C787",
+      "& svg": {
+        width: 10,
+        height: 10,
+        top: "50%",
+        left: "50%",
+        transitionDuration: "0.2s",
+      },
+      "&.newItem": {
+        color: "#2781B0",
+        "& svg": {
+          width: 15,
+          height: 15,
+        },
+      },
+    },
   });
+
+interface IPageHeader {
+  classes: any;
+  label: any;
+  actions?: any;
+  middleComponent?: React.ReactNode;
+}
 
 const PageHeader = ({
   classes,
   label,
   actions,
-  sidebarOpen,
-  operatorMode,
-  managerObjects,
-  toggleList,
   middleComponent,
-  features,
 }: IPageHeader) => {
+  const dispatch = useAppDispatch();
+
+  const sidebarOpen = useSelector(
+    (state: AppState) => state.system.sidebarOpen
+  );
+  const operatorMode = useSelector(selOpMode);
+  const directPVMode = useSelector(selDirectPVMode);
+  const managerObjects = useSelector(
+    (state: AppState) => state.objectBrowser.objectManager.objectsToManage
+  );
+  const features = useSelector(selFeatures);
+  const managerOpen = useSelector(
+    (state: AppState) => state.objectBrowser.objectManager.managerOpen
+  );
+  const newItems = useSelector(
+    (state: AppState) => state.objectBrowser.objectManager.newItems
+  );
+
+  const [newObject, setNewObject] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (managerObjects.length > 0 && !managerOpen) {
+      setNewObject(true);
+      setTimeout(() => {
+        setNewObject(false);
+      }, 300);
+    }
+  }, [managerObjects.length, managerOpen]);
+
   if (features.includes("hide-menu")) {
     return <Fragment />;
   }
@@ -113,12 +153,26 @@ const PageHeader = ({
       >
         {!sidebarOpen && (
           <div className={classes.logo}>
-            {operatorMode ? <OperatorLogo /> : <ConsoleLogo />}
+            {!operatorMode && !directPVMode ? (
+              <ConsoleLogo />
+            ) : (
+              <Fragment>
+                {directPVMode ? <DirectPVLogo /> : <OperatorLogo />}
+              </Fragment>
+            )}
           </div>
         )}
-        <Typography variant="h4" className={classes.labelStyle}>
+        <Box
+          sx={{
+            color: "#000",
+            fontSize: 18,
+            fontWeight: 700,
+            marginLeft: "21px",
+            display: "flex",
+          }}
+        >
           {label}
-        </Typography>
+        </Box>
       </Grid>
       {middleComponent && (
         <Grid
@@ -146,11 +200,33 @@ const PageHeader = ({
             aria-label="Refresh List"
             component="span"
             onClick={() => {
-              toggleList();
+              dispatch(toggleList());
             }}
             id="object-manager-toggle"
             size="large"
+            sx={{
+              marginRight: "20px",
+              color: "#5E5E5E",
+              position: "relative",
+              border: "#E2E2E2 1px solid",
+              borderRadius: "3px",
+              width: "40px",
+              height: "40px",
+              backgroundColor: "#F8F8F8",
+              padding: 0,
+              "&>svg": {
+                width: "25px",
+              },
+            }}
           >
+            <div
+              className={`${classes.indicator} ${newObject ? "newItem" : ""}`}
+              style={{
+                opacity: managerObjects.length > 0 && newItems ? 1 : 0,
+              }}
+            >
+              <CircleIcon />
+            </div>
             <ObjectManagerIcon />
           </IconButton>
         )}
@@ -159,17 +235,4 @@ const PageHeader = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  sidebarOpen: state.system.sidebarOpen,
-  operatorMode: state.system.operatorMode,
-  managerObjects: state.objectBrowser.objectManager.objectsToManage,
-  features: state.console.session.features,
-});
-
-const mapDispatchToProps = {
-  toggleList,
-};
-
-const connector = connect(mapState, mapDispatchToProps);
-
-export default connector(withStyles(styles)(PageHeader));
+export default withStyles(styles)(PageHeader);

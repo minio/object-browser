@@ -16,6 +16,7 @@
 
 import storage from "local-storage-fallback";
 import {
+  IBytesCalc,
   ICapacity,
   IErasureCodeCalc,
   IStorageDistribution,
@@ -59,14 +60,10 @@ export const niceBytesInt = (n: number, showK8sUnits: boolean = false) => {
   while (n >= 1024 && ++l) {
     n = n / 1024;
   }
-  //include a decimal point and a tenths-place digit if presenting
-  //less than ten of KB or greater units
+  // include a decimal point and a tenths-place digit if presenting
+  // less than ten of KB or greater units
   const k8sUnitsN = ["B", ...k8sUnits];
-  return (
-    n.toFixed(n < 10 && l > 0 ? 1 : 0) +
-    " " +
-    (showK8sUnits ? k8sUnitsN[l] : units[l])
-  );
+  return n.toFixed(1) + " " + (showK8sUnits ? k8sUnitsN[l] : units[l]);
 };
 
 export const setCookie = (name: string, val: string) => {
@@ -556,27 +553,31 @@ export const niceDaysInt = (seconds: number, timeVariant: string = "s") => {
   }`;
 };
 
+const twoDigitsNumberString = (value: number) => {
+  return `${value < 10 ? "0" : ""}${value}`;
+};
+
 export const getTimeFromTimestamp = (
   timestamp: string,
-  fullDate: boolean = false
+  fullDate: boolean = false,
+  simplifiedDate: boolean = false
 ) => {
   const timestampToInt = parseInt(timestamp);
-
   if (isNaN(timestampToInt)) {
     return "";
   }
   const dateObject = new Date(timestampToInt * 1000);
 
   if (fullDate) {
-    return `${dateObject.getFullYear()}-${String(
-      dateObject.getMonth() + 1
-    ).padStart(2, "0")}-${String(dateObject.getDay()).padStart(
-      2,
-      "0"
-    )} ${dateObject.getHours()}:${String(dateObject.getMinutes()).padStart(
-      2,
-      "0"
-    )}:${String(dateObject.getSeconds()).padStart(2, "0")}`;
+    if (simplifiedDate) {
+      return `${twoDigitsNumberString(
+        dateObject.getMonth() + 1
+      )}/${twoDigitsNumberString(dateObject.getDate())} ${twoDigitsNumberString(
+        dateObject.getHours()
+      )}:${twoDigitsNumberString(dateObject.getMinutes())}`;
+    } else {
+      return dateObject.toLocaleString();
+    }
   }
   return `${dateObject.getHours()}:${String(dateObject.getMinutes()).padStart(
     2,
@@ -585,12 +586,18 @@ export const getTimeFromTimestamp = (
 };
 
 export const calculateBytes = (
-  x: string,
+  x: string | number,
   showDecimals = false,
   roundFloor = true,
   k8sUnit = false
-) => {
-  const bytes = parseInt(x, 10);
+): IBytesCalc => {
+  let bytes;
+
+  if (typeof x === "string") {
+    bytes = parseInt(x, 10);
+  } else {
+    bytes = x;
+  }
 
   if (bytes === 0) {
     return { total: 0, unit: units[0] };
@@ -602,7 +609,7 @@ export const calculateBytes = (
   // Get unit for measure
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  const fractionDigits = showDecimals ? 0 : 1;
+  const fractionDigits = showDecimals ? 1 : 0;
 
   const bytesUnit = bytes / Math.pow(k, i);
 
@@ -668,7 +675,10 @@ export const representationNumber = (number: number | undefined) => {
   return `${returnValue}${unit}`;
 };
 
-export const encodeFileName = (name: string) => {
+export const encodeURLString = (name: string | null) => {
+  if (!name) {
+    return "";
+  }
   try {
     return btoa(unescape(encodeURIComponent(name)));
   } catch (err) {
@@ -676,7 +686,7 @@ export const encodeFileName = (name: string) => {
   }
 };
 
-export const decodeFileName = (text: string) => {
+export const decodeURLString = (text: string) => {
   try {
     return decodeURIComponent(escape(window.atob(text)));
   } catch (err) {
@@ -699,4 +709,26 @@ export const getCookieValue = (cookieName: string) => {
       .match("(^|;)\\s*" + cookieName + "\\s*=\\s*([^;]+)")
       ?.pop() || ""
   );
+};
+
+export const capacityColors = (usedSpace: number, maxSpace: number) => {
+  const percCalculate = (usedSpace * 100) / maxSpace;
+
+  if (percCalculate >= 90) {
+    return "#C83B51";
+  } else if (percCalculate >= 70) {
+    return "#FFAB0F";
+  }
+
+  return "#07193E";
+};
+
+export const getClientOS = (): string => {
+  const getPlatform = get(window.navigator, "platform", "undefined");
+
+  if (!getPlatform) {
+    return "undefined";
+  }
+
+  return getPlatform;
 };

@@ -15,12 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { IMessageEvent, w3cwebsocket as W3CWebSocket } from "websocket";
 import { Button, Grid } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
-import withStyles from "@mui/styles/withStyles";
 import moment from "moment/moment";
 import PageHeader from "../Common/PageHeader/PageHeader";
 import {
@@ -32,7 +31,6 @@ import {
 } from "../Common/FormComponents/common/styleLibrary";
 import { wsProtocol } from "../../../utils/wsUtils";
 import { SpeedTestResponse } from "./types";
-import { AppState } from "../../../store";
 import { SpeedtestIcon } from "../../../icons";
 import {
   CONSOLE_UI_RESOURCE,
@@ -48,13 +46,10 @@ import DistributedOnly from "../Common/DistributedOnly/DistributedOnly";
 import HelpBox from "../../../common/HelpBox";
 import WarnIcon from "../../../icons/WarnIcon";
 import Loader from "../Common/Loader/Loader";
+import { selDistSet } from "../../../systemSlice";
+import makeStyles from "@mui/styles/makeStyles";
 
-interface ISpeedtest {
-  classes: any;
-  distributedSetup: boolean;
-}
-
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     advancedContent: {
       backgroundColor: "#FBFAFA",
@@ -74,20 +69,17 @@ const styles = (theme: Theme) =>
       fontSize: 13,
       marginBottom: 8,
     },
-    advancedOption: {
-      marginTop: 20,
-    },
-    advancedAutotune: {
-      marginTop: 10,
-    },
     ...advancedFilterToggleStyles,
     ...actionsTray,
     ...searchField,
     ...formFieldStyles,
     ...containerForHeader(theme.spacing(4)),
-  });
+  })
+);
 
-const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
+const Speedtest = () => {
+  const distributedSetup = useSelector(selDistSet);
+  const classes = useStyles();
   const [start, setStart] = useState<boolean>(false);
 
   const [currStatus, setCurrStatus] = useState<SpeedTestResponse[] | null>(
@@ -96,6 +88,7 @@ const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
 
   const [size, setSize] = useState<string>("64");
   const [sizeUnit, setSizeUnit] = useState<string>("MB");
+  const [duration, setDuration] = useState<string>("10");
 
   const [topDate, setTopDate] = useState<number>(0);
   const [currentValue, setCurrentValue] = useState<number>(0);
@@ -115,7 +108,7 @@ const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
 
       const wsProt = wsProtocol(url.protocol);
       const c = new W3CWebSocket(
-        `${wsProt}://${url.hostname}:${port}${baseUrl}ws/speedtest?&size=${size}${sizeUnit}`
+        `${wsProt}://${url.hostname}:${port}${baseUrl}ws/speedtest?&size=${size}${sizeUnit}&duration=${duration}s`
       );
 
       const baseDate = moment();
@@ -175,7 +168,7 @@ const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
       // reset start status
       setStart(false);
     }
-  }, [size, sizeUnit, start]);
+  }, [size, sizeUnit, start, duration]);
 
   useEffect(() => {
     const actualSeconds = (topDate - currentValue) / 1000;
@@ -205,7 +198,7 @@ const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
           >
             <Grid item xs={12} className={classes.boxy}>
               <Grid container>
-                <Grid item md={6} sm={12}>
+                <Grid item md={4} sm={12}>
                   <div className={classes.stepProgressText}>
                     {start ? (
                       <Fragment>
@@ -231,7 +224,7 @@ const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
                     />
                   </div>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item md sm={12}>
                   <div style={{ marginLeft: 10, width: 300 }}>
                     <InputBoxWrapper
                       id={"size"}
@@ -259,7 +252,34 @@ const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
                     />
                   </div>
                 </Grid>
-                <Grid item xs={2} textAlign={"right"}>
+                <Grid item md sm={12}>
+                  <div style={{ marginLeft: 10, width: 300 }}>
+                    <InputBoxWrapper
+                      id={"duration"}
+                      name={"duration"}
+                      label={"Duration"}
+                      onChange={(e) => {
+                        if (e.target.validity.valid) {
+                          setDuration(e.target.value);
+                        }
+                      }}
+                      noLabelMinWidth={true}
+                      value={duration}
+                      disabled={start}
+                      overlayObject={
+                        <InputUnitMenu
+                          id={"size-unit"}
+                          onUnitChange={() => {}}
+                          unitSelected={"s"}
+                          unitsList={[{ label: "s", value: "s" }]}
+                          disabled={start}
+                        />
+                      }
+                      pattern={"[0-9]*"}
+                    />
+                  </div>
+                </Grid>
+                <Grid item md={1} sm={12} textAlign={"right"}>
                   <Button
                     onClick={() => {
                       setCurrStatus(null);
@@ -272,7 +292,9 @@ const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
                       currStatus !== null && !start ? "contained" : "outlined"
                     }
                     className={`${classes.buttonBackground} ${classes.speedStart}`}
-                    disabled={"10".trim() === "" || size.trim() === "" || start}
+                    disabled={
+                      duration.trim() === "" || size.trim() === "" || start
+                    }
                   >
                     {!start && (
                       <Fragment>
@@ -317,10 +339,4 @@ const Speedtest = ({ classes, distributedSetup }: ISpeedtest) => {
   );
 };
 
-const mapState = (state: AppState) => ({
-  distributedSetup: state.system.distributedSetup,
-});
-
-const connector = connect(mapState, null);
-
-export default connector(withStyles(styles)(Speedtest));
+export default Speedtest;

@@ -17,8 +17,7 @@
 import React, { useState } from "react";
 import { DialogContentText } from "@mui/material";
 import { ITenant } from "./types";
-import { connect } from "react-redux";
-import { setErrorSnackMessage } from "../../../../actions";
+
 import { ErrorResponseHandler } from "../../../../common/types";
 import InputBoxWrapper from "../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import Grid from "@mui/material/Grid";
@@ -27,24 +26,26 @@ import ConfirmDialog from "../../Common/ModalWrapper/ConfirmDialog";
 import { ConfirmDeleteIcon } from "../../../../icons";
 import WarningMessage from "../../Common/WarningMessage/WarningMessage";
 import FormSwitchWrapper from "../../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 interface IDeleteTenant {
   deleteOpen: boolean;
   selectedTenant: ITenant;
   closeDeleteModalAndRefresh: (refreshList: boolean) => any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 const DeleteTenant = ({
   deleteOpen,
   selectedTenant,
   closeDeleteModalAndRefresh,
-  setErrorSnackMessage,
 }: IDeleteTenant) => {
+  const dispatch = useAppDispatch();
   const [retypeTenant, setRetypeTenant] = useState("");
 
   const onDelSuccess = () => closeDeleteModalAndRefresh(true);
-  const onDelError = (err: ErrorResponseHandler) => setErrorSnackMessage(err);
+  const onDelError = (err: ErrorResponseHandler) =>
+    dispatch(setErrorSnackMessage(err));
   const onClose = () => closeDeleteModalAndRefresh(false);
 
   const [deleteVolumes, setDeleteVolumes] = useState<boolean>(false);
@@ -119,8 +120,4 @@ const DeleteTenant = ({
   );
 };
 
-const connector = connect(null, {
-  setErrorSnackMessage,
-});
-
-export default connector(DeleteTenant);
+export default DeleteTenant;

@@ -15,7 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -23,9 +24,7 @@ import get from "lodash/get";
 import Grid from "@mui/material/Grid";
 import AddIcon from "../../../../icons/AddIcon";
 import LambdaIcon from "../../../../icons/LambdaIcon";
-import { BucketEvent, BucketEventList, BucketInfo } from "../types";
-import { setErrorSnackMessage } from "../../../../actions";
-import { AppState } from "../../../../store";
+import { BucketEvent, BucketEventList } from "../types";
 import {
   actionsTray,
   searchField,
@@ -37,13 +36,16 @@ import api from "../../../../common/api";
 import HelpBox from "../../../../common/HelpBox";
 import PanelTitle from "../../Common/PanelTitle/PanelTitle";
 import {
-  SecureComponent,
   hasPermission,
+  SecureComponent,
 } from "../../../../common/SecureComponent";
 import { IAM_SCOPES } from "../../../../common/SecureComponent/permissions";
 
 import withSuspense from "../../Common/Components/withSuspense";
 import RBIconButton from "./SummaryItems/RBIconButton";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import { selBucketDetailsLoading } from "./bucketDetailsSlice";
+import { useAppDispatch } from "../../../../store";
 
 const DeleteEvent = withSuspense(React.lazy(() => import("./DeleteEvent")));
 const AddEvent = withSuspense(React.lazy(() => import("./AddEvent")));
@@ -59,26 +61,21 @@ const styles = (theme: Theme) =>
 
 interface IBucketEventsProps {
   classes: any;
-  match: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  loadingBucket: boolean;
-  bucketInfo: BucketInfo | null;
 }
 
-const BucketEventsPanel = ({
-  classes,
-  match,
-  setErrorSnackMessage,
-  loadingBucket,
-  bucketInfo,
-}: IBucketEventsProps) => {
+const BucketEventsPanel = ({ classes }: IBucketEventsProps) => {
+  const dispatch = useAppDispatch();
+  const params = useParams();
+
+  const loadingBucket = useSelector(selBucketDetailsLoading);
+
   const [addEventScreenOpen, setAddEventScreenOpen] = useState<boolean>(false);
   const [loadingEvents, setLoadingEvents] = useState<boolean>(true);
   const [records, setRecords] = useState<BucketEvent[]>([]);
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<BucketEvent | null>(null);
 
-  const bucketName = match.params["bucketName"];
+  const bucketName = params.bucketName || "";
 
   const displayEvents = hasPermission(bucketName, [
     IAM_SCOPES.S3_GET_BUCKET_NOTIFICATIONS,
@@ -102,13 +99,13 @@ const BucketEventsPanel = ({
           })
           .catch((err: ErrorResponseHandler) => {
             setLoadingEvents(false);
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
           });
       } else {
         setLoadingEvents(false);
       }
     }
-  }, [loadingEvents, setErrorSnackMessage, bucketName, displayEvents]);
+  }, [loadingEvents, dispatch, bucketName, displayEvents]);
 
   const eventsDisplay = (events: string[]) => {
     return <Fragment>{events.join(", ")}</Fragment>;
@@ -203,6 +200,7 @@ const BucketEventsPanel = ({
         </Grid>
         {!loadingEvents && (
           <Grid item xs={12}>
+            <br />
             <HelpBox
               title={"Lambda Notifications"}
               iconComponent={<LambdaIcon />}
@@ -233,14 +231,4 @@ const BucketEventsPanel = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-  loadingBucket: state.buckets.bucketDetails.loadingBucket,
-  bucketInfo: state.buckets.bucketDetails.bucketInfo,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(BucketEventsPanel));
+export default withStyles(styles)(BucketEventsPanel);

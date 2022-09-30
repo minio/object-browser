@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -28,7 +28,7 @@ import {
   modalBasic,
   wizardCommon,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { setModalErrorSnackMessage } from "../../../../actions";
+
 import { BulkReplicationItem, BulkReplicationResponse } from "../types";
 import InputBoxWrapper from "../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import ModalWrapper from "../../Common/ModalWrapper/ModalWrapper";
@@ -41,13 +41,14 @@ import { SelectorTypes } from "../../Common/FormComponents/RadioGroupSelector/Ra
 import { getBytes, k8sScalarUnitsExcluding } from "../../../../common/utils";
 import { ErrorResponseHandler } from "../../../../common/types";
 import InputUnitMenu from "../../Common/FormComponents/InputUnitMenu/InputUnitMenu";
+import { setModalErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 interface IBulkReplicationModal {
   open: boolean;
   closeModalAndRefresh: (clearSelection: boolean) => any;
   classes: any;
   buckets: string[];
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -77,8 +78,8 @@ const AddBulkReplicationModal = ({
   closeModalAndRefresh,
   classes,
   buckets,
-  setModalErrorSnackMessage,
 }: IBulkReplicationModal) => {
+  const dispatch = useAppDispatch();
   const [bucketsToAlter, setBucketsToAlter] = useState<string[]>([]);
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [externalLoading, setExternalLoading] = useState<boolean>(false);
@@ -167,7 +168,7 @@ const AddBulkReplicationModal = ({
       })
       .catch((err: ErrorResponseHandler) => {
         setAddLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   };
 
@@ -200,7 +201,7 @@ const AddBulkReplicationModal = ({
       })
       .catch((err: ErrorResponseHandler) => {
         setExternalLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   };
 
@@ -512,8 +513,4 @@ const AddBulkReplicationModal = ({
   );
 };
 
-const connector = connect(null, {
-  setModalErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(AddBulkReplicationModal));
+export default withStyles(styles)(AddBulkReplicationModal);

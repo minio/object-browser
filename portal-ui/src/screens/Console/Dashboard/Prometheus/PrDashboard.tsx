@@ -15,13 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
-
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import { GridSize, useMediaQuery } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   actionsTray,
   widgetContainerCommon,
@@ -30,23 +29,29 @@ import { IDashboardPanel } from "./types";
 import { getWidgetsWithValue, panelsConfiguration } from "./utils";
 import { TabPanel } from "../../../shared/tabs";
 import { ErrorResponseHandler } from "../../../../common/types";
-import { setErrorSnackMessage } from "../../../../actions";
 import api from "../../../../common/api";
 
 import TabSelector from "../../Common/TabSelector/TabSelector";
-import MergedWidgets from "./MergedWidgets";
 import { componentToUse } from "./widgetUtils";
 import ZoomWidget from "./ZoomWidget";
-import { AppState } from "../../../../store";
+import { AppState, useAppDispatch } from "../../../../store";
 import DateRangeSelector from "../../Common/FormComponents/DateRangeSelector/DateRangeSelector";
-import { useTheme } from "@mui/styles";
+import {
+  DLayoutColumnProps,
+  DLayoutRowProps,
+  resourcesPanelsLayout,
+  resourcesPanelsLayoutAdvanced,
+  RowPanelLayout,
+  summaryPanelsLayout,
+  trafficPanelsLayout,
+} from "./Widgets/LayoutUtil";
+import MergedWidgetsRenderer from "./Widgets/MergedWidgetsRenderer";
+import PageLayout from "../../Common/Layout/PageLayout";
+import { setErrorSnackMessage } from "../../../../systemSlice";
 
 interface IPrDashboard {
-  classes: any;
-  displayErrorMessage: typeof setErrorSnackMessage;
+  classes?: any;
   apiPrefix?: string;
-  zoomOpen: boolean;
-  zoomWidget: null | IDashboardPanel;
 }
 
 const styles = (theme: Theme) =>
@@ -58,17 +63,18 @@ const styles = (theme: Theme) =>
       flexDirection: "row",
       justifyContent: "flex-start",
       flexWrap: "wrap",
-      maxWidth: 1180,
     },
   });
 
-const PrDashboard = ({
-  classes,
-  displayErrorMessage,
-  apiPrefix = "admin",
-  zoomOpen,
-  zoomWidget,
-}: IPrDashboard) => {
+const PrDashboard = ({ apiPrefix = "admin" }: IPrDashboard) => {
+  const dispatch = useAppDispatch();
+  const zoomOpen = useSelector(
+    (state: AppState) => state.dashboard.zoom.openZoom
+  );
+  const zoomWidget = useSelector(
+    (state: AppState) => state.dashboard.zoom.widgetRender
+  );
+
   const [timeStart, setTimeStart] = useState<any>(null);
   const [timeEnd, setTimeEnd] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -76,103 +82,9 @@ const PrDashboard = ({
     useState<IDashboardPanel[]>(panelsConfiguration);
   const [curTab, setCurTab] = useState<number>(0);
 
-  const theme = useTheme();
-  const biggerThanMd = useMediaQuery(theme.breakpoints.up("md"));
-
-  const panels = useCallback(
-    (tabName: string, filterPanels?: number[][] | null) => {
-      return filterPanels?.map((panelLine, indexLine) => {
-        const totalPanelsContained = panelLine.length;
-
-        let perc = Math.floor(12 / totalPanelsContained);
-
-        if (!biggerThanMd && totalPanelsContained >= 4) {
-          perc = 6;
-        } else if (!biggerThanMd && totalPanelsContained >= 3) {
-          perc = 12;
-        }
-
-        if (perc < 1) {
-          perc = 1;
-        } else if (perc > 12) {
-          perc = 12;
-        }
-
-        return (
-          <Grid
-            item
-            xs={12}
-            key={`line-${tabName}-${indexLine}`}
-            className={classes.dashboardRow}
-          >
-            {panelLine.map((panelInline, indexPanel) => {
-              const panelInfo = panelInformation.find(
-                (panel) => panel.id === panelInline
-              );
-
-              return (
-                <Grid
-                  key={`widget-${panelInline}-${indexPanel}`}
-                  className={classes.widgetPanelDelimiter}
-                  item
-                  xs={12}
-                  sm={perc as GridSize}
-                  md={perc as GridSize}
-                  lg={perc as GridSize}
-                >
-                  <Grid item xs={12}>
-                    {panelInfo ? (
-                      <Fragment>
-                        {panelInfo.mergedPanels ? (
-                          <Fragment>
-                            <MergedWidgets
-                              title={panelInfo.title}
-                              leftComponent={componentToUse(
-                                panelInfo.mergedPanels[0],
-                                timeStart,
-                                timeEnd,
-                                loading,
-                                apiPrefix
-                              )}
-                              rightComponent={componentToUse(
-                                panelInfo.mergedPanels[1],
-                                timeStart,
-                                timeEnd,
-                                loading,
-                                apiPrefix
-                              )}
-                            />
-                          </Fragment>
-                        ) : (
-                          componentToUse(
-                            panelInfo,
-                            timeStart,
-                            timeEnd,
-                            loading,
-                            apiPrefix
-                          )
-                        )}
-                      </Fragment>
-                    ) : null}
-                  </Grid>
-                </Grid>
-              );
-            })}
-          </Grid>
-        );
-      });
-    },
-    [
-      timeStart,
-      timeEnd,
-      loading,
-      apiPrefix,
-      classes.dashboardRow,
-      classes.widgetPanelDelimiter,
-      panelInformation,
-      biggerThanMd,
-    ]
-  );
+  const getPanelDetails = (id: number) => {
+    return panelInformation.find((panel) => panel.id === id);
+  };
 
   const fetchUsage = useCallback(() => {
     let stepCalc = 0;
@@ -198,20 +110,22 @@ const PrDashboard = ({
           const widgetsWithValue = getWidgetsWithValue(res.widgets);
           setPanelInformation(widgetsWithValue);
         } else {
-          displayErrorMessage({
-            errorMessage:
-              "Widget information could not be retrieved at this time. Please try again",
-            detailedError: "",
-          });
+          dispatch(
+            setErrorSnackMessage({
+              errorMessage:
+                "Widget information could not be retrieved at this time. Please try again",
+              detailedError: "",
+            })
+          );
         }
 
         setLoading(false);
       })
       .catch((err: ErrorResponseHandler) => {
-        displayErrorMessage(err);
+        dispatch(setErrorSnackMessage(err));
         setLoading(false);
       });
-  }, [timeStart, timeEnd, displayErrorMessage, apiPrefix]);
+  }, [timeStart, timeEnd, dispatch, apiPrefix]);
 
   const triggerLoad = () => {
     setLoading(true);
@@ -223,29 +137,76 @@ const PrDashboard = ({
     }
   }, [loading, fetchUsage]);
 
-  const summaryPanels = [
-    [66, 44, 500, 501],
-    [80, 81, 1],
-    [68, 52],
-    [63, 70],
-  ];
+  const renderCmpByConfig = (
+    panelInfo: IDashboardPanel | undefined,
+    key: string
+  ) => {
+    return (
+      <Fragment key={`widget-${key}`}>
+        {panelInfo ? (
+          <Fragment>
+            <Box>
+              {panelInfo.mergedPanels ? (
+                <MergedWidgetsRenderer
+                  info={panelInfo}
+                  timeStart={timeStart}
+                  timeEnd={timeEnd}
+                  loading={loading}
+                  apiPrefix={apiPrefix}
+                />
+              ) : (
+                componentToUse(
+                  panelInfo,
+                  timeStart,
+                  timeEnd,
+                  loading,
+                  apiPrefix,
+                  zoomOpen
+                )
+              )}
+            </Box>
+          </Fragment>
+        ) : null}
+      </Fragment>
+    );
+  };
 
-  if (biggerThanMd) {
-    summaryPanels.splice(1, 0, [50, 502]);
-  } else {
-    summaryPanels.splice(1, 0, [50]);
-    summaryPanels.splice(1, 0, [502]);
-  }
+  const renderPanelItems = (layoutRows: DLayoutRowProps[]) => {
+    return layoutRows.reduce((prev: any[], rowItem, rIdx) => {
+      const { columns = [] } = rowItem;
+      const cellItems: any[] = columns.map(
+        (cellItem: DLayoutColumnProps, colIdx: number) => {
+          const panelInfo = getPanelDetails(cellItem.componentId);
+          return renderCmpByConfig(panelInfo, `${rIdx}-${colIdx}`);
+        }
+      );
+      const rowConfig = (
+        <Box sx={rowItem.sx} key={`layout-row-${rIdx}`}>
+          {cellItems}
+        </Box>
+      );
+      return [...prev, rowConfig];
+    }, []);
+  };
 
-  const resourcesPanels = [
-    [76, 77],
-    [11, 8],
-    [82, 74],
-  ];
-  const requestsPanels = [[60], [71, 17], [73]];
+  const renderSummaryPanels = () => {
+    return renderPanelItems(summaryPanelsLayout);
+  };
+
+  const renderTrafficPanels = () => {
+    return renderPanelItems(trafficPanelsLayout);
+  };
+
+  const renderResourcesPanels = () => {
+    return renderPanelItems(resourcesPanelsLayout);
+  };
+
+  const renderAdvancedResourcesPanels = () => {
+    return renderPanelItems(resourcesPanelsLayoutAdvanced);
+  };
 
   return (
-    <Fragment>
+    <PageLayout>
       {zoomOpen && (
         <ZoomWidget
           modalOpen={zoomOpen}
@@ -256,13 +217,7 @@ const PrDashboard = ({
           apiPrefix={apiPrefix}
         />
       )}
-      <DateRangeSelector
-        timeStart={timeStart}
-        setTimeStart={setTimeStart}
-        timeEnd={timeEnd}
-        setTimeEnd={setTimeEnd}
-        triggerSync={triggerLoad}
-      />
+
       <Grid item xs={12}>
         <TabSelector
           selectedTab={curTab}
@@ -276,28 +231,48 @@ const PrDashboard = ({
           ]}
         />
       </Grid>
-      <Grid item xs={12} className={classes.widgetsContainer}>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          paddingTop: "20px",
+        }}
+      >
+        <Box
+          sx={{
+            marginBottom: "20px",
+          }}
+        >
+          <DateRangeSelector
+            timeStart={timeStart}
+            setTimeStart={setTimeStart}
+            timeEnd={timeEnd}
+            setTimeEnd={setTimeEnd}
+            triggerSync={triggerLoad}
+          />
+        </Box>
         <TabPanel index={0} value={curTab}>
-          {panels("Summary", summaryPanels)}
+          <RowPanelLayout>
+            {panelInformation.length ? renderSummaryPanels() : null}
+          </RowPanelLayout>
         </TabPanel>
         <TabPanel index={1} value={curTab}>
-          {panels("Traffic", requestsPanels)}
+          <RowPanelLayout>
+            {panelInformation.length ? renderTrafficPanels() : null}
+          </RowPanelLayout>
         </TabPanel>
         <TabPanel index={2} value={curTab}>
-          {panels("Resources", resourcesPanels)}
+          <RowPanelLayout>
+            {panelInformation.length ? renderResourcesPanels() : null}
+            <h2 style={{ margin: 0, borderBottom: "1px solid #dedede" }}>
+              Advanced
+            </h2>
+            {panelInformation.length ? renderAdvancedResourcesPanels() : null}
+          </RowPanelLayout>
         </TabPanel>
       </Grid>
-    </Fragment>
+    </PageLayout>
   );
 };
 
-const mapState = (state: AppState) => ({
-  zoomOpen: state.dashboard.zoom.openZoom,
-  zoomWidget: state.dashboard.zoom.widgetRender,
-});
-
-const connector = connect(mapState, {
-  displayErrorMessage: setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(PrDashboard));
+export default withStyles(styles)(PrDashboard);

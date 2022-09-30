@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import React, { Fragment, useEffect, useState, useRef } from "react";
+
 import {
   Bar,
   BarChart,
@@ -25,22 +25,23 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useMediaQuery } from "@mui/material";
+import { useMediaQuery, Grid } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import { IBarChartConfiguration } from "./types";
 import { widgetCommon } from "../../../Common/FormComponents/common/styleLibrary";
 import BarChartTooltip from "./tooltips/BarChartTooltip";
-import { setErrorSnackMessage } from "../../../../../actions";
 import { IDashboardPanel } from "../types";
 import { widgetDetailsToPanel } from "../utils";
 import { ErrorResponseHandler } from "../../../../../common/types";
 import api from "../../../../../common/api";
-import { openZoomPage } from "../../actions";
 import { useTheme } from "@mui/styles";
 import Loader from "../../../Common/Loader/Loader";
+import ExpandGraphLink from "./ExpandGraphLink";
+import { setErrorSnackMessage } from "../../../../../systemSlice";
+import { useAppDispatch } from "../../../../../store";
+import DownloadWidgetDataButton from "../../DownloadWidgetDataButton";
 
 interface IBarChartWidget {
   classes: any;
@@ -49,10 +50,8 @@ interface IBarChartWidget {
   timeStart: any;
   timeEnd: any;
   propLoading: boolean;
-  displayErrorMessage: any;
   apiPrefix: string;
   zoomActivated?: boolean;
-  openZoomPage: typeof openZoomPage;
 }
 
 const styles = (theme: Theme) =>
@@ -70,11 +69,11 @@ const CustomizedAxisTick = ({ y, payload }: any) => {
   return (
     <text
       width={50}
-      fontSize={"63%"}
+      fontSize={"69.7%"}
       textAnchor="start"
       fill="#333"
       transform={`translate(5,${y})`}
-      fontWeight={700}
+      fontWeight={400}
       dy={3}
     >
       {payload.value}
@@ -89,14 +88,22 @@ const BarChartWidget = ({
   timeStart,
   timeEnd,
   propLoading,
-  displayErrorMessage,
   apiPrefix,
   zoomActivated = false,
-  openZoomPage,
 }: IBarChartWidget) => {
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<any>([]);
   const [result, setResult] = useState<IDashboardPanel | null>(null);
+  const [hover, setHover] = useState<boolean>(false);
+  const componentRef = useRef<HTMLElement>();
+
+  const onHover = () => {
+    setHover(true);
+  };
+  const onStopHover = () => {
+    setHover(false);
+  };
 
   useEffect(() => {
     if (propLoading) {
@@ -132,11 +139,11 @@ const BarChartWidget = ({
           setLoading(false);
         })
         .catch((err: ErrorResponseHandler) => {
-          displayErrorMessage(err);
+          dispatch(setErrorSnackMessage(err));
           setLoading(false);
         });
     }
-  }, [loading, panelItem, timeEnd, timeStart, displayErrorMessage, apiPrefix]);
+  }, [loading, panelItem, timeEnd, timeStart, dispatch, apiPrefix]);
 
   const barChartConfiguration = result
     ? (result.widgetConfiguration as IBarChartConfiguration[])
@@ -159,19 +166,27 @@ const BarChartWidget = ({
   const biggerThanMd = useMediaQuery(theme.breakpoints.up("md"));
 
   return (
-    <div className={zoomActivated ? "" : classes.singleValueContainer}>
+    <div
+      className={zoomActivated ? "" : classes.singleValueContainer}
+      onMouseOver={onHover}
+      onMouseLeave={onStopHover}
+    >
       {!zoomActivated && (
-        <div className={classes.titleContainer}>
-          {title}{" "}
-          <button
-            onClick={() => {
-              openZoomPage(panelItem);
-            }}
-            className={classes.zoomChartIcon}
-          >
-            <ZoomOutMapIcon />
-          </button>
-        </div>
+        <Grid container>
+          <Grid item xs={10} alignItems={"start"} justifyItems={"start"}>
+            <div className={classes.titleContainer}>{title}</div>
+          </Grid>
+          <Grid item xs={1} display={"flex"} justifyContent={"flex-end"}>
+            {hover && <ExpandGraphLink panelItem={panelItem} />}
+          </Grid>
+          <Grid item xs={1} display={"flex"} justifyContent={"flex-end"}>
+            <DownloadWidgetDataButton
+              title={title}
+              componentRef={componentRef}
+              data={data}
+            />
+          </Grid>
+        </Grid>
       )}
       {loading && (
         <div className={classes.loadingAlign}>
@@ -180,6 +195,7 @@ const BarChartWidget = ({
       )}
       {!loading && (
         <div
+          ref={componentRef as React.RefObject<HTMLDivElement>}
           className={
             zoomActivated ? classes.zoomChartCont : classes.contentContainer
           }
@@ -200,6 +216,10 @@ const BarChartWidget = ({
                 axisLine={false}
                 width={150}
                 hide={!biggerThanMd}
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 100,
+                }}
               />
               {barChartConfiguration.map((bar) => (
                 <Bar
@@ -241,9 +261,4 @@ const BarChartWidget = ({
   );
 };
 
-const connector = connect(null, {
-  displayErrorMessage: setErrorSnackMessage,
-  openZoomPage: openZoomPage,
-});
-
-export default withStyles(styles)(connector(BarChartWidget));
+export default withStyles(styles)(BarChartWidget);

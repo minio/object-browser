@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -30,17 +30,17 @@ import {
   selectorsCommon,
   tableStyles,
 } from "../Common/FormComponents/common/styleLibrary";
-import { setModalErrorSnackMessage } from "../../../actions";
 import { ErrorResponseHandler } from "../../../common/types";
 import api from "../../../common/api";
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
 import SearchBox from "../Common/SearchBox";
+import { setModalErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
 interface IGroupsProps {
   classes: any;
   selectedGroups: string[];
   setSelectedGroups: any;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -73,8 +73,8 @@ const GroupsSelectors = ({
   classes,
   selectedGroups,
   setSelectedGroups,
-  setModalErrorSnackMessage,
 }: IGroupsProps) => {
+  const dispatch = useAppDispatch();
   // Local State
   const [records, setRecords] = useState<any[]>([]);
   const [loading, isLoading] = useState<boolean>(false);
@@ -93,10 +93,10 @@ const GroupsSelectors = ({
         isLoading(false);
       })
       .catch((err: ErrorResponseHandler) => {
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
         isLoading(false);
       });
-  }, [setModalErrorSnackMessage]);
+  }, [dispatch]);
 
   //Effects
   useEffect(() => {
@@ -145,7 +145,7 @@ const GroupsSelectors = ({
 
               <div className={classes.searchBox}>
                 <SearchBox
-                  placeholder="Filter Groups"
+                  placeholder="Start typing to search for Groups"
                   adornmentPosition="end"
                   onChange={setFilter}
                   value={filter}
@@ -173,10 +173,4 @@ const GroupsSelectors = ({
   );
 };
 
-const mapDispatchToProps = {
-  setModalErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(GroupsSelectors));
+export default withStyles(styles)(GroupsSelectors);

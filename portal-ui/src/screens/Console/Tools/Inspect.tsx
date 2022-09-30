@@ -29,18 +29,19 @@ import {
   modalStyleUtils,
 } from "../Common/FormComponents/common/styleLibrary";
 import withStyles from "@mui/styles/withStyles";
-import { setErrorSnackMessage } from "../../../actions";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import HelpBox from "../../../common/HelpBox";
 import {
   deleteCookie,
+  encodeURLString,
   getCookieValue,
   performDownload,
 } from "../../../common/utils";
 import DistributedOnly from "../Common/DistributedOnly/DistributedOnly";
-import { AppState } from "../../../store";
 import { InspectMenuIcon } from "../../../icons/SidebarMenus";
 import KeyRevealer from "./KeyRevealer";
+import { selDistSet, setErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -50,15 +51,6 @@ const styles = (theme: Theme) =>
     ...deleteDialogStyles,
     ...modalStyleUtils,
   });
-
-const mapState = (state: AppState) => ({
-  distributedSetup: state.system.distributedSetup,
-});
-
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-const connector = connect(mapState, mapDispatchToProps);
 
 const ExampleBlock = ({
   volumeVal,
@@ -99,15 +91,9 @@ const ExampleBlock = ({
   );
 };
 
-const Inspect = ({
-  classes,
-  setErrorSnackMessage,
-  distributedSetup,
-}: {
-  classes: any;
-  setErrorSnackMessage: any;
-  distributedSetup: boolean;
-}) => {
+const Inspect = ({ classes }: { classes: any }) => {
+  const dispatch = useAppDispatch();
+  const distributedSetup = useSelector(selDistSet);
   const [volumeName, setVolumeName] = useState<string>("");
   const [inspectPath, setInspectPath] = useState<string>("");
   const [isEncrypt, setIsEncrypt] = useState<boolean>(true);
@@ -158,8 +144,8 @@ const Inspect = ({
   };
 
   const performInspect = async () => {
-    const file = encodeURIComponent(inspectPath);
-    const volume = encodeURIComponent(volumeName);
+    const file = encodeURLString(inspectPath);
+    const volume = encodeURLString(volumeName);
 
     const urlOfInspectApi = `/api/v1/admin/inspect?volume=${volume}&file=${file}&encrypt=${isEncrypt}`;
 
@@ -168,10 +154,12 @@ const Inspect = ({
         if (!res.ok) {
           const resErr: any = await res.json();
 
-          setErrorSnackMessage({
-            errorMessage: resErr.message,
-            detailedError: resErr.code,
-          });
+          dispatch(
+            setErrorSnackMessage({
+              errorMessage: resErr.message,
+              detailedError: resErr.code,
+            })
+          );
         }
         const blob: Blob = await res.blob();
 
@@ -184,7 +172,7 @@ const Inspect = ({
         setDecryptionKey(decryptKey);
       })
       .catch((err) => {
-        setErrorSnackMessage(err);
+        dispatch(setErrorSnackMessage(err));
       });
   };
 
@@ -237,6 +225,7 @@ const Inspect = ({
           >
             <Box
               sx={{
+                border: "1px solid #eaeaea",
                 flex: {
                   md: 2,
                   xs: 1,
@@ -245,7 +234,10 @@ const Inspect = ({
                   lg: "auto",
                   xs: "100%",
                 },
-                padding: "25px",
+                padding: {
+                  lg: "40px",
+                  xs: "15px",
+                },
               }}
             >
               <form
@@ -441,7 +433,7 @@ const Inspect = ({
                             width: "7px",
                             backgroundColor: "#2781B0",
                             marginRight: "10px",
-                            marginTop: "12px",
+                            marginTop: "7px",
                             flexShrink: 0,
                           },
                         },
@@ -582,4 +574,4 @@ const Inspect = ({
   );
 };
 
-export default withStyles(styles)(connector(Inspect));
+export default withStyles(styles)(Inspect);

@@ -15,14 +15,20 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
 import { Theme } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import Grid from "@mui/material/Grid";
-import { LinearProgress } from "@mui/material";
-import { AddIcon, GroupsIcon, UsersIcon } from "../../../icons";
-import { setErrorSnackMessage } from "../../../actions";
+import { Box, LinearProgress } from "@mui/material";
+import {
+  AddIcon,
+  DeleteIcon,
+  GroupsIcon,
+  IAMPoliciesIcon,
+  UsersIcon,
+} from "../../../icons";
+
 import { GroupsList } from "./types";
 import { stringSort } from "../../../utils/sortFunctions";
 import {
@@ -36,7 +42,6 @@ import api from "../../../common/api";
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
 import PageHeader from "../Common/PageHeader/PageHeader";
 import HelpBox from "../../../common/HelpBox";
-import history from "../../../history";
 import AButton from "../Common/AButton/AButton";
 import PageLayout from "../Common/Layout/PageLayout";
 import SearchBox from "../Common/SearchBox";
@@ -46,15 +51,18 @@ import {
   IAM_SCOPES,
 } from "../../../common/SecureComponent/permissions";
 import {
-  SecureComponent,
   hasPermission,
+  SecureComponent,
 } from "../../../common/SecureComponent";
 
 import withSuspense from "../Common/Components/withSuspense";
 import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
+import { encodeURLString } from "../../../common/utils";
+
+import { setErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
 const DeleteGroup = withSuspense(React.lazy(() => import("./DeleteGroup")));
-const AddGroup = withSuspense(React.lazy(() => import("../Groups/AddGroup")));
 const SetPolicy = withSuspense(
   React.lazy(() => import("../Policies/SetPolicy"))
 );
@@ -62,7 +70,6 @@ const SetPolicy = withSuspense(
 interface IGroupsProps {
   classes: any;
   openGroupModal: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -79,14 +86,16 @@ const styles = (theme: Theme) =>
     ...containerForHeader(theme.spacing(4)),
   });
 
-const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
-  const [addGroupOpen, setGroupOpen] = useState<boolean>(false);
-  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+const Groups = ({ classes }: IGroupsProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [loading, isLoading] = useState<boolean>(false);
   const [records, setRecords] = useState<any[]>([]);
   const [filter, setFilter] = useState<string>("");
   const [policyOpen, setPolicyOpen] = useState<boolean>(false);
+  const [checkedGroups, setCheckedGroups] = useState<string[]>([]);
 
   useEffect(() => {
     isLoading(true);
@@ -108,6 +117,24 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
     IAM_SCOPES.ADMIN_GET_GROUP,
   ]);
 
+  const selectionChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { target: { value = "", checked = false } = {} } = e;
+
+    let elements: string[] = [...checkedGroups]; // We clone the checkedUsers array
+
+    if (checked) {
+      // If the user has checked this field we need to push this to checkedUsersList
+      elements.push(value);
+    } else {
+      // User has unchecked this field, we need to remove it from the list
+      elements = elements.filter((element) => element !== value);
+    }
+
+    setCheckedGroups(elements);
+
+    return elements;
+  };
+
   useEffect(() => {
     if (loading) {
       if (displayGroups) {
@@ -123,7 +150,7 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
               isLoading(false);
             })
             .catch((err: ErrorResponseHandler) => {
-              setErrorSnackMessage(err);
+              dispatch(setErrorSnackMessage(err));
               isLoading(false);
             });
         };
@@ -132,16 +159,11 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
         isLoading(false);
       }
     }
-  }, [loading, setErrorSnackMessage, displayGroups]);
-
-  const closeAddModalAndRefresh = () => {
-    setGroupOpen(false);
-    isLoading(true);
-  };
+  }, [loading, dispatch, displayGroups]);
 
   const closeDeleteModalAndRefresh = (refresh: boolean) => {
     setDeleteOpen(false);
-
+    setCheckedGroups([]);
     if (refresh) {
       isLoading(true);
     }
@@ -152,12 +174,7 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
   );
 
   const viewAction = (group: any) => {
-    history.push(`${IAM_PAGES.GROUPS}/${group}`);
-  };
-
-  const deleteAction = (group: any) => {
-    setDeleteOpen(true);
-    setSelectedGroup(group);
+    navigate(`${IAM_PAGES.GROUPS}/${encodeURLString(group)}`);
   };
 
   const tableActions = [
@@ -167,32 +184,25 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
       disableButtonFunction: () => !getGroup,
     },
     {
-      type: "delete",
-      onClick: deleteAction,
-      disableButtonFunction: () => !deleteGroup,
+      type: "edit",
+      onClick: viewAction,
+      disableButtonFunction: () => !getGroup,
     },
   ];
 
   return (
-    <React.Fragment>
-      {addGroupOpen && (
-        <AddGroup
-          open={addGroupOpen}
-          selectedGroup={selectedGroup}
-          closeModalAndRefresh={closeAddModalAndRefresh}
-        />
-      )}
+    <Fragment>
       {deleteOpen && (
         <DeleteGroup
           deleteOpen={deleteOpen}
-          selectedGroup={selectedGroup}
+          selectedGroups={checkedGroups}
           closeDeleteModalAndRefresh={closeDeleteModalAndRefresh}
         />
       )}
-      {setPolicyOpen && (
+      {policyOpen && (
         <SetPolicy
           open={policyOpen}
-          selectedGroup={selectedGroup}
+          selectedGroups={checkedGroups}
           selectedUser={null}
           closeModalAndRefresh={() => {
             setPolicyOpen(false);
@@ -215,28 +225,68 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
               value={filter}
             />
           </SecureComponent>
-
-          <SecureComponent
-            resource={CONSOLE_UI_RESOURCE}
-            scopes={[
-              IAM_SCOPES.ADMIN_ADD_USER_TO_GROUP,
-              IAM_SCOPES.ADMIN_LIST_USERS,
-            ]}
-            matchAll
-            errorProps={{ disabled: true }}
+          <Box
+            sx={{
+              display: "flex",
+            }}
           >
-            <RBIconButton
-              tooltip={"Create Group"}
-              text={"Create Group"}
-              variant="contained"
-              color="primary"
-              icon={<AddIcon />}
-              onClick={() => {
-                setSelectedGroup(null);
-                setGroupOpen(true);
-              }}
-            />
-          </SecureComponent>
+            <SecureComponent
+              resource={CONSOLE_UI_RESOURCE}
+              scopes={[IAM_SCOPES.ADMIN_ATTACH_USER_OR_GROUP_POLICY]}
+              matchAll
+              errorProps={{ disabled: true }}
+            >
+              <RBIconButton
+                tooltip={"Select Policy"}
+                onClick={() => {
+                  setPolicyOpen(true);
+                }}
+                text={"Assign Policy"}
+                icon={<IAMPoliciesIcon />}
+                color="primary"
+                disabled={checkedGroups.length < 1}
+                variant={"outlined"}
+              />
+            </SecureComponent>
+            <SecureComponent
+              resource={CONSOLE_UI_RESOURCE}
+              scopes={[IAM_SCOPES.ADMIN_REMOVE_USER_FROM_GROUP]}
+              matchAll
+              errorProps={{ disabled: true }}
+            >
+              <RBIconButton
+                tooltip={"Delete Selected"}
+                onClick={() => {
+                  setDeleteOpen(true);
+                }}
+                text={"Delete Selected"}
+                icon={<DeleteIcon />}
+                color="secondary"
+                disabled={checkedGroups.length === 0}
+                variant={"outlined"}
+              />
+            </SecureComponent>
+            <SecureComponent
+              resource={CONSOLE_UI_RESOURCE}
+              scopes={[
+                IAM_SCOPES.ADMIN_ADD_USER_TO_GROUP,
+                IAM_SCOPES.ADMIN_LIST_USERS,
+              ]}
+              matchAll
+              errorProps={{ disabled: true }}
+            >
+              <RBIconButton
+                tooltip={"Create Group"}
+                text={"Create Group"}
+                variant="contained"
+                color="primary"
+                icon={<AddIcon />}
+                onClick={() => {
+                  navigate(`${IAM_PAGES.GROUPS_ADD}`);
+                }}
+              />
+            </SecureComponent>
+          </Box>
         </Grid>
         {loading && <LinearProgress />}
         {!loading && (
@@ -253,6 +303,8 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
                       itemActions={tableActions}
                       columns={[{ label: "Name", elementKey: "" }]}
                       isLoading={loading}
+                      selectedItems={checkedGroups}
+                      onSelect={deleteGroup ? selectionChanged : undefined}
                       records={filteredRecords}
                       entityName="Groups"
                       idField=""
@@ -268,18 +320,8 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
                         A group can have one attached IAM policy, where all
                         users with membership in that group inherit that policy.
                         Groups support more simplified management of user
-                        permissions on the MinIO Tenant.
+                        permissions on the Mantle SDS Tenant.
                         <br />
-                        <br />
-                        You can learn more at our{" "}
-                        <a
-                          href="https://docs.min.io/minio/k8s/tutorials/group-management.html?ref=con"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          documentation
-                        </a>
-                        .
                       </Fragment>
                     }
                   />
@@ -302,7 +344,7 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
                         A group can have one attached IAM policy, where all
                         users with membership in that group inherit that policy.
                         Groups support more simplified management of user
-                        permissions on the MinIO Tenant.
+                        permissions on the Mantle SDS Tenant.
                         <SecureComponent
                           resource={CONSOLE_UI_RESOURCE}
                           scopes={[
@@ -316,8 +358,7 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
                           To get started,{" "}
                           <AButton
                             onClick={() => {
-                              setSelectedGroup(null);
-                              setGroupOpen(true);
+                              navigate(`${IAM_PAGES.GROUPS_ADD}`);
                             }}
                           >
                             Create a Group
@@ -333,14 +374,8 @@ const Groups = ({ classes, setErrorSnackMessage }: IGroupsProps) => {
           </Fragment>
         )}
       </PageLayout>
-    </React.Fragment>
+    </Fragment>
   );
 };
 
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(Groups));
+export default withStyles(styles)(Groups);

@@ -15,33 +15,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
-import history from "../../../history";
-import { Route, Router, Switch, withRouter } from "react-router-dom";
-import { connect } from "react-redux";
-import { AppState } from "../../../store";
-import { setMenuOpen } from "../../../actions";
+import { Route, Routes } from "react-router-dom";
 import NotFoundPage from "../../NotFoundPage";
-
 import ListUsers from "./ListUsers";
 import UserDetails from "./UserDetails";
-import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
-
-const mapState = (state: AppState) => ({
-  open: state.system.sidebarOpen,
-});
-
-const connector = connect(mapState, { setMenuOpen });
+import AddUserScreen from "./AddUserScreen";
+import AddUserServiceAccountScreen from "./AddUserServiceAccountScreen";
 
 const Users = () => {
   return (
-    <Router history={history}>
-      <Switch>
-        <Route path={IAM_PAGES.USERS_VIEW} component={UserDetails} />
-        <Route path={IAM_PAGES.USERS} component={ListUsers} />
-        <Route component={NotFoundPage} />
-      </Switch>
-    </Router>
+    <Routes>
+      <Route path={"add-user"} element={<AddUserScreen />} />
+      <Route path={":userName"} element={<UserDetails />} />
+      <Route
+        path={"new-user-sa/:userName"}
+        element={<AddUserServiceAccountScreen />}
+      />
+      <Route path={"/"} element={<ListUsers />} />
+      <Route element={<NotFoundPage />} />
+    </Routes>
   );
 };
 
-export default withRouter(connector(Users));
+export default Users;

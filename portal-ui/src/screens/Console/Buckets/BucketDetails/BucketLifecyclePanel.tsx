@@ -15,20 +15,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import get from "lodash/get";
 import Grid from "@mui/material/Grid";
-import { BucketInfo, LifeCycleItem } from "../types";
+import { LifeCycleItem } from "../types";
 import { AddIcon, TiersIcon } from "../../../../icons";
 import {
   actionsTray,
   searchField,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { setErrorSnackMessage } from "../../../../actions";
-import { AppState } from "../../../../store";
 import { ErrorResponseHandler } from "../../../../common/types";
 import api from "../../../../common/api";
 import EditLifecycleConfiguration from "./EditLifecycleConfiguration";
@@ -43,6 +41,8 @@ import {
 import { IAM_SCOPES } from "../../../../common/SecureComponent/permissions";
 import RBIconButton from "./SummaryItems/RBIconButton";
 import DeleteBucketLifecycleRule from "./DeleteBucketLifecycleRule";
+import { selBucketDetailsLoading } from "./bucketDetailsSlice";
+import { useParams } from "react-router-dom";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -55,19 +55,12 @@ const styles = (theme: Theme) =>
 
 interface IBucketLifecyclePanelProps {
   classes: any;
-  match: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  loadingBucket: boolean;
-  bucketInfo: BucketInfo | null;
 }
 
-const BucketLifecyclePanel = ({
-  classes,
-  match,
-  setErrorSnackMessage,
-  loadingBucket,
-  bucketInfo,
-}: IBucketLifecyclePanelProps) => {
+const BucketLifecyclePanel = ({ classes }: IBucketLifecyclePanelProps) => {
+  const loadingBucket = useSelector(selBucketDetailsLoading);
+  const params = useParams();
+
   const [loadingLifecycle, setLoadingLifecycle] = useState<boolean>(true);
   const [lifecycleRecords, setLifecycleRecords] = useState<LifeCycleItem[]>([]);
   const [addLifecycleOpen, setAddLifecycleOpen] = useState<boolean>(false);
@@ -78,7 +71,7 @@ const BucketLifecyclePanel = ({
     useState<boolean>(false);
   const [selectedID, setSelectedID] = useState<string | null>(null);
 
-  const bucketName = match.params["bucketName"];
+  const bucketName = params.bucketName || "";
 
   const displayLifeCycleRules = hasPermission(bucketName, [
     IAM_SCOPES.S3_GET_LIFECYCLE_CONFIGURATION,
@@ -352,14 +345,4 @@ const BucketLifecyclePanel = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-  loadingBucket: state.buckets.bucketDetails.loadingBucket,
-  bucketInfo: state.buckets.bucketDetails.bucketInfo,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(BucketLifecyclePanel));
+export default withStyles(styles)(BucketLifecyclePanel);

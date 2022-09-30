@@ -35,9 +35,11 @@ interface CheckBoxProps {
   disabled?: boolean;
   tooltip?: string;
   overrideLabelClasses?: string;
+  overrideCheckboxStyles?: React.CSSProperties;
   index?: number;
   noTopMargin?: boolean;
   checked: boolean;
+  className?: string;
 }
 
 const styles = (theme: Theme) =>
@@ -71,7 +73,9 @@ const CheckboxWrapper = ({
   noTopMargin = false,
   tooltip = "",
   overrideLabelClasses = "",
+  overrideCheckboxStyles,
   classes,
+  className,
 }: CheckBoxProps) => {
   return (
     <React.Fragment>
@@ -80,7 +84,7 @@ const CheckboxWrapper = ({
         xs={12}
         className={`${classes.fieldContainer} ${
           noTopMargin ? classes.noTopMargin : ""
-        }`}
+        } ${className ? className : ""}`}
       >
         <div>
           <Checkbox
@@ -94,6 +98,12 @@ const CheckboxWrapper = ({
             checkedIcon={<span className={classes.checkedIcon} />}
             icon={<span className={classes.unCheckedIcon} />}
             disabled={disabled}
+            disableRipple
+            disableFocusRipple
+            focusRipple={false}
+            centerRipple={false}
+            disableTouchRipple
+            style={overrideCheckboxStyles || {}}
           />
         </div>
         {label !== "" && (

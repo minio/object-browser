@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
+import { useNavigate, useParams } from "react-router-dom";
 import createStyles from "@mui/styles/createStyles";
 import {
   actionsTray,
@@ -9,22 +9,17 @@ import {
   spacingUtils,
   tableStyles,
 } from "../Common/FormComponents/common/styleLibrary";
-import {
-  setErrorSnackMessage,
-  setModalErrorSnackMessage,
-} from "../../../actions";
-import { connect } from "react-redux";
+
 import withStyles from "@mui/styles/withStyles";
 import { Grid } from "@mui/material";
 import ScreenTitle from "../Common/ScreenTitle/ScreenTitle";
 import {
+  AddIcon,
+  GroupsIcon,
   IAMPoliciesIcon,
   TrashIcon,
-  GroupsIcon,
-  AddIcon,
 } from "../../../icons";
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
-import history from "../../../history";
 import api from "../../../common/api";
 import SetPolicy from "../Policies/SetPolicy";
 import AddGroupMember from "./AddGroupMember";
@@ -41,21 +36,21 @@ import {
   IAM_SCOPES,
 } from "../../../common/SecureComponent/permissions";
 import {
-  SecureComponent,
   hasPermission,
+  SecureComponent,
 } from "../../../common/SecureComponent";
 import GroupDetailsHeader from "./GroupDetailsHeader";
 import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
+import { decodeURLString, encodeURLString } from "../../../common/utils";
+import { setModalErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
+import { setSelectedPolicies } from "../Users/AddUsersSlice";
 
 const styles = (theme: Theme) =>
   createStyles({
     pageContainer: {
       border: "1px solid #EAEAEA",
       width: "100%",
-    },
-    breadcrumLink: {
-      textDecoration: "none",
-      color: "black",
     },
     statusLabel: {
       fontSize: ".8rem",
@@ -98,8 +93,6 @@ const styles = (theme: Theme) =>
 
 interface IGroupDetailsProps {
   classes: any;
-  match: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 type GroupInfo = {
@@ -114,11 +107,11 @@ export const formatPolicy = (policy: string = ""): string[] => {
   return policy.split(",");
 };
 
-export const getPoliciesAsString = (policies: string[]): string => {
-  return policies.join(", ");
-};
-
 const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
+
   const [groupDetails, setGroupDetails] = useState<GroupInfo>({});
 
   /*Modals*/
@@ -127,9 +120,7 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [memberFilter, setMemberFilter] = useState<string>("");
 
-  //const [policyFilter, setPolicyFilter] = useState<string>("");
-
-  const { groupName = "" } = useParams<Record<string, string>>();
+  const groupName = decodeURLString(params.groupName || "");
 
   const { members = [], policy = "", status: groupEnabled } = groupDetails;
 
@@ -155,12 +146,12 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
   function fetchGroupInfo() {
     if (getGroupDetails) {
       api
-        .invoke("GET", `/api/v1/group?name=${encodeURI(groupName)}`)
+        .invoke("GET", `/api/v1/group/${encodeURLString(groupName)}`)
         .then((res: any) => {
           setGroupDetails(res);
         })
         .catch((err) => {
-          setModalErrorSnackMessage(err);
+          dispatch(setModalErrorSnackMessage(err));
           setGroupDetails({});
         });
     }
@@ -168,7 +159,7 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
 
   function toggleGroupStatus(nextStatus: boolean) {
     return api
-      .invoke("PUT", `/api/v1/group?name=${encodeURI(groupName)}`, {
+      .invoke("PUT", `/api/v1/group/${encodeURLString(groupName)}`, {
         group: groupName,
         members: members,
         status: nextStatus ? "enabled" : "disabled",
@@ -177,7 +168,7 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
         fetchGroupInfo();
       })
       .catch((err: ErrorResponseHandler) => {
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   }
 
@@ -222,7 +213,7 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
               {
                 type: "view",
                 onClick: (userName) => {
-                  history.push(`${IAM_PAGES.USERS}/${userName}`);
+                  navigate(`${IAM_PAGES.USERS}/${encodeURLString(userName)}`);
                 },
               },
             ]}
@@ -260,7 +251,7 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
             {
               type: "view",
               onClick: (policy) => {
-                history.push(`${IAM_PAGES.POLICIES}/${policy}`);
+                navigate(`${IAM_PAGES.POLICIES}/${encodeURLString(policy)}`);
               },
             },
           ]}
@@ -355,11 +346,12 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
       {policyOpen ? (
         <SetPolicy
           open={policyOpen}
-          selectedGroup={groupName}
+          selectedGroups={[groupName]}
           selectedUser={null}
           closeModalAndRefresh={() => {
             setPolicyOpen(false);
             fetchGroupInfo();
+            dispatch(setSelectedPolicies([]));
           }}
         />
       ) : null}
@@ -382,11 +374,11 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
       {deleteOpen && (
         <DeleteGroup
           deleteOpen={deleteOpen}
-          selectedGroup={groupName}
+          selectedGroups={[groupName]}
           closeDeleteModalAndRefresh={(isDelSuccess: boolean) => {
             setDeleteOpen(false);
             if (isDelSuccess) {
-              history.push(IAM_PAGES.GROUPS);
+              navigate(IAM_PAGES.GROUPS);
             }
           }}
         />
@@ -396,10 +388,4 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
   );
 };
 
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(GroupsDetails));
+export default withStyles(styles)(GroupsDetails);

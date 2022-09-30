@@ -22,12 +22,11 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
-import withStyles from "@mui/styles/withStyles";
-import { withRouter } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import get from "lodash/get";
 import { BucketObjectItem, BucketObjectItemsList } from "./types";
@@ -36,8 +35,9 @@ import TableWrapper, {
   ItemActions,
 } from "../../../../Common/TableWrapper/TableWrapper";
 import {
-  decodeFileName,
-  encodeFileName,
+  decodeURLString,
+  encodeURLString,
+  getClientOS,
   niceBytesInt,
 } from "../../../../../../common/utils";
 
@@ -52,27 +52,11 @@ import {
 import { Badge, Typography } from "@mui/material";
 import BrowserBreadcrumbs from "../../../../ObjectBrowser/BrowserBreadcrumbs";
 import {
-  completeObject,
-  openList,
-  resetRewind,
-  setLoadingObjectInfo,
-  setLoadingObjectsList,
-  setLoadingVersions,
-  setNewObject,
-  setObjectDetailsView,
-  setSearchObjects,
-  setSelectedObjectView,
-  setShowDeletedObjects,
-  setVersionsModeEnabled,
-  updateProgress,
-} from "../../../../ObjectBrowser/actions";
-import { Route } from "../../../../ObjectBrowser/types";
-
-import { download, extensionPreview, sortListObjects } from "../utils";
-import {
-  setErrorSnackMessage,
-  setSnackBarMessage,
-} from "../../../../../../actions";
+  download,
+  extensionPreview,
+  permissionItems,
+  sortListObjects,
+} from "../utils";
 import {
   BucketInfo,
   BucketObjectLocking,
@@ -83,14 +67,13 @@ import { ErrorResponseHandler } from "../../../../../../common/types";
 
 import ScreenTitle from "../../../../Common/ScreenTitle/ScreenTitle";
 
-import { setBucketDetailsLoad, setBucketInfo } from "../../../actions";
-import { AppState } from "../../../../../../store";
+import { AppState, useAppDispatch } from "../../../../../../store";
 import PageLayout from "../../../../Common/Layout/PageLayout";
 
 import { IAM_SCOPES } from "../../../../../../common/SecureComponent/permissions";
 import {
-  SecureComponent,
   hasPermission,
+  SecureComponent,
 } from "../../../../../../common/SecureComponent";
 
 import withSuspense from "../../../../Common/Components/withSuspense";
@@ -108,6 +91,43 @@ import ActionsListSection from "./ActionsListSection";
 import { listModeColumns, rewindModeColumns } from "./ListObjectsHelpers";
 import VersionsNavigator from "../ObjectDetails/VersionsNavigator";
 import CheckboxWrapper from "../../../../Common/FormComponents/CheckboxWrapper/CheckboxWrapper";
+
+import {
+  setErrorSnackMessage,
+  setSnackBarMessage,
+} from "../../../../../../systemSlice";
+
+import {
+  makeid,
+  storeCallForObjectWithID,
+} from "../../../../ObjectBrowser/transferManager";
+import {
+  cancelObjectInList,
+  completeObject,
+  failObject,
+  openList,
+  resetRewind,
+  setLoadingObjectInfo,
+  setLoadingObjectsList,
+  setLoadingVersions,
+  setNewObject,
+  setObjectDetailsView,
+  setSearchObjects,
+  setSelectedObjectView,
+  setShowDeletedObjects,
+  setSimplePathHandler,
+  setVersionsModeEnabled,
+  updateProgress,
+} from "../../../../ObjectBrowser/objectBrowserSlice";
+import makeStyles from "@mui/styles/makeStyles";
+import {
+  selBucketDetailsInfo,
+  selBucketDetailsLoading,
+  setBucketDetailsLoad,
+  setBucketInfo,
+} from "../../../BucketDetails/bucketDetailsSlice";
+import RenameLongFileName from "../../../../ObjectBrowser/RenameLongFilename";
+import { selFeatures } from "../../../../consoleSlice";
 
 const HistoryIcon = React.lazy(
   () => import("../../../../../../icons/HistoryIcon")
@@ -131,13 +151,19 @@ const PreviewFileModal = withSuspense(
   React.lazy(() => import("../Preview/PreviewFileModal"))
 );
 
-const styles = (theme: Theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     browsePaper: {
       border: 0,
       height: "calc(100vh - 210px)",
+      "&.isEmbedded": {
+        height: "calc(100vh - 315px)",
+      },
       "&.actionsPanelOpen": {
         minHeight: "100%",
+      },
+      "@media (max-width: 800px)": {
+        width: 800,
       },
     },
     "@global": {
@@ -183,10 +209,26 @@ const styles = (theme: Theme) =>
     breadcrumbsContainer: {
       padding: "12px 14px 5px",
     },
+    parentWrapper: {
+      "@media (max-width: 800px)": {
+        overflowX: "auto",
+      },
+    },
+    fullContainer: {
+      "@media (max-width: 799px)": {
+        width: 0,
+      },
+    },
+    hideListOnSmall: {
+      "@media (max-width: 799px)": {
+        display: "none",
+      },
+    },
     ...objectBrowserExtras,
     ...objectBrowserCommon,
     ...containerForHeader(theme.spacing(4)),
-  });
+  })
+);
 
 const baseDnDStyle = {
   borderWidth: 2,
@@ -206,42 +248,6 @@ const acceptDnDStyle = {
   backgroundColor: "#fafafa",
   borderColor: "#00e676",
 };
-
-interface IListObjectsProps {
-  classes: any;
-  match: any;
-  history: any;
-  routesList: Route[];
-  downloadingFiles: string[];
-  rewindEnabled: boolean;
-  rewindDate: any;
-  bucketToRewind: string;
-  searchObjects: string;
-  showDeleted: boolean;
-  loading: boolean;
-  setSnackBarMessage: typeof setSnackBarMessage;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  resetRewind: typeof resetRewind;
-  loadingBucket: boolean;
-  setBucketInfo: typeof setBucketInfo;
-  bucketInfo: BucketInfo | null;
-  versionsMode: boolean;
-  detailsOpen: boolean;
-  setBucketDetailsLoad: typeof setBucketDetailsLoad;
-  setNewObject: typeof setNewObject;
-  updateProgress: typeof updateProgress;
-  completeObject: typeof completeObject;
-  openList: typeof openList;
-  setSearchObjects: typeof setSearchObjects;
-  selectedInternalPaths: string | null;
-  setVersionsModeEnabled: typeof setVersionsModeEnabled;
-  setShowDeletedObjects: typeof setShowDeletedObjects;
-  setLoadingVersions: typeof setLoadingVersions;
-  setObjectDetailsView: typeof setObjectDetailsView;
-  setSelectedObjectView: typeof setSelectedObjectView;
-  setLoadingObjectInfo: typeof setLoadingObjectInfo;
-  setLoadingObjectsList: typeof setLoadingObjectsList;
-}
 
 function useInterval(callback: any, delay: number) {
   const savedCallback = useRef<Function | null>(null);
@@ -268,39 +274,54 @@ function useInterval(callback: any, delay: number) {
 
 const defLoading = <Typography component="h3">Loading...</Typography>;
 
-const ListObjects = ({
-  classes,
-  match,
-  history,
-  rewindEnabled,
-  rewindDate,
-  loading,
-  bucketToRewind,
-  setSnackBarMessage,
-  setErrorSnackMessage,
-  resetRewind,
-  setBucketDetailsLoad,
-  loadingBucket,
-  setBucketInfo,
-  bucketInfo,
-  setNewObject,
-  updateProgress,
-  completeObject,
-  setSearchObjects,
-  searchObjects,
-  versionsMode,
-  openList,
-  setVersionsModeEnabled,
-  showDeleted,
-  detailsOpen,
-  setShowDeletedObjects,
-  setLoadingVersions,
-  setObjectDetailsView,
-  selectedInternalPaths,
-  setSelectedObjectView,
-  setLoadingObjectInfo,
-  setLoadingObjectsList,
-}: IListObjectsProps) => {
+const ListObjects = () => {
+  const classes = useStyles();
+  const dispatch = useAppDispatch();
+  const params = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const rewindEnabled = useSelector(
+    (state: AppState) => state.objectBrowser.rewind.rewindEnabled
+  );
+  const rewindDate = useSelector(
+    (state: AppState) => state.objectBrowser.rewind.dateToRewind
+  );
+  const bucketToRewind = useSelector(
+    (state: AppState) => state.objectBrowser.rewind.bucketToRewind
+  );
+  const versionsMode = useSelector(
+    (state: AppState) => state.objectBrowser.versionsMode
+  );
+
+  const searchObjects = useSelector(
+    (state: AppState) => state.objectBrowser.searchObjects
+  );
+  const showDeleted = useSelector(
+    (state: AppState) => state.objectBrowser.showDeleted
+  );
+  const detailsOpen = useSelector(
+    (state: AppState) => state.objectBrowser.objectDetailsOpen
+  );
+  const selectedInternalPaths = useSelector(
+    (state: AppState) => state.objectBrowser.selectedInternalPaths
+  );
+  const loading = useSelector(
+    (state: AppState) => state.objectBrowser.loadingObjects
+  );
+  const simplePath = useSelector(
+    (state: AppState) => state.objectBrowser.simplePath
+  );
+
+  const loadingBucket = useSelector(selBucketDetailsLoading);
+  const bucketInfo = useSelector(selBucketDetailsInfo);
+  const allowResources = useSelector(
+    (state: AppState) => state.console.session.allowResources
+  );
+
+  const features = useSelector(selFeatures);
+  const obOnly = !!features?.includes("object-browser-only");
+
   const [records, setRecords] = useState<BucketObjectItem[]>([]);
   const [deleteMultipleOpen, setDeleteMultipleOpen] = useState<boolean>(false);
   const [loadingStartTime, setLoadingStartTime] = useState<number>(0);
@@ -324,9 +345,13 @@ const ListObjects = ({
   const [canShareFile, setCanShareFile] = useState<boolean>(false);
   const [canPreviewFile, setCanPreviewFile] = useState<boolean>(false);
   const [quota, setQuota] = useState<BucketQuota | null>(null);
+  const [downloadRenameModal, setDownloadRenameModal] =
+    useState<BucketObjectItem | null>(null);
 
-  const internalPaths = get(match.params, "subpaths", "");
-  const bucketName = match.params["bucketName"];
+  const pathSegment = location.pathname.split("/browse/");
+
+  const internalPaths = pathSegment.length === 2 ? pathSegment[1] : "";
+  const bucketName = params.bucketName || "";
 
   const fileUpload = useRef<HTMLInputElement>(null);
   const folderUpload = useRef<HTMLInputElement>(null);
@@ -372,7 +397,8 @@ const ListObjects = ({
 
           setQuota(quotaVals);
         })
-        .catch(() => {
+        .catch((err) => {
+          console.error("Error Getting Quota Status: ", err.detailedError);
           setQuota(null);
         });
     }
@@ -380,14 +406,14 @@ const ListObjects = ({
 
   useEffect(() => {
     if (selectedObjects.length > 0) {
-      setObjectDetailsView(true);
+      dispatch(setObjectDetailsView(true));
       return;
     }
 
     if (selectedObjects.length === 0 && selectedInternalPaths === null) {
-      setObjectDetailsView(false);
+      dispatch(setObjectDetailsView(false));
     }
-  }, [selectedObjects, selectedInternalPaths, setObjectDetailsView]);
+  }, [selectedObjects, selectedInternalPaths, dispatch]);
 
   const displayDeleteObject = hasPermission(bucketName, [
     IAM_SCOPES.S3_DELETE_OBJECT,
@@ -420,10 +446,10 @@ const ListObjects = ({
 
   useEffect(() => {
     if (!iniLoad) {
-      setBucketDetailsLoad(true);
+      dispatch(setBucketDetailsLoad(true));
       setIniLoad(true);
     }
-  }, [iniLoad, setBucketDetailsLoad, setIniLoad]);
+  }, [iniLoad, dispatch, setIniLoad]);
 
   useInterval(() => {
     // Your custom logic here
@@ -442,7 +468,10 @@ const ListObjects = ({
             setLoadingVersioning(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            console.error(
+              "Error Getting Object Versioning Status: ",
+              err.detailedError
+            );
             setLoadingVersioning(false);
           });
       } else {
@@ -450,7 +479,7 @@ const ListObjects = ({
         setRecords([]);
       }
     }
-  }, [bucketName, loadingVersioning, setErrorSnackMessage, displayListObjects]);
+  }, [bucketName, loadingVersioning, dispatch, displayListObjects]);
 
   useEffect(() => {
     if (loadingLocking) {
@@ -462,7 +491,10 @@ const ListObjects = ({
             setLoadingLocking(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            console.error(
+              "Error Getting Object Locking Status: ",
+              err.detailedError
+            );
             setLoadingLocking(false);
           });
       } else {
@@ -470,41 +502,46 @@ const ListObjects = ({
         setLoadingLocking(false);
       }
     }
-  }, [bucketName, loadingLocking, setErrorSnackMessage, displayListObjects]);
+  }, [bucketName, loadingLocking, dispatch, displayListObjects]);
 
   useEffect(() => {
-    const decodedIPaths = decodeFileName(internalPaths);
+    const decodedIPaths = decodeURLString(internalPaths);
 
     if (decodedIPaths.endsWith("/") || decodedIPaths === "") {
-      setLoadingObjectsList(true);
-      setObjectDetailsView(false);
-      setSearchObjects("");
+      dispatch(setObjectDetailsView(false));
+      dispatch(setSelectedObjectView(null));
+      dispatch(
+        setSimplePathHandler(decodedIPaths === "" ? "/" : decodedIPaths)
+      );
     } else {
-      setLoadingObjectInfo(true);
-      setObjectDetailsView(true);
-      setLoadingVersions(true);
-      setSelectedObjectView(
-        `${decodedIPaths ? `${encodeFileName(decodedIPaths)}` : ``}`
+      dispatch(setLoadingObjectInfo(true));
+      dispatch(setObjectDetailsView(true));
+      dispatch(setLoadingVersions(true));
+      dispatch(
+        setSelectedObjectView(
+          `${decodedIPaths ? `${encodeURLString(decodedIPaths)}` : ``}`
+        )
+      );
+      dispatch(
+        setSimplePathHandler(
+          `${decodedIPaths.split("/").slice(0, -1).join("/")}/`
+        )
       );
     }
-  }, [
-    internalPaths,
-    setSearchObjects,
-    rewindDate,
-    rewindEnabled,
-    setLoadingObjectInfo,
-    setLoadingVersions,
-    setObjectDetailsView,
-    setSelectedObjectView,
-    setLoadingObjectsList,
-  ]);
+  }, [internalPaths, rewindDate, rewindEnabled, dispatch]);
+
+  useEffect(() => {
+    dispatch(setSearchObjects(""));
+    dispatch(setLoadingObjectsList(true));
+    setSelectedObjects([]);
+  }, [simplePath, dispatch, setSelectedObjects]);
 
   useEffect(() => {
     if (loading) {
       if (displayListObjects) {
         let pathPrefix = "";
         if (internalPaths) {
-          const decodedPath = decodeFileName(internalPaths);
+          const decodedPath = decodeURLString(internalPaths);
           pathPrefix = decodedPath.endsWith("/")
             ? decodedPath
             : decodedPath + "/";
@@ -520,7 +557,7 @@ const ListObjects = ({
         // Is rewind enabled?, we use Rewind API
         if (rewindEnabled) {
           if (bucketToRewind !== bucketName) {
-            resetRewind();
+            dispatch(resetRewind());
             return;
           }
 
@@ -541,7 +578,7 @@ const ListObjects = ({
           .invoke(
             "GET",
             `${urlTake}${
-              pathPrefix ? `?prefix=${encodeFileName(pathPrefix)}` : ``
+              pathPrefix ? `?prefix=${encodeURLString(pathPrefix)}` : ``
             }`
           )
           .then((res: BucketObjectItemsList) => {
@@ -552,7 +589,7 @@ const ListObjects = ({
             // We separate items between folders or files to display folders at the beginning always.
             records.forEach((record) => {
               // We omit files from the same path
-              if (record.name !== decodeFileName(internalPaths)) {
+              if (record.name !== decodeURLString(internalPaths)) {
                 // this is a folder
                 if (record.name.endsWith("/")) {
                   folders.push(record);
@@ -575,14 +612,14 @@ const ListObjects = ({
 
                 let pathPrefix = "";
                 if (internalPaths) {
-                  const decodedPath = decodeFileName(internalPaths);
+                  const decodedPath = decodeURLString(internalPaths);
                   pathPrefix = decodedPath.endsWith("/")
                     ? decodedPath
                     : decodedPath + "/";
                 }
 
                 pathTest = `/api/v1/buckets/${bucketName}/rewind/${rewindParsed}${
-                  pathPrefix ? `?prefix=${encodeFileName(pathPrefix)}` : ``
+                  pathPrefix ? `?prefix=${encodeURLString(pathPrefix)}` : ``
                 }`;
               }
 
@@ -592,7 +629,7 @@ const ListObjects = ({
                   //It is a file since it has elements in the object, setting file flag and waiting for component mount
                   if (!res.objects) {
                     // It is a folder, we remove loader & set original results list
-                    setLoadingObjectsList(false);
+                    dispatch(setLoadingObjectsList(false));
                     setRecords(recordsInElement);
                   } else {
                     // This code prevents the program from opening a file when a substring of that file is entered as a new folder.
@@ -617,11 +654,11 @@ const ListObjects = ({
                       setRecords(recordsInElement);
                     } else {
                       // This is a file. We change URL & Open file details view.
-                      setObjectDetailsView(true);
-                      setSelectedObjectView(internalPaths);
+                      dispatch(setObjectDetailsView(true));
+                      dispatch(setSelectedObjectView(internalPaths));
 
                       // We split the selected object URL & remove the last item to fetch the files list for the parent folder
-                      const parentPath = `${decodeFileName(internalPaths)
+                      const parentPath = `${decodeURLString(internalPaths)
                         .split("/")
                         .slice(0, -1)
                         .join("/")}/`;
@@ -631,7 +668,7 @@ const ListObjects = ({
                           "GET",
                           `${urlTake}${
                             pathPrefix
-                              ? `?prefix=${encodeFileName(parentPath)}`
+                              ? `?prefix=${encodeURLString(parentPath)}`
                               : ``
                           }`
                         )
@@ -643,30 +680,40 @@ const ListObjects = ({
                         .catch(() => {});
                     }
 
-                    setLoadingObjectsList(false);
+                    dispatch(setLoadingObjectsList(false));
                   }
                 })
                 .catch((err: ErrorResponseHandler) => {
-                  setLoadingObjectsList(false);
-                  setErrorSnackMessage(err);
+                  dispatch(setLoadingObjectsList(false));
+                  dispatch(setErrorSnackMessage(err));
                 });
             } else {
               setRecords(recordsInElement);
-              setLoadingObjectsList(false);
+              dispatch(setLoadingObjectsList(false));
             }
           })
           .catch((err: ErrorResponseHandler) => {
-            setLoadingObjectsList(false);
-            setErrorSnackMessage(err);
+            const permitItems = permissionItems(
+              bucketName,
+              pathPrefix,
+              allowResources || []
+            );
+
+            if (!permitItems || permitItems.length === 0) {
+              dispatch(setErrorSnackMessage(err));
+            } else {
+              setRecords(permitItems);
+            }
+
+            dispatch(setLoadingObjectsList(false));
           });
       } else {
-        setLoadingObjectsList(false);
+        dispatch(setLoadingObjectsList(false));
       }
     }
   }, [
     loading,
-    match,
-    setErrorSnackMessage,
+    dispatch,
     bucketName,
     rewindEnabled,
     rewindDate,
@@ -675,10 +722,7 @@ const ListObjects = ({
     showDeleted,
     displayListObjects,
     bucketToRewind,
-    resetRewind,
-    setObjectDetailsView,
-    setSelectedObjectView,
-    setLoadingObjectsList,
+    allowResources,
   ]);
 
   // bucket info
@@ -687,29 +731,23 @@ const ListObjects = ({
       api
         .invoke("GET", `/api/v1/buckets/${bucketName}`)
         .then((res: BucketInfo) => {
-          setBucketDetailsLoad(false);
-          setBucketInfo(res);
+          dispatch(setBucketDetailsLoad(false));
+          dispatch(setBucketInfo(res));
         })
         .catch((err: ErrorResponseHandler) => {
-          setBucketDetailsLoad(false);
-          setErrorSnackMessage(err);
+          dispatch(setBucketDetailsLoad(false));
+          dispatch(setErrorSnackMessage(err));
         });
     }
-  }, [
-    bucketName,
-    loadingBucket,
-    setBucketDetailsLoad,
-    setBucketInfo,
-    setErrorSnackMessage,
-  ]);
+  }, [bucketName, loadingBucket, dispatch]);
 
   const closeDeleteMultipleModalAndRefresh = (refresh: boolean) => {
     setDeleteMultipleOpen(false);
 
     if (refresh) {
-      setSnackBarMessage(`Objects deleted successfully.`);
+      dispatch(setSnackBarMessage(`Objects deleted successfully.`));
       setSelectedObjects([]);
-      setLoadingObjectsList(true);
+      dispatch(setLoadingObjectsList(true));
     }
   };
 
@@ -734,55 +772,77 @@ const ListObjects = ({
   };
 
   const downloadObject = (object: BucketObjectItem) => {
-    const identityDownload = encodeFileName(
+    const identityDownload = encodeURLString(
       `${bucketName}-${object.name}-${new Date().getTime()}-${Math.random()}`
     );
 
-    setNewObject({
+    const downloadCall = download(
       bucketName,
-      done: false,
-      instanceID: identityDownload,
-      percentage: 0,
-      prefix: object.name,
-      type: "download",
-      waitingForFile: true,
-    });
-
-    download(
-      bucketName,
-      encodeFileName(object.name),
+      encodeURLString(object.name),
       object.version_id,
       object.size,
+      null,
       (progress) => {
-        updateProgress(identityDownload, progress);
+        dispatch(
+          updateProgress({
+            instanceID: identityDownload,
+            progress: progress,
+          })
+        );
       },
       () => {
-        completeObject(identityDownload);
+        dispatch(completeObject(identityDownload));
+      },
+      (msg: string) => {
+        dispatch(failObject({ instanceID: identityDownload, msg }));
+      },
+      () => {
+        dispatch(cancelObjectInList(identityDownload));
       }
     );
+    const ID = makeid(8);
+    storeCallForObjectWithID(ID, downloadCall);
+    dispatch(
+      setNewObject({
+        ID,
+        bucketName,
+        done: false,
+        instanceID: identityDownload,
+        percentage: 0,
+        prefix: object.name,
+        type: "download",
+        waitingForFile: true,
+        failed: false,
+        cancelled: false,
+        errorMessage: "",
+      })
+    );
+
+    downloadCall.send();
   };
 
   const openPath = (idElement: string) => {
     setSelectedObjects([]);
 
     const newPath = `/buckets/${bucketName}/browse${
-      idElement ? `/${encodeFileName(idElement)}` : ``
+      idElement ? `/${encodeURLString(idElement)}` : ``
     }`;
-    history.push(newPath);
+    navigate(newPath);
 
-    setObjectDetailsView(true);
-    setLoadingVersions(true);
-    setSelectedObjectView(`${idElement ? `${encodeFileName(idElement)}` : ``}`);
+    dispatch(setObjectDetailsView(true));
+    dispatch(setLoadingVersions(true));
+    dispatch(
+      setSelectedObjectView(
+        `${idElement ? `${encodeURLString(idElement)}` : ``}`
+      )
+    );
   };
 
   const uploadObject = useCallback(
     (files: File[], folderPath: string): void => {
       let pathPrefix = "";
-      if (internalPaths) {
-        const decodedPath = decodeFileName(internalPaths);
-        pathPrefix = decodedPath.endsWith("/")
-          ? decodedPath
-          : decodedPath + "/";
+      if (simplePath) {
+        pathPrefix = simplePath.endsWith("/") ? simplePath : simplePath + "/";
       }
 
       const upload = (
@@ -795,13 +855,23 @@ const ListObjects = ({
           return new Promise((resolve, reject) => {
             let uploadUrl = `api/v1/buckets/${bucketName}/objects/upload`;
             const fileName = file.name;
+
             const blobFile = new Blob([file], { type: file.type });
 
             let encodedPath = "";
-            const relativeFolderPath =
-              get(file, "webkitRelativePath", "") !== ""
-                ? get(file, "webkitRelativePath", "")
-                : folderPath;
+
+            const filePath = get(file, "path", "");
+            const fileWebkitRelativePath = get(file, "webkitRelativePath", "");
+
+            let relativeFolderPath = folderPath;
+
+            // File was uploaded via drag & drop
+            if (filePath !== "") {
+              relativeFolderPath = filePath;
+            } else if (fileWebkitRelativePath !== "") {
+              // File was uploaded using upload button
+              relativeFolderPath = fileWebkitRelativePath;
+            }
 
             if (path !== "" || relativeFolderPath !== "") {
               const finalFolderPath = relativeFolderPath
@@ -809,9 +879,20 @@ const ListObjects = ({
                 .slice(0, -1)
                 .join("/");
 
-              encodedPath = encodeFileName(
-                `${path}${finalFolderPath}${
-                  !finalFolderPath.endsWith("/") ? "/" : ""
+              const pathClean = path.endsWith("/") ? path.slice(0, -1) : path;
+
+              encodedPath = encodeURLString(
+                `${pathClean}${
+                  !pathClean.endsWith("/") &&
+                  finalFolderPath !== "" &&
+                  !finalFolderPath.startsWith("/")
+                    ? "/"
+                    : ""
+                }${finalFolderPath}${
+                  !finalFolderPath.endsWith("/") ||
+                  (finalFolderPath.trim() === "" && !path.endsWith("/"))
+                    ? "/"
+                    : ""
                 }`
               );
             }
@@ -820,19 +901,9 @@ const ListObjects = ({
               uploadUrl = `${uploadUrl}?prefix=${encodedPath}`;
             }
 
-            const identity = encodeFileName(
+            const identity = encodeURLString(
               `${bucketName}-${encodedPath}-${new Date().getTime()}-${Math.random()}`
             );
-
-            setNewObject({
-              bucketName,
-              done: false,
-              instanceID: identity,
-              percentage: 0,
-              prefix: `${decodeFileName(encodedPath)}${fileName}`,
-              type: "upload",
-              waitingForFile: false,
-            });
 
             let xhr = new XMLHttpRequest();
             xhr.open("POST", uploadUrl, true);
@@ -850,7 +921,7 @@ const ListObjects = ({
             xhr.onload = function (event) {
               // resolve promise only when HTTP code is ok
               if (xhr.status >= 200 && xhr.status < 300) {
-                completeObject(identity);
+                dispatch(completeObject(identity));
                 resolve({ status: xhr.status });
               } else {
                 // reject promise if there was a server error
@@ -864,34 +935,78 @@ const ListObjects = ({
                     errorMessage = "something went wrong";
                   }
                 }
+                dispatch(
+                  failObject({
+                    instanceID: identity,
+                    msg: errorMessage,
+                  })
+                );
                 reject({ status: xhr.status, message: errorMessage });
               }
             };
 
             xhr.upload.addEventListener("error", (event) => {
               reject(errorMessage);
+              dispatch(
+                failObject({
+                  instanceID: identity,
+                  msg: "A network error occurred.",
+                })
+              );
               return;
             });
 
             xhr.upload.addEventListener("progress", (event) => {
               const progress = Math.floor((event.loaded * 100) / event.total);
 
-              updateProgress(identity, progress);
+              dispatch(
+                updateProgress({
+                  instanceID: identity,
+                  progress: progress,
+                })
+              );
             });
 
             xhr.onerror = () => {
               reject(errorMessage);
+              dispatch(
+                failObject({
+                  instanceID: identity,
+                  msg: "A network error occurred.",
+                })
+              );
               return;
             };
             xhr.onloadend = () => {
               if (files.length === 0) {
-                setLoadingObjectsList(true);
+                dispatch(setLoadingObjectsList(true));
               }
+            };
+            xhr.onabort = () => {
+              dispatch(cancelObjectInList(identity));
             };
 
             const formData = new FormData();
             if (file.size !== undefined) {
               formData.append(file.size.toString(), blobFile, fileName);
+              const ID = makeid(8);
+              storeCallForObjectWithID(ID, xhr);
+              dispatch(
+                setNewObject({
+                  ID,
+                  bucketName,
+                  done: false,
+                  instanceID: identity,
+                  percentage: 0,
+                  prefix: `${decodeURLString(encodedPath)}${fileName}`,
+                  type: "upload",
+                  waitingForFile: false,
+                  failed: false,
+                  cancelled: false,
+                  errorMessage: "",
+                })
+              );
+
               xhr.send(formData);
             }
           });
@@ -899,7 +1014,7 @@ const ListObjects = ({
 
         const uploadFilePromises: any = [];
         // open object manager
-        openList();
+        dispatch(openList());
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
           uploadFilePromises.push(uploadPromise(file));
@@ -916,27 +1031,21 @@ const ListObjects = ({
               errorMessage: "There were some errors during file upload",
               detailedError: `Uploaded files ${successUploadedFiles}/${totalFiles}`,
             };
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
           }
+          // We force objects list reload after all promises were handled
+          dispatch(setLoadingObjectsList(true));
+          setSelectedObjects([]);
         });
       };
 
       upload(files, bucketName, pathPrefix, folderPath);
     },
-    [
-      bucketName,
-      completeObject,
-      internalPaths,
-      openList,
-      setNewObject,
-      setErrorSnackMessage,
-      updateProgress,
-      setLoadingObjectsList,
-    ]
+    [bucketName, dispatch, simplePath]
   );
 
   const onDrop = useCallback(
-    (acceptedFiles) => {
+    (acceptedFiles: any[]) => {
       if (acceptedFiles && acceptedFiles.length > 0) {
         let newFolderPath: string = acceptedFiles[0].path;
         uploadObject(acceptedFiles, newFolderPath);
@@ -1034,7 +1143,7 @@ const ListObjects = ({
       elements = elements.filter((element) => element !== value);
     }
     setSelectedObjects(elements);
-    setSelectedObjectView(null);
+    dispatch(setSelectedObjectView(null));
 
     return elements;
   };
@@ -1043,10 +1152,10 @@ const ListObjects = ({
     const newSortDirection = get(sortData, "sortDirection", "DESC");
     setCurrentSortField(sortData.sortBy);
     setSortDirection(newSortDirection);
-    setLoadingObjectsList(true);
+    dispatch(setLoadingObjectsList(true));
   };
 
-  const pageTitle = decodeFileName(internalPaths);
+  const pageTitle = decodeURLString(internalPaths);
   const currentPath = pageTitle.split("/").filter((i: string) => i !== "");
 
   const plSelect = filteredRecords;
@@ -1061,7 +1170,7 @@ const ListObjects = ({
   }
 
   const selectAllItems = () => {
-    setSelectedObjectView(null);
+    dispatch(setSelectedObjectView(null));
 
     if (selectedObjects.length === payload.length) {
       setSelectedObjects([]);
@@ -1081,6 +1190,18 @@ const ListObjects = ({
 
       itemsToDownload = filteredRecords.filter(filterFunction);
 
+      // I case just one element is selected, then we trigger download modal validation.
+      // We are going to enforce zip download when multiple files are selected
+      if (itemsToDownload.length === 1) {
+        if (
+          itemsToDownload[0].name.length > 200 &&
+          getClientOS().toLowerCase().includes("win")
+        ) {
+          setDownloadRenameModal(itemsToDownload[0]);
+          return;
+        }
+      }
+
       itemsToDownload.forEach((filteredItem) => {
         downloadObject(filteredItem);
       });
@@ -1092,19 +1213,41 @@ const ListObjects = ({
   }
 
   const onClosePanel = (forceRefresh: boolean) => {
-    setObjectDetailsView(false);
-    setSelectedObjectView(null);
+    dispatch(setSelectedObjectView(null));
+    dispatch(setVersionsModeEnabled({ status: false }));
+    if (detailsOpen && selectedInternalPaths !== null) {
+      // We change URL to be the contained folder
+
+      const decodedPath = decodeURLString(internalPaths);
+      const splitURLS = decodedPath.split("/");
+
+      // We remove the last section of the URL as it should be a file
+      splitURLS.pop();
+
+      let URLItem = "";
+
+      if (splitURLS && splitURLS.length > 0) {
+        URLItem = `${splitURLS.join("/")}/`;
+      }
+
+      navigate(`/buckets/${bucketName}/browse/${encodeURLString(URLItem)}`);
+    }
+
+    dispatch(setObjectDetailsView(false));
     setSelectedObjects([]);
-    setVersionsModeEnabled(false);
 
     if (forceRefresh) {
-      setLoadingObjectsList(true);
+      dispatch(setLoadingObjectsList(true));
     }
   };
 
   const setDeletedAction = () => {
-    setShowDeletedObjects(!showDeleted);
+    dispatch(setShowDeletedObjects(!showDeleted));
     onClosePanel(true);
+  };
+
+  const closeRenameModal = () => {
+    setDownloadRenameModal(null);
   };
 
   const tableActions: ItemActions[] = [
@@ -1190,7 +1333,22 @@ const ListObjects = ({
           onClosePreview={closePreviewWindow}
         />
       )}
-      <PageLayout>
+      {!!downloadRenameModal && (
+        <RenameLongFileName
+          open={!!downloadRenameModal}
+          closeModal={closeRenameModal}
+          currentItem={downloadRenameModal.name.split("/")?.pop() || ""}
+          bucketName={bucketName}
+          internalPaths={internalPaths}
+          actualInfo={{
+            name: downloadRenameModal.name,
+            last_modified: "",
+            version_id: downloadRenameModal.version_id,
+            size: downloadRenameModal.size.toString(),
+          }}
+        />
+      )}
+      <PageLayout variant={"full"}>
         <Grid item xs={12} className={classes.screenTitleContainer}>
           <ScreenTitle
             className={classes.screenTitle}
@@ -1237,81 +1395,90 @@ const ListObjects = ({
             }
             actions={
               <Fragment>
-                <RBIconButton
-                  id={"rewind-objects-list"}
-                  tooltip={"Rewind Bucket"}
-                  text={"Rewind"}
-                  icon={
-                    <Badge
-                      badgeContent=" "
-                      color="secondary"
-                      variant="dot"
-                      invisible={!rewindEnabled}
-                      className={classes.badgeOverlap}
-                      sx={{ height: 12 }}
-                    >
-                      <HistoryIcon />
-                    </Badge>
-                  }
-                  color="primary"
-                  variant={"outlined"}
-                  onClick={() => {
-                    setRewindSelect(true);
-                  }}
-                  disabled={
-                    !isVersioned ||
-                    !hasPermission(bucketName, [IAM_SCOPES.S3_PUT_OBJECT])
-                  }
-                />
-                <RBIconButton
-                  id={"refresh-objects-list"}
-                  tooltip={"Reload List"}
-                  text={"Refresh"}
-                  icon={<RefreshIcon />}
-                  color="primary"
-                  variant={"outlined"}
-                  onClick={() => {
-                    if (versionsMode) {
-                      setLoadingVersions(true);
-                    } else {
-                      setLoadingObjectsList(true);
+                <div className={classes.actionsSection}>
+                  <RBIconButton
+                    id={"rewind-objects-list"}
+                    tooltip={"Rewind Bucket"}
+                    text={"Rewind"}
+                    icon={
+                      <Badge
+                        badgeContent=" "
+                        color="secondary"
+                        variant="dot"
+                        invisible={!rewindEnabled}
+                        className={classes.badgeOverlap}
+                        sx={{ height: 16 }}
+                      >
+                        <HistoryIcon
+                          style={{
+                            minWidth: 16,
+                            minHeight: 16,
+                            width: 16,
+                            height: 16,
+                          }}
+                        />
+                      </Badge>
                     }
-                  }}
-                  disabled={
-                    !hasPermission(bucketName, [IAM_SCOPES.S3_LIST_BUCKET]) ||
-                    rewindEnabled
-                  }
-                />
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleUploadButton}
-                  style={{ display: "none" }}
-                  ref={fileUpload}
-                />
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleUploadButton}
-                  style={{ display: "none" }}
-                  ref={folderUpload}
-                />
-                <UploadFilesButton
-                  bucketName={bucketName}
-                  uploadPath={uploadPath.join("/")}
-                  uploadFileFunction={(closeMenu) => {
-                    if (fileUpload && fileUpload.current) {
-                      fileUpload.current.click();
+                    color="primary"
+                    variant={"outlined"}
+                    onClick={() => {
+                      setRewindSelect(true);
+                    }}
+                    disabled={
+                      !isVersioned ||
+                      !hasPermission(bucketName, [IAM_SCOPES.S3_GET_OBJECT])
                     }
-                    closeMenu();
-                  }}
-                  uploadFolderFunction={(closeMenu) => {
-                    if (folderUpload && folderUpload.current) {
-                      folderUpload.current.click();
+                  />
+                  <RBIconButton
+                    id={"refresh-objects-list"}
+                    tooltip={"Reload List"}
+                    text={"Refresh"}
+                    icon={<RefreshIcon />}
+                    color="primary"
+                    variant={"outlined"}
+                    onClick={() => {
+                      if (versionsMode) {
+                        dispatch(setLoadingVersions(true));
+                      } else {
+                        dispatch(setLoadingObjectsList(true));
+                      }
+                    }}
+                    disabled={
+                      !hasPermission(bucketName, [IAM_SCOPES.S3_LIST_BUCKET]) ||
+                      rewindEnabled
                     }
-                    closeMenu();
-                  }}
-                />
+                  />
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleUploadButton}
+                    style={{ display: "none" }}
+                    ref={fileUpload}
+                  />
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleUploadButton}
+                    style={{ display: "none" }}
+                    ref={folderUpload}
+                  />
+                  <UploadFilesButton
+                    bucketName={bucketName}
+                    uploadPath={uploadPath.join("/")}
+                    uploadFileFunction={(closeMenu) => {
+                      if (fileUpload && fileUpload.current) {
+                        fileUpload.current.click();
+                      }
+                      closeMenu();
+                    }}
+                    uploadFolderFunction={(closeMenu) => {
+                      if (folderUpload && folderUpload.current) {
+                        folderUpload.current.click();
+                      }
+                      closeMenu();
+                    }}
+                  />
+                </div>
               </Fragment>
             }
           />
@@ -1342,7 +1509,7 @@ const ListObjects = ({
                 resource={bucketName}
                 errorProps={{ disabled: true }}
               >
-                <Grid item xs={12}>
+                <Grid item xs={12} className={classes.fullContainer}>
                   <Grid item xs={12} className={classes.breadcrumbsContainer}>
                     <BrowserBreadcrumbs
                       bucketName={bucketName}
@@ -1359,6 +1526,7 @@ const ListObjects = ({
                               onChange={setDeletedAction}
                               checked={showDeleted}
                               overrideLabelClasses={classes.labelStyle}
+                              className={classes.overrideShowDeleted}
                               noTopMargin
                             />
                           </div>
@@ -1378,8 +1546,8 @@ const ListObjects = ({
                     idField="name"
                     records={payload}
                     customPaperHeight={`${classes.browsePaper} ${
-                      detailsOpen ? "actionsPanelOpen" : ""
-                    }`}
+                      obOnly ? "isEmbedded" : ""
+                    } ${detailsOpen ? "actionsPanelOpen" : ""}`}
                     selectedItems={selectedObjects}
                     onSelect={selectListObjects}
                     customEmptyMessage={`This location is empty${
@@ -1398,6 +1566,7 @@ const ListObjects = ({
 
                       return "";
                     }}
+                    parentClassName={classes.parentWrapper}
                   />
                 </Grid>
               </SecureComponent>
@@ -1412,6 +1581,7 @@ const ListObjects = ({
                 closePanel={() => {
                   onClosePanel(false);
                 }}
+                className={`${versionsMode ? classes.hideListOnSmall : ""}`}
               >
                 {selectedObjects.length > 0 && (
                   <ActionsListSection
@@ -1437,42 +1607,4 @@ const ListObjects = ({
   );
 };
 
-const mapStateToProps = ({ objectBrowser, buckets }: AppState) => ({
-  routesList: get(objectBrowser, "routesList", []),
-  downloadingFiles: get(objectBrowser, "downloadingFiles", []),
-  rewindEnabled: get(objectBrowser, "rewind.rewindEnabled", false),
-  rewindDate: get(objectBrowser, "rewind.dateToRewind", null),
-  bucketToRewind: get(objectBrowser, "rewind.bucketToRewind", ""),
-  versionsMode: get(objectBrowser, "versionsMode", false),
-  loadingBucket: buckets.bucketDetails.loadingBucket,
-  bucketInfo: buckets.bucketDetails.bucketInfo,
-  searchObjects: objectBrowser.searchObjects,
-  showDeleted: objectBrowser.showDeleted,
-  detailsOpen: objectBrowser.objectDetailsOpen,
-  selectedInternalPaths: objectBrowser.selectedInternalPaths,
-  loading: objectBrowser.loadingObjects,
-});
-
-const mapDispatchToProps = {
-  setSnackBarMessage,
-  setErrorSnackMessage,
-  resetRewind,
-  setBucketDetailsLoad,
-  setBucketInfo,
-  setNewObject,
-  updateProgress,
-  completeObject,
-  openList,
-  setSearchObjects,
-  setVersionsModeEnabled,
-  setShowDeletedObjects,
-  setLoadingVersions,
-  setObjectDetailsView,
-  setSelectedObjectView,
-  setLoadingObjectInfo,
-  setLoadingObjectsList,
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-export default withRouter(connector(withStyles(styles)(ListObjects)));
+export default ListObjects;

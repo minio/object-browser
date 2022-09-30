@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import get from "lodash/get";
 import PrDashboard from "./Prometheus/PrDashboard";
 import PageHeader from "../Common/PageHeader/PageHeader";
@@ -27,13 +27,14 @@ import withStyles from "@mui/styles/withStyles";
 import { LinearProgress } from "@mui/material";
 import api from "../../../common/api";
 import { Usage } from "./types";
-import { setErrorSnackMessage } from "../../../actions";
+
 import { ErrorResponseHandler } from "../../../common/types";
 import BasicDashboard from "./BasicDashboard/BasicDashboard";
+import { setErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
 interface IDashboardSimple {
   classes: any;
-  displayErrorMessage: typeof setErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -41,7 +42,8 @@ const styles = (theme: Theme) =>
     ...containerForHeader(theme.spacing(4)),
   });
 
-const Dashboard = ({ classes, displayErrorMessage }: IDashboardSimple) => {
+const Dashboard = ({ classes }: IDashboardSimple) => {
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState<boolean>(true);
   const [basicResult, setBasicResult] = useState<Usage | null>(null);
 
@@ -53,10 +55,10 @@ const Dashboard = ({ classes, displayErrorMessage }: IDashboardSimple) => {
         setLoading(false);
       })
       .catch((err: ErrorResponseHandler) => {
-        displayErrorMessage(err);
+        dispatch(setErrorSnackMessage(err));
         setLoading(false);
       });
-  }, [setBasicResult, setLoading, displayErrorMessage]);
+  }, [setBasicResult, setLoading, dispatch]);
 
   useEffect(() => {
     if (loading) {
@@ -78,9 +80,7 @@ const Dashboard = ({ classes, displayErrorMessage }: IDashboardSimple) => {
       ) : (
         <Fragment>
           {widgets !== null ? (
-            <Grid container className={classes.container}>
-              <PrDashboard />
-            </Grid>
+            <PrDashboard />
           ) : (
             <BasicDashboard usage={basicResult} />
           )}
@@ -90,8 +90,4 @@ const Dashboard = ({ classes, displayErrorMessage }: IDashboardSimple) => {
   );
 };
 
-const connector = connect(null, {
-  displayErrorMessage: setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(Dashboard));
+export default withStyles(styles)(Dashboard);

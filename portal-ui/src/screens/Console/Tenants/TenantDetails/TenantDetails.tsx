@@ -15,29 +15,26 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { Link, Redirect, Route, Router, Switch } from "react-router-dom";
+import { useSelector } from "react-redux";
+import {
+  Link,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import get from "lodash/get";
 import Grid from "@mui/material/Grid";
-import { setErrorSnackMessage, setSnackBarMessage } from "../../../../actions";
-import {
-  setTenantDetailsLoad,
-  setTenantInfo,
-  setTenantName,
-  setTenantTab,
-} from "../actions";
-import { ITenant } from "../ListTenants/types";
 import {
   containerForHeader,
   pageContentStyles,
   tenantDetailsStyles,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { AppState } from "../../../../store";
-import { ErrorResponseHandler } from "../../../../common/types";
-import api from "../../../../common/api";
+import { AppState, useAppDispatch } from "../../../../store";
 import PageHeader from "../../Common/PageHeader/PageHeader";
 import { CircleIcon, MinIOTierIconXs, TrashIcon } from "../../../../icons";
 import { niceBytes } from "../../../../common/utils";
@@ -52,14 +49,21 @@ import BoxIconButton from "../../Common/BoxIconButton/BoxIconButton";
 import withSuspense from "../../Common/Components/withSuspense";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
 import { tenantIsOnline } from "../ListTenants/utils";
+import { setSnackBarMessage } from "../../../../systemSlice";
+import { setTenantName } from "../tenantsSlice";
+import { getTenantAsync } from "../thunks/tenantDetailsAsync";
+import { LinearProgress } from "@mui/material";
 
 const TenantYAML = withSuspense(React.lazy(() => import("./TenantYAML")));
 const TenantSummary = withSuspense(React.lazy(() => import("./TenantSummary")));
 const TenantLicense = withSuspense(React.lazy(() => import("./TenantLicense")));
 const PoolsSummary = withSuspense(React.lazy(() => import("./PoolsSummary")));
 const PodsSummary = withSuspense(React.lazy(() => import("./PodsSummary")));
-const TenantLogging = withSuspense(React.lazy(() => import("./TenantLogging")));
+const TenantLogging = withSuspense(
+  React.lazy(() => import("./TenantAuditLogsScreen"))
+);
 const TenantEvents = withSuspense(React.lazy(() => import("./TenantEvents")));
+const TenantCSR = withSuspense(React.lazy(() => import("./TenantCSR")));
 const VolumesSummary = withSuspense(
   React.lazy(() => import("./VolumesSummary"))
 );
@@ -81,25 +85,12 @@ const DeleteTenant = withSuspense(
   React.lazy(() => import("../ListTenants/DeleteTenant"))
 );
 const PodDetails = withSuspense(React.lazy(() => import("./pods/PodDetails")));
-const TenantMonitoring = withSuspense(
-  React.lazy(() => import("./TenantMonitoring"))
+const EditTenantMonitoringScreen = withSuspense(
+  React.lazy(() => import("./EditTenantMonitoringScreen"))
 );
 
 interface ITenantDetailsProps {
   classes: any;
-  match: any;
-  history: any;
-  loadingTenant: boolean;
-  currentTab: string;
-  selectedTenant: string;
-  tenantInfo: ITenant | null;
-  selectedNamespace: string;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  setSnackBarMessage: typeof setSnackBarMessage;
-  setTenantDetailsLoad: typeof setTenantDetailsLoad;
-  setTenantName: typeof setTenantName;
-  setTenantInfo: typeof setTenantInfo;
-  setTenantTab: typeof setTenantTab;
 }
 
 const styles = (theme: Theme) =>
@@ -173,98 +164,50 @@ const styles = (theme: Theme) =>
     },
   });
 
-const TenantDetails = ({
-  classes,
-  match,
-  history,
-  loadingTenant,
-  selectedTenant,
-  tenantInfo,
-  selectedNamespace,
-  setErrorSnackMessage,
-  setSnackBarMessage,
-  setTenantDetailsLoad,
-  setTenantName,
-  setTenantInfo,
-}: ITenantDetailsProps) => {
-  const [yamlScreenOpen, setYamlScreenOpen] = useState<boolean>(false);
+const TenantDetails = ({ classes }: ITenantDetailsProps) => {
+  const dispatch = useAppDispatch();
+  const params = useParams();
+  const navigate = useNavigate();
+  const { pathname = "" } = useLocation();
 
-  const tenantName = match.params["tenantName"];
-  const tenantNamespace = match.params["tenantNamespace"];
+  const loadingTenant = useSelector(
+    (state: AppState) => state.tenants.loadingTenant
+  );
+  const selectedTenant = useSelector(
+    (state: AppState) => state.tenants.currentTenant
+  );
+  const selectedNamespace = useSelector(
+    (state: AppState) => state.tenants.currentNamespace
+  );
+  const tenantInfo = useSelector((state: AppState) => state.tenants.tenantInfo);
+
+  const tenantName = params.tenantName || "";
+  const tenantNamespace = params.tenantNamespace || "";
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
 
+  // if the current tenant selected is not the one in the redux, reload it
   useEffect(() => {
-    if (!loadingTenant) {
-      if (
-        tenantName !== selectedTenant ||
-        tenantNamespace !== selectedNamespace
-      ) {
-        setTenantName(tenantName, tenantNamespace);
-        setTenantDetailsLoad(true);
-      }
+    if (
+      selectedNamespace !== tenantNamespace ||
+      selectedTenant !== tenantName
+    ) {
+      dispatch(
+        setTenantName({
+          name: tenantName,
+          namespace: tenantNamespace,
+        })
+      );
+      dispatch(getTenantAsync());
     }
   }, [
-    loadingTenant,
     selectedTenant,
     selectedNamespace,
-    setTenantDetailsLoad,
-    setTenantInfo,
-    setTenantName,
+    dispatch,
     tenantName,
     tenantNamespace,
   ]);
 
-  useEffect(() => {
-    if (loadingTenant) {
-      api
-        .invoke(
-          "GET",
-          `/api/v1/namespaces/${tenantNamespace}/tenants/${tenantName}`
-        )
-        .then((res: ITenant) => {
-          // add computed fields
-          const resPools = !res.pools ? [] : res.pools;
-
-          let totalInstances = 0;
-          let totalVolumes = 0;
-          let poolNamedIndex = 0;
-          for (let pool of resPools) {
-            const cap =
-              pool.volumes_per_server *
-              pool.servers *
-              pool.volume_configuration.size;
-            pool.label = `pool-${poolNamedIndex}`;
-            if (pool.name === undefined || pool.name === "") {
-              pool.name = pool.label;
-            }
-            pool.capacity = niceBytes(cap + "");
-            pool.volumes = pool.servers * pool.volumes_per_server;
-            totalInstances += pool.servers;
-            totalVolumes += pool.volumes;
-            poolNamedIndex += 1;
-          }
-          res.total_instances = totalInstances;
-          res.total_volumes = totalVolumes;
-
-          setTenantInfo(res);
-          setTenantDetailsLoad(false);
-        })
-        .catch((err: ErrorResponseHandler) => {
-          setErrorSnackMessage(err);
-          setTenantDetailsLoad(false);
-        });
-    }
-  }, [
-    loadingTenant,
-    tenantNamespace,
-    tenantName,
-    setTenantInfo,
-    setTenantDetailsLoad,
-    setErrorSnackMessage,
-  ]);
-
-  const path = get(match, "path", "/");
-  const splitSections = path.split("/");
+  const splitSections = pathname.split("/");
 
   let highlightedTab = splitSections[splitSections.length - 1] || "summary";
   if (highlightedTab === ":podName" || highlightedTab === "pods") {
@@ -278,12 +221,7 @@ const TenantDetails = ({
   }, [highlightedTab]);
 
   const editYaml = () => {
-    setYamlScreenOpen(true);
-  };
-
-  const closeYAMLModalAndRefresh = () => {
-    setYamlScreenOpen(false);
-    setTenantDetailsLoad(true);
+    navigate(getRoutePath("summary/yaml"));
   };
 
   const getRoutePath = (newValue: string) => {
@@ -298,8 +236,8 @@ const TenantDetails = ({
     setDeleteOpen(false);
 
     if (reloadData) {
-      setSnackBarMessage("Tenant Deleted");
-      history.push(`/tenants`);
+      dispatch(setSnackBarMessage("Tenant Deleted"));
+      navigate(`/tenants`);
     }
   };
 
@@ -315,14 +253,6 @@ const TenantDetails = ({
 
   return (
     <Fragment>
-      {yamlScreenOpen && (
-        <TenantYAML
-          open={yamlScreenOpen}
-          closeModalAndRefresh={closeYAMLModalAndRefresh}
-          tenant={tenantName}
-          namespace={tenantNamespace}
-        />
-      )}
       {deleteOpen && tenantInfo !== null && (
         <DeleteTenant
           deleteOpen={deleteOpen}
@@ -341,6 +271,11 @@ const TenantDetails = ({
       />
 
       <PageLayout className={classes.pageContainer}>
+        {loadingTenant && (
+          <Grid item xs={12}>
+            <LinearProgress />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <ScreenTitle
             icon={
@@ -359,7 +294,7 @@ const TenantDetails = ({
                 <TenantsIcon />
               </Fragment>
             }
-            title={match.params["tenantName"]}
+            title={tenantName}
             subTitle={
               <Fragment>
                 Namespace: {tenantNamespace} / Capacity:{" "}
@@ -369,6 +304,7 @@ const TenantDetails = ({
             actions={
               <div>
                 <BoxIconButton
+                  id={"delete-tenant"}
                   tooltip={"Delete"}
                   variant="outlined"
                   aria-label="Delete"
@@ -389,6 +325,7 @@ const TenantDetails = ({
                   }}
                   tooltip={"Edit YAML"}
                   color="primary"
+                  id={"yaml_button"}
                   variant="outlined"
                   aria-label="Edit YAML"
                   onClick={() => {
@@ -405,7 +342,7 @@ const TenantDetails = ({
                   }}
                   tooltip={"Management Console"}
                   onClick={() => {
-                    history.push(
+                    navigate(
                       `/namespaces/${tenantNamespace}/tenants/${tenantName}/hop`
                     );
                   }}
@@ -425,7 +362,7 @@ const TenantDetails = ({
                   variant="outlined"
                   aria-label="Refresh List"
                   onClick={() => {
-                    setTenantDetailsLoad(true);
+                    dispatch(getTenantAsync());
                   }}
                 >
                   <span>Refresh</span> <RefreshIcon />
@@ -440,78 +377,39 @@ const TenantDetails = ({
           isRouteTabs
           routes={
             <div className={classes.contentSpacer}>
-              <Router history={history}>
-                <Switch>
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_SUMMARY}
-                    component={TenantSummary}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_METRICS}
-                    component={TenantMetrics}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_TRACE}
-                    component={TenantTrace}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_IDENTITY_PROVIDER}
-                    component={TenantIdentityProvider}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_SECURITY}
-                    component={TenantSecurity}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_ENCRYPTION}
-                    component={TenantEncryption}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_POOLS}
-                    component={PoolsSummary}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_PODS}
-                    component={PodDetails}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_PODS_LIST}
-                    component={PodsSummary}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_PVCS}
-                    component={TenantVolumes}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_VOLUMES}
-                    component={VolumesSummary}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_LICENSE}
-                    component={TenantLicense}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_MONITORING}
-                    component={TenantMonitoring}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_LOGGING}
-                    component={TenantLogging}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT_EVENTS}
-                    component={TenantEvents}
-                  />
-                  <Route
-                    path={IAM_PAGES.NAMESPACE_TENANT}
-                    component={() => (
-                      <Redirect
-                        to={`/namespaces/${tenantNamespace}/tenants/${tenantName}/summary`}
-                      />
-                    )}
-                  />
-                </Switch>
-              </Router>
+              <Routes>
+                <Route path={"summary"} element={<TenantSummary />} />
+                <Route path={`summary/yaml`} element={<TenantYAML />} />
+                <Route path={"metrics"} element={<TenantMetrics />} />
+                <Route path={"trace"} element={<TenantTrace />} />
+                <Route
+                  path={"identity-provider"}
+                  element={<TenantIdentityProvider />}
+                />
+                <Route path={"security"} element={<TenantSecurity />} />
+                <Route path={"encryption"} element={<TenantEncryption />} />
+                <Route path={"pools"} element={<PoolsSummary />} />
+                <Route path={"pods/:podName"} element={<PodDetails />} />
+                <Route path={"pods"} element={<PodsSummary />} />
+                <Route path={"pvcs/:PVCName"} element={<TenantVolumes />} />
+                <Route path={"volumes"} element={<VolumesSummary />} />
+                <Route path={"license"} element={<TenantLicense />} />
+                <Route
+                  path={"monitoring"}
+                  element={<EditTenantMonitoringScreen />}
+                />
+                <Route path={"logging"} element={<TenantLogging />} />
+                <Route path={"events"} element={<TenantEvents />} />
+                <Route path={"csr"} element={<TenantCSR />} />
+                <Route
+                  path={"/"}
+                  element={
+                    <Navigate
+                      to={`/namespaces/${tenantNamespace}/tenants/${tenantName}/summary`}
+                    />
+                  }
+                />
+              </Routes>
             </div>
           }
         >
@@ -565,15 +463,6 @@ const TenantDetails = ({
           }}
           {{
             tabConfig: {
-              label: "Pods",
-              value: "pods",
-              component: Link,
-              to: getRoutePath("pods"),
-            },
-          }}
-
-          {{
-            tabConfig: {
               label: "Monitoring",
               value: "monitoring",
               component: Link,
@@ -582,12 +471,22 @@ const TenantDetails = ({
           }}
           {{
             tabConfig: {
-              label: "Logging",
+              label: "Audit Log",
               value: "logging",
               component: Link,
               to: getRoutePath("logging"),
             },
           }}
+          {{
+            tabConfig: {
+              label: "Pods",
+              value: "pods",
+              component: Link,
+              id: "tenant-pod-tab",
+              to: getRoutePath("pods"),
+            },
+          }}
+
           {{
             tabConfig: {
               label: "Volumes",
@@ -606,6 +505,14 @@ const TenantDetails = ({
           }}
           {{
             tabConfig: {
+              label: "Certificate Requests",
+              value: "csr",
+              component: Link,
+              to: getRoutePath("csr"),
+            },
+          }}
+          {{
+            tabConfig: {
               label: "License",
               value: "license",
               component: Link,
@@ -618,19 +525,4 @@ const TenantDetails = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  loadingTenant: state.tenants.tenantDetails.loadingTenant,
-  selectedTenant: state.tenants.tenantDetails.currentTenant,
-  selectedNamespace: state.tenants.tenantDetails.currentNamespace,
-  tenantInfo: state.tenants.tenantDetails.tenantInfo,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-  setSnackBarMessage,
-  setTenantDetailsLoad,
-  setTenantName,
-  setTenantInfo,
-});
-
-export default withStyles(styles)(connector(TenantDetails));
+export default withStyles(styles)(TenantDetails);

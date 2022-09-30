@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -30,7 +30,6 @@ import {
   modalStyleUtils,
   spacingUtils,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { setModalErrorSnackMessage } from "../../../../actions";
 import InputBoxWrapper from "../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import ModalWrapper from "../../Common/ModalWrapper/ModalWrapper";
 import PredefinedList from "../../Common/FormComponents/PredefinedList/PredefinedList";
@@ -47,13 +46,14 @@ import {
   ITierResponse,
 } from "../../Configurations/TiersConfiguration/types";
 import { MultiBucketResult } from "../types";
+import { setModalErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 interface IBulkReplicationModal {
   open: boolean;
   closeModalAndRefresh: (clearSelection: boolean) => any;
   classes: any;
   buckets: string[];
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -72,10 +72,6 @@ const styles = (theme: Theme) =>
       paddingTop: 5,
       color: "#42C91A",
     },
-    hide: {
-      opacity: 0,
-      transitionDuration: "0.3s",
-    },
     ...spacingUtils,
     ...modalStyleUtils,
     ...formFieldStyles,
@@ -87,8 +83,8 @@ const AddBulkReplicationModal = ({
   closeModalAndRefresh,
   classes,
   buckets,
-  setModalErrorSnackMessage,
 }: IBulkReplicationModal) => {
+  const dispatch = useAppDispatch();
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [loadingTiers, setLoadingTiers] = useState<boolean>(true);
   const [tiersList, setTiersList] = useState<ITiersDropDown[]>([]);
@@ -129,10 +125,10 @@ const AddBulkReplicationModal = ({
         })
         .catch((err: ErrorResponseHandler) => {
           setLoadingTiers(false);
-          setModalErrorSnackMessage(err);
+          dispatch(setModalErrorSnackMessage(err));
         });
     }
-  }, [loadingTiers, setModalErrorSnackMessage]);
+  }, [loadingTiers, dispatch]);
 
   useEffect(() => {
     let valid = true;
@@ -212,7 +208,7 @@ const AddBulkReplicationModal = ({
       })
       .catch((err: ErrorResponseHandler) => {
         setAddLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   };
 
@@ -455,8 +451,4 @@ const AddBulkReplicationModal = ({
   );
 };
 
-const connector = connect(null, {
-  setModalErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(AddBulkReplicationModal));
+export default withStyles(styles)(AddBulkReplicationModal);

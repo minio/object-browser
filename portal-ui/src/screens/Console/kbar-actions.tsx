@@ -15,16 +15,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Action } from "kbar/lib/types";
-import history from "../../history";
 import { BucketsIcon } from "../../icons";
 import { validRoutes } from "./valid-routes";
+import { IAM_PAGES } from "../../common/SecureComponent/permissions";
+import { Bucket } from "./Buckets/types";
 
 export const routesAsKbarActions = (
   features: string[] | null,
-  operatorMode: boolean
+  operatorMode: boolean,
+  directPVMode: boolean,
+  buckets: Bucket[],
+  navigate: (url: string) => void
 ) => {
   const initialActions: Action[] = [];
-  const allowedMenuItems = validRoutes(features, operatorMode);
+  const allowedMenuItems = validRoutes(features, operatorMode, directPVMode);
   for (const i of allowedMenuItems) {
     if (i.children && i.children.length > 0) {
       for (const childI of i.children) {
@@ -32,7 +36,7 @@ export const routesAsKbarActions = (
           id: `${childI.id}`,
           name: childI.name,
           section: i.name,
-          perform: () => history.push(`${childI.to}`),
+          perform: () => navigate(`${childI.to}`),
           icon: <childI.icon />,
         };
         initialActions.push(a);
@@ -42,7 +46,7 @@ export const routesAsKbarActions = (
         id: `${i.id}`,
         name: i.name,
         section: "Navigation",
-        perform: () => history.push(`${i.to}`),
+        perform: () => navigate(`${i.to}`),
         icon: <i.icon />,
       };
       initialActions.push(a);
@@ -54,10 +58,24 @@ export const routesAsKbarActions = (
       id: `create-bucket`,
       name: "Create Bucket",
       section: "Buckets",
-      perform: () => history.push(`/add-bucket`),
+      perform: () => navigate(IAM_PAGES.ADD_BUCKETS),
       icon: <BucketsIcon />,
     };
     initialActions.push(a);
+
+    if (buckets) {
+      buckets.map((buck) => [
+        initialActions.push({
+          id: buck.name,
+          name: buck.name,
+          section: "List of Buckets",
+          perform: () => {
+            navigate(`/buckets/${buck.name}/browse`);
+          },
+          icon: <BucketsIcon />,
+        }),
+      ]);
+    }
   }
   return initialActions;
 };

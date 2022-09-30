@@ -52,13 +52,13 @@ export const valueDef = (
   type: string,
   defaults: IElementValue[]
 ) => {
-  let defValue = type === "on|off" ? "false" : "";
+  let defValue = type === "on|off" ? "off" : "";
 
   if (defaults.length > 0) {
     const storedConfig = defaults.find((element) => element.key === key);
 
     if (storedConfig) {
-      defValue = storedConfig.value;
+      defValue = storedConfig.value || "";
     }
   }
 
@@ -77,13 +77,12 @@ const ConfTargetGeneric = ({
 
   // Effect to create all the values to hold
   useEffect(() => {
-    const values: IElementValue[] = [];
-    fields.forEach((field) => {
+    const values: IElementValue[] = fields.map((field) => {
       const stateInsert: IElementValue = {
         key: field.name,
         value: valueDef(field.name, field.type, defValList),
       };
-      values.push(stateInsert);
+      return stateInsert;
     });
 
     setValueHolder(values);
@@ -105,12 +104,12 @@ const ConfTargetGeneric = ({
   const fieldDefinition = (field: KVField, item: number) => {
     switch (field.type) {
       case "on|off":
-        const value = valueHolder[item] ? valueHolder[item].value : "false";
+        const value = valueHolder[item] ? valueHolder[item].value : "off";
 
         return (
           <FormSwitchWrapper
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const value = e.target.checked ? "true" : "false";
+              const value = e.target.checked ? "on" : "off";
               setValueElement(field.name, value, item);
             }}
             id={field.name}
@@ -118,7 +117,7 @@ const ConfTargetGeneric = ({
             label={field.label}
             value={"switch_on"}
             tooltip={field.tooltip}
-            checked={value === "true"}
+            checked={value === "on"}
           />
         );
       case "csv":
@@ -127,9 +126,9 @@ const ConfTargetGeneric = ({
             elements={valueHolder[item] ? valueHolder[item].value : ""}
             label={field.label}
             name={field.name}
-            onChange={(value: string) =>
-              setValueElement(field.name, value, item)
-            }
+            onChange={(value: string) => {
+              setValueElement(field.name, value, item);
+            }}
             tooltip={field.tooltip}
             commonPlaceholder={field.placeholder}
             withBorder={true}

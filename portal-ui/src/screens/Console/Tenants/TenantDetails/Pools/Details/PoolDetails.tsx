@@ -15,46 +15,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment } from "react";
-import { connect } from "react-redux";
-import { Theme } from "@mui/material/styles";
-import createStyles from "@mui/styles/createStyles";
-import withStyles from "@mui/styles/withStyles";
-import {
-  containerForHeader,
-  spacingUtils,
-  tableStyles,
-  tenantDetailsStyles,
-  textStyleUtils,
-} from "../../../../Common/FormComponents/common/styleLibrary";
-import { setErrorSnackMessage } from "../../../../../../actions";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { AppState } from "../../../../../../store";
-import { setTenantDetailsLoad } from "../../../actions";
 import { Box } from "@mui/material";
-import { ITenant } from "../../../ListTenants/types";
 import Grid from "@mui/material/Grid";
 import LabelValuePair from "../../../../Common/UsageBarWrapper/LabelValuePair";
 import { niceBytesInt } from "../../../../../../common/utils";
 import StackRow from "../../../../Common/UsageBarWrapper/StackRow";
 import RBIconButton from "../../../../Buckets/BucketDetails/SummaryItems/RBIconButton";
 import { EditTenantIcon } from "../../../../../../icons";
-
-interface IPoolDetails {
-  classes: any;
-  history: any;
-  loadingTenant: boolean;
-  tenant: ITenant | null;
-  selectedPool: string | null;
-  setTenantDetailsLoad: typeof setTenantDetailsLoad;
-}
-
-const styles = (theme: Theme) =>
-  createStyles({
-    ...spacingUtils,
-    ...textStyleUtils,
-    ...tenantDetailsStyles,
-    ...tableStyles,
-    ...containerForHeader(theme.spacing(4)),
-  });
 
 const stylingLayout = {
   border: "#EAEAEA 1px solid",
@@ -71,7 +41,14 @@ const twoColCssGridLayoutConfig = {
   padding: "15px",
 };
 
-const PoolDetails = ({ tenant, selectedPool, history }: IPoolDetails) => {
+const PoolDetails = () => {
+  const navigate = useNavigate();
+
+  const tenant = useSelector((state: AppState) => state.tenants.tenantInfo);
+  const selectedPool = useSelector(
+    (state: AppState) => state.tenants.selectedPool
+  );
+
   const poolInformation =
     tenant?.pools.find((pool) => pool.name === selectedPool) || null;
 
@@ -110,7 +87,7 @@ const PoolDetails = ({ tenant, selectedPool, history }: IPoolDetails) => {
           <RBIconButton
             icon={<EditTenantIcon />}
             onClick={() => {
-              history.push(
+              navigate(
                 `/namespaces/${tenant?.namespace || ""}/tenants/${
                   tenant?.name || ""
                 }/edit-pool`
@@ -278,15 +255,4 @@ const PoolDetails = ({ tenant, selectedPool, history }: IPoolDetails) => {
   );
 };
 
-const mapState = (state: AppState) => ({
-  loadingTenant: state.tenants.tenantDetails.loadingTenant,
-  selectedTenant: state.tenants.tenantDetails.currentTenant,
-  tenant: state.tenants.tenantDetails.tenantInfo,
-  selectedPool: state.tenants.tenantDetails.selectedPool,
-});
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-  setTenantDetailsLoad,
-});
-
-export default withStyles(styles)(connector(PoolDetails));
+export default PoolDetails;

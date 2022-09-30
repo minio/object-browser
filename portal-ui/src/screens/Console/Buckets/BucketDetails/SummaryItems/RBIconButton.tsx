@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from "react";
+import React, { Fragment } from "react";
 import BoxIconButton from "../../../Common/BoxIconButton/BoxIconButton";
 import { IconButtonProps } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";
@@ -93,21 +93,26 @@ const RBIconButton = (props: RBIconProps) => {
       variant="outlined"
       onClick={onClick}
       disabled={disabled}
-      color="secondary"
       size="medium"
       sx={{
-        border: "1px solid #f44336",
         "& span": {
           fontSize: 14,
           "@media (max-width: 900px)": {
-            display: showLabelAlways ? "inline" : "none",
-            marginRight: showLabelAlways ? "7px" : "",
+            "&:not(.MuiBadge-root, .MuiBadge-badge)": {
+              display: showLabelAlways ? "inline" : "none",
+              marginRight: showLabelAlways ? "7px" : "",
+            },
           },
         },
       }}
       {...restProps}
     >
-      <span>{text}</span> {icon}
+      {text !== "" && (
+        <Fragment>
+          <span>{text}</span>
+        </Fragment>
+      )}
+      {icon}
     </BoxIconButton>
   );
 };

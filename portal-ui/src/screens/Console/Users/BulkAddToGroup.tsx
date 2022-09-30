@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -25,27 +25,24 @@ import {
   formFieldStyles,
   modalStyleUtils,
 } from "../Common/FormComponents/common/styleLibrary";
-import { setModalErrorSnackMessage } from "../../../actions";
 import { ErrorResponseHandler } from "../../../common/types";
 import api from "../../../common/api";
 import GroupsSelectors from "./GroupsSelectors";
 import ModalWrapper from "../Common/ModalWrapper/ModalWrapper";
 import PredefinedList from "../Common/FormComponents/PredefinedList/PredefinedList";
 import { AddMembersToGroupIcon } from "../../../icons";
+import { setModalErrorSnackMessage } from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
 
 interface IAddToGroup {
   open: boolean;
   checkedUsers: any;
   closeModalAndRefresh: any;
   classes: any;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
   createStyles({
-    buttonContainer: {
-      textAlign: "right",
-    },
     ...modalStyleUtils,
     ...formFieldStyles,
   });
@@ -55,8 +52,8 @@ const BulkAddToGroup = ({
   checkedUsers,
   closeModalAndRefresh,
   classes,
-  setModalErrorSnackMessage,
 }: IAddToGroup) => {
+  const dispatch = useAppDispatch();
   //Local States
   const [saving, isSaving] = useState<boolean>(false);
   const [accepted, setAccepted] = useState<boolean>(false);
@@ -77,14 +74,16 @@ const BulkAddToGroup = ({
           })
           .catch((err: ErrorResponseHandler) => {
             isSaving(false);
-            setModalErrorSnackMessage(err);
+            dispatch(setModalErrorSnackMessage(err));
           });
       } else {
         isSaving(false);
-        setModalErrorSnackMessage({
-          errorMessage: "You need to select at least one group to assign",
-          detailedError: "",
-        });
+        dispatch(
+          setModalErrorSnackMessage({
+            errorMessage: "You need to select at least one group to assign",
+            detailedError: "",
+          })
+        );
       }
     }
   }, [
@@ -93,7 +92,7 @@ const BulkAddToGroup = ({
     closeModalAndRefresh,
     selectedGroups,
     checkedUsers,
-    setModalErrorSnackMessage,
+    dispatch,
   ]);
 
   //Fetch Actions
@@ -180,10 +179,4 @@ const BulkAddToGroup = ({
   );
 };
 
-const mapDispatchToProps = {
-  setModalErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(BulkAddToGroup));
+export default withStyles(styles)(BulkAddToGroup);

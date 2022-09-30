@@ -96,7 +96,7 @@ const MenuItem = ({
   );
 
   const selectMenuHandler = useCallback(
-    (e) => {
+    (e: any) => {
       onExpand(page.id);
       setSelectedMenuItem(page.id);
       page.onClick && page.onClick(e);
@@ -150,6 +150,7 @@ const MenuItem = ({
               <Suspense fallback={<div>...</div>}>
                 <page.icon />
               </Suspense>
+              {page.badge ? <page.badge /> : null}
             </ListItemIcon>
           </Tooltip>
         )}

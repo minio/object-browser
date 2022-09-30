@@ -18,7 +18,6 @@ import * as roles from "./roles";
 import * as elements from "./elements";
 import * as constants from "./constants";
 import { Selector } from "testcafe";
-import { logoutItem } from "./elements-menu";
 
 import * as Minio from "minio";
 
@@ -34,14 +33,28 @@ export const setUpNamedBucket = (t, name) => {
     accessKey: "minioadmin",
     secretKey: "minioadmin",
   });
-
   return new Promise((resolve, reject) => {
-    minioClient.makeBucket(name, "us-east-1").then(resolve).catch(resolve);
+    minioClient.makeBucket(name, "us-east-1", (err) => {
+      if (err) {
+        console.log(err);
+      }
+      resolve("done: " + err);
+    });
   });
 };
 
 export const uploadObjectToBucket = (t, modifier, objectName, objectPath) => {
   const bucketName = `${constants.TEST_BUCKET_NAME}-${modifier}`;
+  return uploadNamedObjectToBucket(t, bucketName, objectName, objectPath);
+};
+
+export const uploadNamedObjectToBucket = (
+  t,
+  modifier,
+  objectName,
+  objectPath
+) => {
+  const bucketName = modifier;
   const minioClient = new Minio.Client({
     endPoint: "localhost",
     port: 9000,
@@ -50,10 +63,12 @@ export const uploadObjectToBucket = (t, modifier, objectName, objectPath) => {
     secretKey: "minioadmin",
   });
   return new Promise((resolve, reject) => {
-    minioClient
-      .fPutObject(bucketName, objectName, objectPath, {})
-      .then(resolve)
-      .catch(resolve);
+    minioClient.fPutObject(bucketName, objectName, objectPath, {}, (err) => {
+      if (err) {
+        console.log(err);
+      }
+      resolve("done");
+    });
   });
 };
 
@@ -107,10 +122,8 @@ export const cleanUpBucket = (t, modifier) => {
 };
 
 export const namedTestBucketBrowseButtonFor = (name) => {
-  return Selector("h1")
-    .withText(name)
-    .parent(4)
-    .find("button:enabled")
+  return Selector("button:enabled")
+    .withAttribute("id", `browse-${name}`)
     .withText("Browse");
 };
 
@@ -157,8 +170,7 @@ export const cleanUpBucketAndUploads = (t, modifier) => {
 export const createUser = (t) => {
   return t
     .useRole(roles.admin)
-    .navigateTo("http://localhost:9090/identity/users")
-    .click(elements.createUserButton)
+    .navigateTo(`http://localhost:9090/identity/users/add-user`)
     .typeText(elements.usersAccessKeyInput, constants.TEST_USER_NAME)
     .typeText(elements.usersSecretKeyInput, constants.TEST_PASSWORD)
     .click(elements.saveButton);

@@ -15,20 +15,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { Box, Grid } from "@mui/material";
 import get from "lodash/get";
-import { AppState } from "../../../../store";
-import { setErrorSnackMessage } from "../../../../actions";
 import {
-  BucketEncryptionInfo,
-  BucketInfo,
   BucketObjectLocking,
   BucketQuota,
-  BucketReplication,
   BucketVersioning,
 } from "../types";
 import { BucketList } from "../../Watch/types";
@@ -41,7 +37,7 @@ import {
   IRetentionConfig,
 } from "../../../../common/types";
 import api from "../../../../common/api";
-import { setBucketDetailsLoad } from "../actions";
+
 import { IAM_SCOPES } from "../../../../common/SecureComponent/permissions";
 import {
   hasPermission,
@@ -56,15 +52,19 @@ import EditablePropertyItem from "./SummaryItems/EditablePropertyItem";
 import ReportedUsage from "./SummaryItems/ReportedUsage";
 import BucketQuotaSize from "./SummaryItems/BucketQuotaSize";
 import SectionTitle from "../../Common/SectionTitle";
+import { selDistSet, setErrorSnackMessage } from "../../../../systemSlice";
+import {
+  selBucketDetailsInfo,
+  selBucketDetailsLoading,
+  setBucketDetailsLoad,
+} from "./bucketDetailsSlice";
+import { useAppDispatch } from "../../../../store";
 
 const SetAccessPolicy = withSuspense(
   React.lazy(() => import("./SetAccessPolicy"))
 );
 const SetRetentionConfig = withSuspense(
   React.lazy(() => import("./SetRetentionConfig"))
-);
-const EnableBucketEncryption = withSuspense(
-  React.lazy(() => import("./EnableBucketEncryption"))
 );
 const EnableVersioningModal = withSuspense(
   React.lazy(() => import("./EnableVersioningModal"))
@@ -74,16 +74,6 @@ const BucketTags = withSuspense(
 );
 
 const EnableQuota = withSuspense(React.lazy(() => import("./EnableQuota")));
-
-interface IBucketSummaryProps {
-  classes: any;
-  match: any;
-  distributedSetup: boolean;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  loadingBucket: boolean;
-  bucketInfo: BucketInfo | null;
-  setBucketDetailsLoad: typeof setBucketDetailsLoad;
-}
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -98,47 +88,43 @@ const twoColCssGridLayoutConfig = {
   gap: 2,
 };
 
-const BucketSummary = ({
-  classes,
-  match,
-  distributedSetup,
-  setErrorSnackMessage,
-  loadingBucket,
-  bucketInfo,
-  setBucketDetailsLoad,
-}: IBucketSummaryProps) => {
-  const [encryptionCfg, setEncryptionCfg] =
-    useState<BucketEncryptionInfo | null>(null);
+interface IBucketSummaryProps {
+  classes: any;
+}
+
+const BucketSummary = ({ classes }: IBucketSummaryProps) => {
+  const dispatch = useAppDispatch();
+  const params = useParams();
+
+  const loadingBucket = useSelector(selBucketDetailsLoading);
+  const bucketInfo = useSelector(selBucketDetailsInfo);
+
+  const distributedSetup = useSelector(selDistSet);
   const [bucketSize, setBucketSize] = useState<string>("0");
   const [hasObjectLocking, setHasObjectLocking] = useState<boolean>(false);
   const [accessPolicyScreenOpen, setAccessPolicyScreenOpen] =
     useState<boolean>(false);
-  const [replicationRules, setReplicationRules] = useState<boolean>(false);
   const [loadingObjectLocking, setLoadingLocking] = useState<boolean>(true);
   const [loadingSize, setLoadingSize] = useState<boolean>(true);
   const [bucketLoading, setBucketLoading] = useState<boolean>(true);
-  const [loadingEncryption, setLoadingEncryption] = useState<boolean>(true);
   const [loadingVersioning, setLoadingVersioning] = useState<boolean>(true);
   const [loadingQuota, setLoadingQuota] = useState<boolean>(true);
-  const [loadingReplication, setLoadingReplication] = useState<boolean>(true);
   const [loadingRetention, setLoadingRetention] = useState<boolean>(true);
   const [isVersioned, setIsVersioned] = useState<boolean>(false);
   const [quotaEnabled, setQuotaEnabled] = useState<boolean>(false);
   const [quota, setQuota] = useState<BucketQuota | null>(null);
-  const [encryptionEnabled, setEncryptionEnabled] = useState<boolean>(false);
   const [retentionEnabled, setRetentionEnabled] = useState<boolean>(false);
   const [retentionConfig, setRetentionConfig] =
     useState<IRetentionConfig | null>(null);
   const [retentionConfigOpen, setRetentionConfigOpen] =
     useState<boolean>(false);
-  const [enableEncryptionScreenOpen, setEnableEncryptionScreenOpen] =
-    useState<boolean>(false);
+
   const [enableQuotaScreenOpen, setEnableQuotaScreenOpen] =
     useState<boolean>(false);
   const [enableVersioningOpen, setEnableVersioningOpen] =
     useState<boolean>(false);
 
-  const bucketName = match.params["bucketName"];
+  const bucketName = params.bucketName || "";
 
   let accessPolicy = "n/a";
   let policyDefinition = "";
@@ -150,10 +136,6 @@ const BucketSummary = ({
 
   const displayGetBucketObjectLockConfiguration = hasPermission(bucketName, [
     IAM_SCOPES.S3_GET_BUCKET_OBJECT_LOCK_CONFIGURATION,
-  ]);
-
-  const displayGetBucketEncryptionConfiguration = hasPermission(bucketName, [
-    IAM_SCOPES.S3_GET_BUCKET_ENCRYPTION_CONFIGURATION,
   ]);
 
   const displayGetBucketQuota = hasPermission(bucketName, [
@@ -169,36 +151,6 @@ const BucketSummary = ({
   }, [loadingBucket, setBucketLoading]);
 
   useEffect(() => {
-    if (loadingEncryption) {
-      if (displayGetBucketEncryptionConfiguration) {
-        api
-          .invoke("GET", `/api/v1/buckets/${bucketName}/encryption/info`)
-          .then((res: BucketEncryptionInfo) => {
-            if (res.algorithm) {
-              setEncryptionEnabled(true);
-              setEncryptionCfg(res);
-            }
-            setLoadingEncryption(false);
-          })
-          .catch((err: ErrorResponseHandler) => {
-            if (
-              err.errorMessage ===
-              "The server side encryption configuration was not found"
-            ) {
-              setEncryptionEnabled(false);
-              setEncryptionCfg(null);
-            }
-            setLoadingEncryption(false);
-          });
-      } else {
-        setEncryptionEnabled(false);
-        setEncryptionCfg(null);
-        setLoadingEncryption(false);
-      }
-    }
-  }, [loadingEncryption, bucketName, displayGetBucketEncryptionConfiguration]);
-
-  useEffect(() => {
     if (loadingVersioning && distributedSetup) {
       api
         .invoke("GET", `/api/v1/buckets/${bucketName}/versioning`)
@@ -207,11 +159,11 @@ const BucketSummary = ({
           setLoadingVersioning(false);
         })
         .catch((err: ErrorResponseHandler) => {
-          setErrorSnackMessage(err);
+          dispatch(setErrorSnackMessage(err));
           setLoadingVersioning(false);
         });
     }
-  }, [loadingVersioning, setErrorSnackMessage, bucketName, distributedSetup]);
+  }, [loadingVersioning, dispatch, bucketName, distributedSetup]);
 
   useEffect(() => {
     if (loadingQuota && distributedSetup) {
@@ -228,7 +180,7 @@ const BucketSummary = ({
             setLoadingQuota(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
             setQuotaEnabled(false);
             setLoadingQuota(false);
           });
@@ -240,7 +192,7 @@ const BucketSummary = ({
   }, [
     loadingQuota,
     setLoadingVersioning,
-    setErrorSnackMessage,
+    dispatch,
     bucketName,
     distributedSetup,
     displayGetBucketQuota,
@@ -256,7 +208,7 @@ const BucketSummary = ({
             setLoadingLocking(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
             setLoadingLocking(false);
           });
       } else {
@@ -265,7 +217,7 @@ const BucketSummary = ({
     }
   }, [
     loadingObjectLocking,
-    setErrorSnackMessage,
+    dispatch,
     bucketName,
     loadingVersioning,
     distributedSetup,
@@ -290,26 +242,10 @@ const BucketSummary = ({
         })
         .catch((err: ErrorResponseHandler) => {
           setLoadingSize(false);
-          setErrorSnackMessage(err);
+          dispatch(setErrorSnackMessage(err));
         });
     }
-  }, [loadingSize, setErrorSnackMessage, bucketName]);
-
-  useEffect(() => {
-    if (loadingReplication && distributedSetup) {
-      api
-        .invoke("GET", `/api/v1/buckets/${bucketName}/replication`)
-        .then((res: BucketReplication) => {
-          const r = res.rules ? res.rules : [];
-          setReplicationRules(r.length > 0);
-          setLoadingReplication(false);
-        })
-        .catch((err: ErrorResponseHandler) => {
-          setErrorSnackMessage(err);
-          setLoadingReplication(false);
-        });
-    }
-  }, [loadingReplication, setErrorSnackMessage, bucketName, distributedSetup]);
+  }, [loadingSize, dispatch, bucketName]);
 
   useEffect(() => {
     if (loadingRetention && hasObjectLocking) {
@@ -329,11 +265,10 @@ const BucketSummary = ({
   }, [loadingRetention, hasObjectLocking, bucketName]);
 
   const loadAllBucketData = () => {
-    setBucketDetailsLoad(true);
+    dispatch(setBucketDetailsLoad(true));
     setBucketLoading(true);
     setLoadingSize(true);
     setLoadingVersioning(true);
-    setLoadingEncryption(true);
     setLoadingRetention(true);
   };
 
@@ -344,10 +279,6 @@ const BucketSummary = ({
     setEnableQuotaScreenOpen(true);
   };
 
-  const closeEnableBucketEncryption = () => {
-    setEnableEncryptionScreenOpen(false);
-    setLoadingEncryption(true);
-  };
   const closeEnableBucketQuota = () => {
     setEnableQuotaScreenOpen(false);
     setLoadingQuota(true);
@@ -372,15 +303,6 @@ const BucketSummary = ({
   // @ts-ignore
   return (
     <Fragment>
-      {enableEncryptionScreenOpen && (
-        <EnableBucketEncryption
-          open={enableEncryptionScreenOpen}
-          selectedBucket={bucketName}
-          encryptionEnabled={encryptionEnabled}
-          encryptionCfg={encryptionCfg}
-          closeModalAndRefresh={closeEnableBucketEncryption}
-        />
-      )}
       {enableQuotaScreenOpen && (
         <EnableQuota
           open={enableQuotaScreenOpen}
@@ -441,45 +363,6 @@ const BucketSummary = ({
                 </SecureComponent>
 
                 <SecureComponent
-                  scopes={[IAM_SCOPES.S3_GET_BUCKET_ENCRYPTION_CONFIGURATION]}
-                  resource={bucketName}
-                >
-                  <EditablePropertyItem
-                    iamScopes={[
-                      IAM_SCOPES.S3_PUT_BUCKET_ENCRYPTION_CONFIGURATION,
-                    ]}
-                    resourceName={bucketName}
-                    property={"Encryption:"}
-                    value={encryptionEnabled ? "Enabled" : "Disabled"}
-                    onEdit={() => {
-                      setEnableEncryptionScreenOpen(true);
-                    }}
-                    isLoading={loadingEncryption}
-                  />
-                </SecureComponent>
-
-                <SecureComponent
-                  scopes={[IAM_SCOPES.S3_GET_REPLICATION_CONFIGURATION]}
-                  resource={bucketName}
-                >
-                  <LabelValuePair
-                    label={"Replication:"}
-                    value={
-                      <LabelWithIcon
-                        icon={
-                          replicationRules ? <EnabledIcon /> : <DisabledIcon />
-                        }
-                        label={
-                          <label className={classes.textMuted}>
-                            {replicationRules ? "Enabled" : "Disabled"}
-                          </label>
-                        }
-                      />
-                    }
-                  />
-                </SecureComponent>
-
-                <SecureComponent
                   scopes={[IAM_SCOPES.S3_GET_BUCKET_OBJECT_LOCK_CONFIGURATION]}
                   resource={bucketName}
                 >
@@ -502,14 +385,17 @@ const BucketSummary = ({
                 <Box className={classes.spacerTop}>
                   <LabelValuePair
                     label={"Tags:"}
-                    value={
-                      <BucketTags
-                        setErrorSnackMessage={setErrorSnackMessage}
-                        bucketName={bucketName}
-                      />
-                    }
+                    value={<BucketTags bucketName={bucketName} />}
                   />
                 </Box>
+                <EditablePropertyItem
+                  iamScopes={[IAM_SCOPES.ADMIN_SET_BUCKET_QUOTA]}
+                  resourceName={bucketName}
+                  property={"Quota:"}
+                  value={quotaEnabled ? "Enabled" : "Disabled"}
+                  onEdit={setBucketQuota}
+                  isLoading={loadingQuota}
+                />
               </Box>
 
               <Box
@@ -520,6 +406,9 @@ const BucketSummary = ({
                 }}
               >
                 <ReportedUsage bucketSize={bucketSize} />
+                {quotaEnabled && quota ? (
+                  <BucketQuotaSize quota={quota} />
+                ) : null}
               </Box>
             </Box>
           </Grid>
@@ -546,31 +435,11 @@ const BucketSummary = ({
                   <EditablePropertyItem
                     iamScopes={[IAM_SCOPES.S3_PUT_BUCKET_VERSIONING]}
                     resourceName={bucketName}
-                    property={"Versioning:"}
-                    value={isVersioned ? "Enabled" : "Disabled"}
+                    property={"Current Status:"}
+                    value={isVersioned ? "Versioned" : "Unversioned (Default)"}
                     onEdit={setBucketVersioning}
                     isLoading={loadingVersioning}
                   />
-
-                  <EditablePropertyItem
-                    iamScopes={[IAM_SCOPES.ADMIN_SET_BUCKET_QUOTA]}
-                    resourceName={bucketName}
-                    property={"Quota:"}
-                    value={quotaEnabled ? "Enabled" : "Disabled"}
-                    onEdit={setBucketQuota}
-                    isLoading={loadingQuota}
-                  />
-                </Box>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr",
-                    alignItems: "flex-start",
-                  }}
-                >
-                  {quotaEnabled && quota ? (
-                    <BucketQuotaSize quota={quota} />
-                  ) : null}
                 </Box>
               </Box>
             </Grid>
@@ -660,16 +529,4 @@ const BucketSummary = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-  distributedSetup: state.system.distributedSetup,
-  loadingBucket: state.buckets.bucketDetails.loadingBucket,
-  bucketInfo: state.buckets.bucketDetails.bucketInfo,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-  setBucketDetailsLoad,
-});
-
-export default withStyles(styles)(connector(BucketSummary));
+export default withStyles(styles)(BucketSummary);

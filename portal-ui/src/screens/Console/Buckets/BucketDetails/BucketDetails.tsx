@@ -15,8 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { Link, Redirect, Route, Router, Switch } from "react-router-dom";
-import { connect } from "react-redux";
+import {
+  Link,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -30,9 +37,6 @@ import {
   pageContentStyles,
   searchField,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { setErrorSnackMessage } from "../../../../actions";
-import { setBucketDetailsLoad, setBucketInfo } from "../actions";
-import { AppState } from "../../../../store";
 import { ErrorResponseHandler } from "../../../../common/types";
 import PageHeader from "../../Common/PageHeader/PageHeader";
 
@@ -45,13 +49,25 @@ import PageLayout from "../../Common/Layout/PageLayout";
 import VerticalTabs from "../../Common/VerticalTabs/VerticalTabs";
 import BackLink from "../../../../common/BackLink";
 import {
-  SecureComponent,
   hasPermission,
+  SecureComponent,
 } from "../../../../common/SecureComponent";
 
 import withSuspense from "../../Common/Components/withSuspense";
 import RBIconButton from "./SummaryItems/RBIconButton";
 import { TrashIcon } from "../../../../icons";
+import {
+  selDistSet,
+  selSiteRep,
+  setErrorSnackMessage,
+} from "../../../../systemSlice";
+import {
+  selBucketDetailsInfo,
+  selBucketDetailsLoading,
+  setBucketDetailsLoad,
+  setBucketInfo,
+} from "./bucketDetailsSlice";
+import { useAppDispatch } from "../../../../store";
 
 const BucketsIcon = React.lazy(() => import("../../../../icons/BucketsIcon"));
 const FolderIcon = React.lazy(() => import("../../../../icons/FolderIcon"));
@@ -68,15 +84,6 @@ const AccessDetailsPanel = withSuspense(
 const BucketSummaryPanel = withSuspense(
   React.lazy(() => import("./BucketSummaryPanel"))
 );
-const BucketEventsPanel = withSuspense(
-  React.lazy(() => import("./BucketEventsPanel"))
-);
-const BucketReplicationPanel = withSuspense(
-  React.lazy(() => import("./BucketReplicationPanel"))
-);
-const BucketLifecyclePanel = withSuspense(
-  React.lazy(() => import("./BucketLifecyclePanel"))
-);
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -88,18 +95,9 @@ const styles = (theme: Theme) =>
       paddingTop: 0,
     },
     ...pageContentStyles,
-    breadcrumLink: {
-      textDecoration: "none",
-      color: "black",
-    },
     ...searchField,
     capitalize: {
       textTransform: "capitalize",
-    },
-    deleteBtn: {
-      color: "#f44336",
-      border: "1px solid rgba(244, 67, 54, 0.5)",
-      maxWidth: 140,
     },
     ...hrClass,
     ...buttonsStyles,
@@ -108,32 +106,23 @@ const styles = (theme: Theme) =>
 
 interface IBucketDetailsProps {
   classes: any;
-  match: any;
-  history: any;
-  distributedSetup: boolean;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  setBucketDetailsLoad: typeof setBucketDetailsLoad;
-  loadingBucket: boolean;
-  setBucketInfo: typeof setBucketInfo;
-  bucketInfo: BucketInfo | null;
 }
 
-const BucketDetails = ({
-  classes,
-  match,
-  history,
-  setErrorSnackMessage,
-  distributedSetup,
-  setBucketDetailsLoad,
-  loadingBucket,
-  setBucketInfo,
-  bucketInfo,
-}: IBucketDetailsProps) => {
+const BucketDetails = ({ classes }: IBucketDetailsProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
+
+  const distributedSetup = useSelector(selDistSet);
+  const loadingBucket = useSelector(selBucketDetailsLoading);
+  const bucketInfo = useSelector(selBucketDetailsInfo);
+  const siteReplicationInfo = useSelector(selSiteRep);
+
   const [iniLoad, setIniLoad] = useState<boolean>(false);
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
-  const bucketName = match.params["bucketName"];
+  const bucketName = params.bucketName || "";
 
-  let selTab = match?.params["0"];
+  let selTab = params["0"] || "";
   selTab = selTab ? selTab : "summary";
 
   const [activeTab, setActiveTab] = useState(selTab);
@@ -144,39 +133,31 @@ const BucketDetails = ({
 
   useEffect(() => {
     if (!iniLoad) {
-      setBucketDetailsLoad(true);
+      dispatch(setBucketDetailsLoad(true));
       setIniLoad(true);
     }
-  }, [iniLoad, setBucketDetailsLoad, setIniLoad]);
+  }, [iniLoad, dispatch, setIniLoad]);
 
   useEffect(() => {
     if (loadingBucket) {
       api
         .invoke("GET", `/api/v1/buckets/${bucketName}`)
         .then((res: BucketInfo) => {
-          setBucketDetailsLoad(false);
-          setBucketInfo(res);
+          dispatch(setBucketDetailsLoad(false));
+          dispatch(setBucketInfo(res));
         })
         .catch((err: ErrorResponseHandler) => {
-          setBucketDetailsLoad(false);
-          setErrorSnackMessage(err);
+          dispatch(setBucketDetailsLoad(false));
+          dispatch(setErrorSnackMessage(err));
         });
     }
-  }, [
-    bucketName,
-    loadingBucket,
-    setBucketDetailsLoad,
-    setBucketInfo,
-    setErrorSnackMessage,
-  ]);
+  }, [bucketName, loadingBucket, dispatch]);
 
   let topLevelRoute = `/buckets/${bucketName}`;
   const defaultRoute = "/admin/summary";
 
   const manageBucketRoutes: Record<string, any> = {
     events: "/admin/events",
-    replication: "/admin/replication",
-    lifecycle: "/admin/lifecycle",
     access: "/admin/access",
     prefix: "/admin/prefix",
   };
@@ -194,12 +175,12 @@ const BucketDetails = ({
   const closeDeleteModalAndRefresh = (refresh: boolean) => {
     setDeleteOpen(false);
     if (refresh) {
-      history.push("/buckets");
+      navigate("/buckets");
     }
   };
 
   const openBucketBrowser = () => {
-    history.push(`/buckets/${bucketName}/browse`);
+    navigate(`/buckets/${bucketName}/browse`);
   };
 
   return (
@@ -280,7 +261,7 @@ const BucketDetails = ({
                 </SecureComponent>
                 <RBIconButton
                   onClick={() => {
-                    setBucketDetailsLoad(true);
+                    dispatch(setBucketDetailsLoad(true));
                   }}
                   text={`Refresh`}
                   icon={<RefreshIcon />}
@@ -296,51 +277,17 @@ const BucketDetails = ({
             isRouteTabs
             routes={
               <div className={classes.contentSpacer}>
-                <Router history={history}>
-                  <Switch>
-                    <Route
-                      exact
-                      path="/buckets/:bucketName/admin/summary"
-                      component={BucketSummaryPanel}
-                    />
-                    <Route
-                      exact
-                      path="/buckets/:bucketName/admin/events"
-                      component={BucketEventsPanel}
-                    />
-                    {distributedSetup && (
-                      <Route
-                        exact
-                        path="/buckets/:bucketName/admin/replication"
-                        component={BucketReplicationPanel}
-                      />
-                    )}
-                    {distributedSetup && (
-                      <Route
-                        exact
-                        path="/buckets/:bucketName/admin/lifecycle"
-                        component={BucketLifecyclePanel}
-                      />
-                    )}
-
-                    <Route
-                      exact
-                      path="/buckets/:bucketName/admin/access"
-                      component={AccessDetailsPanel}
-                    />
-                    <Route
-                      exact
-                      path="/buckets/:bucketName/admin/prefix"
-                      component={AccessRulePanel}
-                    />
-                    <Route
-                      path="/buckets/:bucketName"
-                      component={() => (
-                        <Redirect to={`/buckets/${bucketName}/admin/summary`} />
-                      )}
-                    />
-                  </Switch>
-                </Router>
+                <Routes>
+                  <Route path="summary" element={<BucketSummaryPanel />} />
+                  <Route path="access" element={<AccessDetailsPanel />} />
+                  <Route path="prefix" element={<AccessRulePanel />} />
+                  <Route
+                    path="*"
+                    element={
+                      <Navigate to={`/buckets/${bucketName}/admin/summary`} />
+                    }
+                  />
+                </Routes>
               </div>
             }
           >
@@ -350,46 +297,6 @@ const BucketDetails = ({
                 value: "summary",
                 component: Link,
                 to: getRoutePath("summary"),
-              },
-            }}
-            {{
-              tabConfig: {
-                label: "Events",
-                value: "events",
-                component: Link,
-                disabled: !hasPermission(bucketName, [
-                  IAM_SCOPES.S3_GET_BUCKET_NOTIFICATIONS,
-                  IAM_SCOPES.S3_PUT_BUCKET_NOTIFICATIONS,
-                ]),
-                to: getRoutePath("events"),
-              },
-            }}
-            {{
-              tabConfig: {
-                label: "Replication",
-                value: "replication",
-                component: Link,
-                disabled:
-                  !distributedSetup ||
-                  !hasPermission(bucketName, [
-                    IAM_SCOPES.S3_GET_REPLICATION_CONFIGURATION,
-                    IAM_SCOPES.S3_PUT_REPLICATION_CONFIGURATION,
-                  ]),
-                to: getRoutePath("replication"),
-              },
-            }}
-            {{
-              tabConfig: {
-                label: "Lifecycle",
-                value: "lifecycle",
-                component: Link,
-                disabled:
-                  !distributedSetup ||
-                  !hasPermission(bucketName, [
-                    IAM_SCOPES.S3_GET_LIFECYCLE_CONFIGURATION,
-                    IAM_SCOPES.S3_PUT_LIFECYCLE_CONFIGURATION,
-                  ]),
-                to: getRoutePath("lifecycle"),
               },
             }}
             {{
@@ -423,18 +330,4 @@ const BucketDetails = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-  selectedTab: state.buckets.bucketDetails.selectedTab,
-  distributedSetup: state.system.distributedSetup,
-  loadingBucket: state.buckets.bucketDetails.loadingBucket,
-  bucketInfo: state.buckets.bucketDetails.bucketInfo,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-  setBucketDetailsLoad,
-  setBucketInfo,
-});
-
-export default withStyles(styles)(connector(BucketDetails));
+export default withStyles(styles)(BucketDetails);

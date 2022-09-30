@@ -22,15 +22,15 @@ import { ICertificateInfo } from "../../Tenants/types";
 import LanguageIcon from "@mui/icons-material/Language";
 import Chip from "@mui/material/Chip";
 import {
-  Typography,
-  Divider,
   Box,
-  Grid,
   Container,
-  ListItemText,
+  Divider,
+  Grid,
   List,
   ListItem,
   ListItemAvatar,
+  ListItemText,
+  Typography,
 } from "@mui/material";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import Moment from "react-moment";
@@ -38,17 +38,6 @@ import CertificateIcon from "../../../../icons/CertificateIcon";
 
 const styles = (theme: Theme) =>
   createStyles({
-    root: {
-      padding: 0,
-      margin: 0,
-      border: 0,
-      backgroundColor: "transparent",
-      textDecoration: "underline",
-      cursor: "pointer",
-      fontSize: "inherit",
-      color: theme.palette.info.main,
-      fontFamily: "Lato, sans-serif",
-    },
     certificateIcon: {
       float: "left",
       paddingTop: "5px !important",

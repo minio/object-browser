@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, Fragment } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import useApi from "../../../../Common/Hooks/useApi";
 import { ErrorResponseHandler } from "../../../../../../common/types";
 import { MetadataResponse } from "./types";
@@ -36,9 +36,6 @@ const styles = (theme: Theme) =>
         width: 16,
         height: 16,
       },
-    },
-    titleCol: {
-      width: "25%",
     },
     titleItem: {
       width: "35%",

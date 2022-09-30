@@ -113,18 +113,24 @@ export const IAM_SCOPES = {
 export const IAM_PAGES = {
   /* Buckets */
   BUCKETS: "/buckets",
-  ADD_BUCKETS: "/add-bucket",
-  BUCKETS_ADMIN_VIEW: "/buckets/:bucketName/admin*",
-  BUCKETS_BROWSE_VIEW: "/buckets/:bucketName/browse*",
+  ADD_BUCKETS: "add-bucket",
+  BUCKETS_ADMIN_VIEW: ":bucketName/admin/*",
+  BUCKETS_BROWSE_VIEW: ":bucketName/browse/*",
   /* Identity */
   IDENTITY: "/identity",
   USERS: "/identity/users",
-  USERS_VIEW: "/identity/users/:userName+",
+  USERS_VIEW: "/identity/users/:userName",
+  USER_ADD: "/identity/users/add-user",
   GROUPS: "/identity/groups",
-  GROUPS_VIEW: "/identity/groups/:groupName+",
+  GROUPS_ADD: "/identity/groups/create-group",
+  GROUPS_VIEW: "/identity/groups/:groupName",
   ACCOUNT: "/identity/account",
+  ACCOUNT_ADD: "/identity/account/new-account",
+  USER_SA_ACCOUNT_ADD: "/identity/users/new-user-sa/:userName",
+
   /* Access */
   POLICIES: "/access/policies",
+  POLICY_ADD: "/access/add-policy",
   POLICIES_VIEW: "/access/policies/*",
   /* Monitoring */
   TOOLS_LOGS: "/tools/logs",
@@ -204,6 +210,13 @@ export const IAM_PAGES = {
     "/namespaces/:tenantNamespace/tenants/:tenantName/logging",
   NAMESPACE_TENANT_EVENTS:
     "/namespaces/:tenantNamespace/tenants/:tenantName/events",
+  NAMESPACE_TENANT_CSR: "/namespaces/:tenantNamespace/tenants/:tenantName/csr",
+  OPERATOR_MARKETPLACE: "/marketplace",
+
+  /* DirectPV */
+  DIRECTPV_STORAGE: "/storage",
+  DIRECTPV_DRIVES: "/drives",
+  DIRECTPV_VOLUMES: "/volumes",
 };
 
 // roles
@@ -295,6 +308,10 @@ export const IAM_PAGES_PERMISSIONS = {
     IAM_SCOPES.ADMIN_ADD_USER_TO_GROUP, // display "edit members" button in groups detail page
     IAM_SCOPES.ADMIN_ATTACH_USER_OR_GROUP_POLICY, // display "set policy" button in groups details page
   ],
+  [IAM_PAGES.GROUPS_ADD]: [
+    IAM_SCOPES.ADMIN_LIST_USERS, // displays users
+    IAM_SCOPES.ADMIN_CREATE_USER, // displays create user button
+  ],
   [IAM_PAGES.USERS]: [
     IAM_SCOPES.ADMIN_LIST_USERS, // displays users
     IAM_SCOPES.ADMIN_CREATE_USER, // displays create user button
@@ -306,6 +323,14 @@ export const IAM_PAGES_PERMISSIONS = {
     IAM_SCOPES.ADMIN_DISABLE_USER,
     IAM_SCOPES.ADMIN_DELETE_USER,
   ],
+  [IAM_PAGES.USER_SA_ACCOUNT_ADD]: [
+    IAM_SCOPES.ADMIN_CREATE_SERVICEACCOUNT,
+    IAM_SCOPES.ADMIN_UPDATE_SERVICEACCOUNT,
+    IAM_SCOPES.ADMIN_REMOVE_SERVICEACCOUNT,
+    IAM_SCOPES.ADMIN_LIST_SERVICEACCOUNTS,
+  ],
+  [IAM_PAGES.USER_ADD]: [IAM_SCOPES.ADMIN_CREATE_USER], // displays create user button
+  [IAM_PAGES.ACCOUNT_ADD]: [IAM_SCOPES.ADMIN_CREATE_SERVICEACCOUNT],
   [IAM_PAGES.DASHBOARD]: [
     IAM_SCOPES.ADMIN_SERVER_INFO, // displays dashboard information
   ],
@@ -318,6 +343,9 @@ export const IAM_PAGES_PERMISSIONS = {
   ],
   [IAM_PAGES.POLICIES]: [
     IAM_SCOPES.ADMIN_LIST_USER_POLICIES, // displays policies
+    IAM_SCOPES.ADMIN_CREATE_POLICY, // displays create policy button
+  ],
+  [IAM_PAGES.POLICY_ADD]: [
     IAM_SCOPES.ADMIN_CREATE_POLICY, // displays create policy button
   ],
   [IAM_PAGES.SETTINGS]: [

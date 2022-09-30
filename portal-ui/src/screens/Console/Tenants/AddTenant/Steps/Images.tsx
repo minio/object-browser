@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -25,8 +25,7 @@ import {
   modalBasic,
   wizardCommon,
 } from "../../../Common/FormComponents/common/styleLibrary";
-import { isPageValid, updateAddField } from "../../actions";
-import { AppState } from "../../../../../store";
+import { AppState, useAppDispatch } from "../../../../../store";
 import { clearValidationError } from "../../utils";
 import {
   commonFormValidation,
@@ -34,37 +33,10 @@ import {
 } from "../../../../../utils/validationFunctions";
 import FormSwitchWrapper from "../../../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
 import InputBoxWrapper from "../../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
+import { isPageValid, updateAddField } from "../createTenantSlice";
 
 interface IImagesProps {
-  updateAddField: typeof updateAddField;
-  isPageValid: typeof isPageValid;
-  storageClasses: any;
   classes: any;
-  customImage: boolean;
-  imageName: string;
-  customDockerhub: boolean;
-  imageRegistry: string;
-  imageRegistryUsername: string;
-  imageRegistryPassword: string;
-  exposeMinIO: boolean;
-  exposeConsole: boolean;
-  prometheusCustom: boolean;
-  tenantCustom: boolean;
-  logSearchCustom: boolean;
-  logSearchVolumeSize: string;
-  logSearchSizeFactor: string;
-  prometheusVolumeSize: string;
-  prometheusSizeFactor: string;
-  logSearchSelectedStorageClass: string;
-  logSearchImage: string;
-  kesImage: string;
-  logSearchPostgresImage: string;
-  logSearchPostgresInitImage: string;
-  prometheusSelectedStorageClass: string;
-  prometheusImage: string;
-  prometheusSidecarImage: string;
-  prometheusInitImage: string;
-  selectedStorageClass: string;
 }
 
 const styles = (theme: Theme) =>
@@ -74,45 +46,91 @@ const styles = (theme: Theme) =>
     ...wizardCommon,
   });
 
-const Images = ({
-  classes,
-  storageClasses,
-  customImage,
-  imageName,
-  customDockerhub,
-  imageRegistry,
-  imageRegistryUsername,
-  imageRegistryPassword,
-  exposeMinIO,
-  exposeConsole,
-  prometheusCustom,
-  tenantCustom,
-  logSearchCustom,
-  logSearchVolumeSize,
-  logSearchSizeFactor,
-  logSearchImage,
-  kesImage,
-  logSearchPostgresImage,
-  logSearchPostgresInitImage,
-  prometheusVolumeSize,
-  prometheusSizeFactor,
-  logSearchSelectedStorageClass,
-  prometheusSelectedStorageClass,
-  prometheusImage,
-  prometheusSidecarImage,
-  prometheusInitImage,
-  updateAddField,
-  isPageValid,
-  selectedStorageClass,
-}: IImagesProps) => {
+const Images = ({ classes }: IImagesProps) => {
+  const dispatch = useAppDispatch();
+
+  const customImage = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.customImage
+  );
+  const imageName = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.imageName
+  );
+  const customDockerhub = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.customDockerhub
+  );
+  const imageRegistry = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.imageRegistry
+  );
+  const imageRegistryUsername = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.imageRegistryUsername
+  );
+  const imageRegistryPassword = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.imageRegistryPassword
+  );
+
+  const prometheusCustom = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.prometheusEnabled
+  );
+  const tenantCustom = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.tenantCustom
+  );
+  const logSearchCustom = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.logSearchEnabled
+  );
+  const logSearchVolumeSize = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.logSearchVolumeSize
+  );
+
+  const prometheusVolumeSize = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.prometheusVolumeSize
+  );
+
+  const logSearchSelectedStorageClass = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.logSearchSelectedStorageClass
+  );
+  const logSearchImage = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.logSearchImage
+  );
+  const kesImage = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.kesImage
+  );
+  const logSearchPostgresImage = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.logSearchPostgresImage
+  );
+  const logSearchPostgresInitImage = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.logSearchPostgresInitImage
+  );
+  const prometheusSelectedStorageClass = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.prometheusSelectedStorageClass
+  );
+  const prometheusImage = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.prometheusImage
+  );
+  const prometheusSidecarImage = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.prometheusSidecarImage
+  );
+  const prometheusInitImage = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.prometheusInitImage
+  );
+
   const [validationErrors, setValidationErrors] = useState<any>({});
 
   // Common
   const updateField = useCallback(
     (field: string, value: any) => {
-      updateAddField("configure", field, value);
+      dispatch(
+        updateAddField({ pageName: "configure", field: field, value: value })
+      );
     },
-    [updateAddField]
+    [dispatch]
   );
 
   // Validation
@@ -250,7 +268,12 @@ const Images = ({
 
     const commonVal = commonFormValidation(customAccountValidation);
 
-    isPageValid("configure", Object.keys(commonVal).length === 0);
+    dispatch(
+      isPageValid({
+        pageName: "configure",
+        valid: Object.keys(commonVal).length === 0,
+      })
+    );
 
     setValidationErrors(commonVal);
   }, [
@@ -267,7 +290,7 @@ const Images = ({
     imageRegistry,
     imageRegistryUsername,
     imageRegistryPassword,
-    isPageValid,
+    dispatch,
     prometheusCustom,
     tenantCustom,
     logSearchCustom,
@@ -302,7 +325,7 @@ const Images = ({
             label="MinIO"
             value={imageName}
             error={validationErrors["image"] || ""}
-            placeholder="E.g. minio/minio:RELEASE.2022-02-26T02-54-46Z"
+            placeholder="minio/minio:RELEASE.2022-02-26T02-54-46Z"
           />
         </Grid>
 
@@ -317,7 +340,7 @@ const Images = ({
             label="KES"
             value={kesImage}
             error={validationErrors["kesImage"] || ""}
-            placeholder="E.g. minio/kes:v0.17.6"
+            placeholder="minio/kes:v0.17.6"
           />
         </Grid>
         <Grid item xs={12} className={classes.formFieldRow}>
@@ -334,7 +357,7 @@ const Images = ({
             label="API"
             value={logSearchImage}
             error={validationErrors["logSearchImage"] || ""}
-            placeholder="E.g. minio/operator:v4.4.10"
+            placeholder="minio/operator:v4.4.22"
           />
         </Grid>
         <Grid item xs={12} className={classes.formFieldRow}>
@@ -348,7 +371,7 @@ const Images = ({
             label="PostgreSQL"
             value={logSearchPostgresImage}
             error={validationErrors["logSearchPostgresImage"] || ""}
-            placeholder="E.g. library/postgres:13"
+            placeholder="library/postgres:13"
           />
         </Grid>
         <Grid item xs={12} className={classes.formFieldRow}>
@@ -362,7 +385,7 @@ const Images = ({
             label="PostgreSQL Init"
             value={logSearchPostgresInitImage}
             error={validationErrors["logSearchPostgresInitImage"] || ""}
-            placeholder="E.g. library/busybox:1.33.1"
+            placeholder="library/busybox:1.33.1"
           />
         </Grid>
         <Grid item xs={12} className={classes.formFieldRow}>
@@ -379,7 +402,7 @@ const Images = ({
             label="Prometheus"
             value={prometheusImage}
             error={validationErrors["prometheusImage"] || ""}
-            placeholder="E.g. quay.io/prometheus/prometheus:latest"
+            placeholder="quay.io/prometheus/prometheus:latest"
           />
         </Grid>
         <Grid item xs={12} className={classes.formFieldRow}>
@@ -393,7 +416,7 @@ const Images = ({
             label="Prometheus Sidecar"
             value={prometheusSidecarImage}
             error={validationErrors["prometheusSidecarImage"] || ""}
-            placeholder="E.g. quay.io/prometheus/prometheus:latest"
+            placeholder="library/alpine:latest"
           />
         </Grid>
         <Grid item xs={12} className={classes.formFieldRow}>
@@ -407,7 +430,7 @@ const Images = ({
             label="Prometheus Init"
             value={prometheusInitImage}
             error={validationErrors["prometheusInitImage"] || ""}
-            placeholder="E.g. quay.io/prometheus/prometheus:latest"
+            placeholder="library/busybox:1.33.1"
           />
         </Grid>
       </Fragment>
@@ -446,7 +469,7 @@ const Images = ({
               label="Endpoint"
               value={imageRegistry}
               error={validationErrors["registry"] || ""}
-              placeholder="E.g. https://index.docker.io/v1/"
+              placeholder="https://index.docker.io/v1/"
               required
             />
           </Grid>
@@ -482,52 +505,4 @@ const Images = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  storageClasses: state.tenants.createTenant.storageClasses,
-  customImage: state.tenants.createTenant.fields.configure.customImage,
-  imageName: state.tenants.createTenant.fields.configure.imageName,
-  customDockerhub: state.tenants.createTenant.fields.configure.customDockerhub,
-  imageRegistry: state.tenants.createTenant.fields.configure.imageRegistry,
-  imageRegistryUsername:
-    state.tenants.createTenant.fields.configure.imageRegistryUsername,
-  imageRegistryPassword:
-    state.tenants.createTenant.fields.configure.imageRegistryPassword,
-  exposeMinIO: state.tenants.createTenant.fields.configure.exposeMinIO,
-  exposeConsole: state.tenants.createTenant.fields.configure.exposeConsole,
-  prometheusCustom:
-    state.tenants.createTenant.fields.configure.prometheusEnabled,
-  tenantCustom: state.tenants.createTenant.fields.configure.tenantCustom,
-  logSearchCustom: state.tenants.createTenant.fields.configure.logSearchEnabled,
-  logSearchVolumeSize:
-    state.tenants.createTenant.fields.configure.logSearchVolumeSize,
-  logSearchSizeFactor:
-    state.tenants.createTenant.fields.configure.logSearchSizeFactor,
-  prometheusVolumeSize:
-    state.tenants.createTenant.fields.configure.prometheusVolumeSize,
-  prometheusSizeFactor:
-    state.tenants.createTenant.fields.configure.prometheusSizeFactor,
-  logSearchSelectedStorageClass:
-    state.tenants.createTenant.fields.configure.logSearchSelectedStorageClass,
-  logSearchImage: state.tenants.createTenant.fields.configure.logSearchImage,
-  kesImage: state.tenants.createTenant.fields.configure.kesImage,
-  logSearchPostgresImage:
-    state.tenants.createTenant.fields.configure.logSearchPostgresImage,
-  logSearchPostgresInitImage:
-    state.tenants.createTenant.fields.configure.logSearchPostgresInitImage,
-  prometheusSelectedStorageClass:
-    state.tenants.createTenant.fields.configure.prometheusSelectedStorageClass,
-  prometheusImage: state.tenants.createTenant.fields.configure.prometheusImage,
-  prometheusSidecarImage:
-    state.tenants.createTenant.fields.configure.prometheusSidecarImage,
-  prometheusInitImage:
-    state.tenants.createTenant.fields.configure.prometheusInitImage,
-  selectedStorageClass:
-    state.tenants.createTenant.fields.nameTenant.selectedStorageClass,
-});
-
-const connector = connect(mapState, {
-  updateAddField,
-  isPageValid,
-});
-
-export default withStyles(styles)(connector(Images));
+export default withStyles(styles)(Images);

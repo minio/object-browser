@@ -164,6 +164,12 @@ const IconsScreen = ({ classes }: IIconsScreenSimple) => {
         </Grid>
 
         <Grid item xs={3} sm={2} md={1}>
+          <cicons.AlertIcon />
+          <br />
+          AlertIcon
+        </Grid>
+
+        <Grid item xs={3} sm={2} md={1}>
           <cicons.AllBucketsIcon />
           <br />
           AllBucketsIcon
@@ -233,6 +239,12 @@ const IconsScreen = ({ classes }: IIconsScreenSimple) => {
           <cicons.CallHomeFeatureIcon />
           <br />
           CallHomeFeatureIcon
+        </Grid>
+
+        <Grid item xs={3} sm={2} md={1}>
+          <cicons.CancelledIcon />
+          <br />
+          CancelledIcon
         </Grid>
 
         <Grid item xs={3} sm={2} md={1}>
@@ -401,6 +413,12 @@ const IconsScreen = ({ classes }: IIconsScreenSimple) => {
           <cicons.EditIcon />
           <br />
           EditIcon
+        </Grid>
+
+        <Grid item xs={3} sm={2} md={1}>
+          <cicons.EditTagIcon />
+          <br />
+          EditTagIcon
         </Grid>
 
         <Grid item xs={3} sm={2} md={1}>
@@ -614,6 +632,12 @@ const IconsScreen = ({ classes }: IIconsScreenSimple) => {
         </Grid>
 
         <Grid item xs={3} sm={2} md={1}>
+          <cicons.InfoIcon />
+          <br />
+          InfoIcon
+        </Grid>
+
+        <Grid item xs={3} sm={2} md={1}>
           <cicons.JSONIcon />
           <br />
           JSONIcon
@@ -653,6 +677,12 @@ const IconsScreen = ({ classes }: IIconsScreenSimple) => {
           <cicons.LifecycleConfigIcon />
           <br />
           LifecycleConfigIcon
+        </Grid>
+
+        <Grid item xs={3} sm={2} md={1}>
+          <cicons.LinkIcon />
+          <br />
+          LinkIcon
         </Grid>
 
         <Grid item xs={3} sm={2} md={1}>
@@ -845,6 +875,12 @@ const IconsScreen = ({ classes }: IIconsScreenSimple) => {
           <cicons.RefreshIcon />
           <br />
           RefreshIcon
+        </Grid>
+
+        <Grid item xs={3} sm={2} md={1}>
+          <cicons.RemoveAllIcon />
+          <br />
+          RemoveAllIcon
         </Grid>
 
         <Grid item xs={3} sm={2} md={1}>
@@ -1104,6 +1140,21 @@ const IconsScreen = ({ classes }: IIconsScreenSimple) => {
           <cicons.FilterIcon />
           <br />
           FilterIcon
+        </Grid>
+        <Grid item xs={3} sm={2} md={1}>
+          <cicons.SuccessIcon />
+          <br />
+          SuccessIcon
+        </Grid>
+        <Grid item xs={3} sm={2} md={1}>
+          <cicons.NetworkGetIcon />
+          <br />
+          NetworkGetIcon
+        </Grid>
+        <Grid item xs={3} sm={2} md={1}>
+          <cicons.NetworkPutIcon />
+          <br />
+          NetworkPutIcon
         </Grid>
       </Grid>
       <h1>Menu Icons</h1>

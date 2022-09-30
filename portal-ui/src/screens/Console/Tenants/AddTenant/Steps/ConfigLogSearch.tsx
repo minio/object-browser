@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -25,8 +25,7 @@ import {
   modalBasic,
   wizardCommon,
 } from "../../../Common/FormComponents/common/styleLibrary";
-import { isPageValid, updateAddField } from "../../actions";
-import { AppState } from "../../../../../store";
+import { AppState, useAppDispatch } from "../../../../../store";
 import { clearValidationError } from "../../utils";
 import {
   commonFormValidation,
@@ -35,25 +34,12 @@ import {
 import FormSwitchWrapper from "../../../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
 import InputBoxWrapper from "../../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import SelectWrapper from "../../../Common/FormComponents/SelectWrapper/SelectWrapper";
-import { ISecurityContext } from "../../types";
 import InputUnitMenu from "../../../Common/FormComponents/InputUnitMenu/InputUnitMenu";
+import SectionH1 from "../../../Common/SectionH1";
+import { isPageValid, updateAddField } from "../createTenantSlice";
 
 interface IConfigureProps {
-  updateAddField: typeof updateAddField;
-  isPageValid: typeof isPageValid;
-  storageClasses: any;
   classes: any;
-  logSearchEnabled: boolean;
-  logSearchVolumeSize: string;
-  logSearchSizeFactor: string;
-  logSearchSelectedStorageClass: string;
-  logSearchImage: string;
-  logSearchPostgresImage: string;
-  logSearchPostgresInitImage: string;
-  selectedStorageClass: string;
-  tenantSecurityContext: ISecurityContext;
-  logSearchSecurityContext: ISecurityContext;
-  logSearchPostgresSecurityContext: ISecurityContext;
 }
 
 const styles = (theme: Theme) =>
@@ -64,9 +50,6 @@ const styles = (theme: Theme) =>
       "& .multiContainer": {
         border: "1px solid red",
       },
-    },
-    containerItem: {
-      marginRight: 15,
     },
     fieldGroup: {
       ...createTenantCommon.fieldGroup,
@@ -98,23 +81,50 @@ const styles = (theme: Theme) =>
     ...wizardCommon,
   });
 
-const ConfigLogSearch = ({
-  classes,
-  storageClasses,
-  logSearchEnabled,
-  logSearchVolumeSize,
-  logSearchSizeFactor,
-  logSearchImage,
-  logSearchPostgresImage,
-  logSearchPostgresInitImage,
-  logSearchSelectedStorageClass,
-  updateAddField,
-  isPageValid,
-  selectedStorageClass,
-  tenantSecurityContext,
-  logSearchSecurityContext,
-  logSearchPostgresSecurityContext,
-}: IConfigureProps) => {
+const ConfigLogSearch = ({ classes }: IConfigureProps) => {
+  const dispatch = useAppDispatch();
+
+  const storageClasses = useSelector(
+    (state: AppState) => state.createTenant.storageClasses
+  );
+  const logSearchEnabled = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.logSearchEnabled
+  );
+  const logSearchVolumeSize = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.logSearchVolumeSize
+  );
+  const logSearchSelectedStorageClass = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.logSearchSelectedStorageClass
+  );
+  const logSearchImage = useSelector(
+    (state: AppState) => state.createTenant.fields.configure.logSearchImage
+  );
+  const logSearchPostgresImage = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.logSearchPostgresImage
+  );
+  const logSearchPostgresInitImage = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.logSearchPostgresInitImage
+  );
+  const selectedStorageClass = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.nameTenant.selectedStorageClass
+  );
+  const tenantSecurityContext = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.tenantSecurityContext
+  );
+  const logSearchSecurityContext = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.logSearchSecurityContext
+  );
+  const logSearchPostgresSecurityContext = useSelector(
+    (state: AppState) =>
+      state.createTenant.fields.configure.logSearchPostgresSecurityContext
+  );
+
   const [validationErrors, setValidationErrors] = useState<any>({});
 
   const configureSTClasses = [
@@ -125,9 +135,11 @@ const ConfigLogSearch = ({
   // Common
   const updateField = useCallback(
     (field: string, value: any) => {
-      updateAddField("configure", field, value);
+      dispatch(
+        updateAddField({ pageName: "configure", field: field, value: value })
+      );
     },
-    [updateAddField]
+    [dispatch]
   );
 
   // Validation
@@ -211,14 +223,19 @@ const ConfigLogSearch = ({
 
     const commonVal = commonFormValidation(customAccountValidation);
 
-    isPageValid("configure", Object.keys(commonVal).length === 0);
+    dispatch(
+      isPageValid({
+        pageName: "configure",
+        valid: Object.keys(commonVal).length === 0,
+      })
+    );
 
     setValidationErrors(commonVal);
   }, [
     logSearchImage,
     logSearchPostgresImage,
     logSearchPostgresInitImage,
-    isPageValid,
+    dispatch,
     logSearchEnabled,
     logSearchSelectedStorageClass,
     logSearchVolumeSize,
@@ -250,307 +267,353 @@ const ConfigLogSearch = ({
 
   return (
     <Paper className={classes.paperWrapper}>
-      <div className={classes.headerElement}>
-        <h3 className={classes.h3Section}>Audit Log</h3>
-        <span className={classes.descriptionText}>
-          Audit log deploys a small PostgreSQL database and stores access logs
-          of all calls into the tenant.
-        </span>
-      </div>
-      <Grid item xs={12} className={classes.configSectionItem}>
-        <FormSwitchWrapper
-          value="logSearchConfig"
-          id="log-search-enabled"
-          name="log_search_enabled"
-          checked={logSearchEnabled}
-          onChange={(e) => {
-            const targetD = e.target;
-            const checked = targetD.checked;
-
-            updateField("logSearchEnabled", checked);
-          }}
-          label={"Enabled"}
-        />
-      </Grid>
-      {logSearchEnabled && (
-        <Grid xs={12} className={classes.logSearchEnabledFields}>
-          <Grid item xs={12}>
-            <SelectWrapper
-              id="log_search_storage_class"
-              name="log_search_storage_class"
-              onChange={(e: SelectChangeEvent<string>) => {
-                updateField(
-                  "logSearchSelectedStorageClass",
-                  e.target.value as string
-                );
-              }}
-              label="Log Search Storage Class"
-              value={logSearchSelectedStorageClass}
-              options={configureSTClasses}
-              disabled={configureSTClasses.length < 1}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <div className={classes.multiContainer}>
-              <InputBoxWrapper
-                type="number"
-                id="log_search_volume_size"
-                name="log_search_volume_size"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  updateField("logSearchVolumeSize", e.target.value);
-                  cleanValidation("log_search_volume_size");
-                }}
-                label="Storage Size"
-                overlayObject={
-                  <InputUnitMenu
-                    id={"size-unit"}
-                    onUnitChange={() => {}}
-                    unitSelected={"Gi"}
-                    unitsList={[{ label: "Gi", value: "Gi" }]}
-                    disabled={true}
-                  />
-                }
-                value={logSearchVolumeSize}
-                required
-                error={validationErrors["log_search_volume_size"] || ""}
-                min="0"
-              />
-            </div>
-          </Grid>
-
-          <fieldset
-            className={`${classes.fieldGroup} ${classes.fieldSpaceTop}`}
-          >
-            <legend className={classes.descriptionText}>
-              SecurityContext for LogSearch
-            </legend>
-
-            <Grid item xs={12}>
-              <div
-                className={`${classes.multiContainer} ${classes.responsiveSectionItem}`}
-              >
-                <div className={classes.configSectionItem}>
-                  <InputBoxWrapper
-                    type="number"
-                    id="logSearch_securityContext_runAsUser"
-                    name="logSearch_securityContext_runAsUser"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      updateField("logSearchSecurityContext", {
-                        ...logSearchSecurityContext,
-                        runAsUser: e.target.value,
-                      });
-                      cleanValidation("logSearch_securityContext_runAsUser");
-                    }}
-                    label="Run As User"
-                    value={logSearchSecurityContext.runAsUser}
-                    required
-                    error={
-                      validationErrors["logSearch_securityContext_runAsUser"] ||
-                      ""
-                    }
-                    min="0"
-                  />
-                </div>
-                <div className={classes.configSectionItem}>
-                  <InputBoxWrapper
-                    type="number"
-                    id="logSearch_securityContext_runAsGroup"
-                    name="logSearch_securityContext_runAsGroup"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      updateField("logSearchSecurityContext", {
-                        ...logSearchSecurityContext,
-                        runAsGroup: e.target.value,
-                      });
-                      cleanValidation("logSearch_securityContext_runAsGroup");
-                    }}
-                    label="Run As Group"
-                    value={logSearchSecurityContext.runAsGroup}
-                    required
-                    error={
-                      validationErrors[
-                        "logSearch_securityContext_runAsGroup"
-                      ] || ""
-                    }
-                    min="0"
-                  />
-                </div>
-                <div className={classes.configSectionItem}>
-                  <InputBoxWrapper
-                    type="number"
-                    id="logSearch_securityContext_fsGroup"
-                    name="logSearch_securityContext_fsGroup"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      updateField("logSearchSecurityContext", {
-                        ...logSearchSecurityContext,
-                        fsGroup: e.target.value,
-                      });
-                      cleanValidation("logSearch_securityContext_fsGroup");
-                    }}
-                    label="FsGroup"
-                    value={logSearchSecurityContext.fsGroup}
-                    required
-                    error={
-                      validationErrors["logSearch_securityContext_fsGroup"] ||
-                      ""
-                    }
-                    min="0"
-                  />
-                </div>
-              </div>
-            </Grid>
-            <br />
-            <Grid item xs={12}>
-              <div className={classes.multiContainer}>
-                <FormSwitchWrapper
-                  value="logSearchSecurityContextRunAsNonRoot"
-                  id="logSearch_securityContext_runAsNonRoot"
-                  name="logSearch_securityContext_runAsNonRoot"
-                  checked={logSearchSecurityContext.runAsNonRoot}
-                  onChange={(e) => {
-                    const targetD = e.target;
-                    const checked = targetD.checked;
-                    updateField("logSearchSecurityContext", {
-                      ...logSearchSecurityContext,
-                      runAsNonRoot: checked,
-                    });
-                  }}
-                  label={"Do not run as Root"}
-                />
-              </div>
-            </Grid>
-          </fieldset>
-          <fieldset className={classes.fieldGroup}>
-            <legend className={classes.descriptionText}>
-              SecurityContext for PostgreSQL
-            </legend>
-
-            <Grid item xs={12}>
-              <div
-                className={`${classes.multiContainer} ${classes.responsiveSectionItem}`}
-              >
-                <div className={classes.configSectionItem}>
-                  <InputBoxWrapper
-                    type="number"
-                    id="postgres_securityContext_runAsUser"
-                    name="postgres_securityContext_runAsUser"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      updateField("logSearchPostgresSecurityContext", {
-                        ...logSearchPostgresSecurityContext,
-                        runAsUser: e.target.value,
-                      });
-                      cleanValidation("postgres_securityContext_runAsUser");
-                    }}
-                    label="Run As User"
-                    value={logSearchPostgresSecurityContext.runAsUser}
-                    required
-                    error={
-                      validationErrors["postgres_securityContext_runAsUser"] ||
-                      ""
-                    }
-                    min="0"
-                  />
-                </div>
-                <div className={classes.configSectionItem}>
-                  <InputBoxWrapper
-                    type="number"
-                    id="postgres_securityContext_runAsGroup"
-                    name="postgres_securityContext_runAsGroup"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      updateField("logSearchPostgresSecurityContext", {
-                        ...logSearchPostgresSecurityContext,
-                        runAsGroup: e.target.value,
-                      });
-                      cleanValidation("postgres_securityContext_runAsGroup");
-                    }}
-                    label="Run As Group"
-                    value={logSearchPostgresSecurityContext.runAsGroup}
-                    required
-                    error={
-                      validationErrors["postgres_securityContext_runAsGroup"] ||
-                      ""
-                    }
-                    min="0"
-                  />
-                </div>
-                <div className={classes.configSectionItem}>
-                  <InputBoxWrapper
-                    type="number"
-                    id="postgres_securityContext_fsGroup"
-                    name="postgres_securityContext_fsGroup"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      updateField("logSearchPostgresSecurityContext", {
-                        ...logSearchPostgresSecurityContext,
-                        fsGroup: e.target.value,
-                      });
-                      cleanValidation("postgres_securityContext_fsGroup");
-                    }}
-                    label="FsGroup"
-                    value={logSearchPostgresSecurityContext.fsGroup}
-                    required
-                    error={
-                      validationErrors["postgres_securityContext_fsGroup"] || ""
-                    }
-                    min="0"
-                  />
-                </div>
-              </div>
-            </Grid>
-            <br />
-            <Grid item xs={12}>
-              <div className={classes.multiContainer}>
-                <FormSwitchWrapper
-                  value="postgresSecurityContextRunAsNonRoot"
-                  id="postgres_securityContext_runAsNonRoot"
-                  name="postgres_securityContext_runAsNonRoot"
-                  checked={logSearchPostgresSecurityContext.runAsNonRoot}
-                  onChange={(e) => {
-                    const targetD = e.target;
-                    const checked = targetD.checked;
-                    updateField("logSearchPostgresSecurityContext", {
-                      ...logSearchPostgresSecurityContext,
-                      runAsNonRoot: checked,
-                    });
-                  }}
-                  label={"Do not run as Root"}
-                />
-              </div>
-            </Grid>
-          </fieldset>
+      <Grid container alignItems={"center"}>
+        <Grid item xs>
+          <SectionH1>Audit Log</SectionH1>
         </Grid>
-      )}
+        <Grid item xs={4}>
+          <FormSwitchWrapper
+            value="enableLogging"
+            id="enableLogging"
+            name="enableLogging"
+            checked={logSearchEnabled}
+            onChange={(e) => {
+              const targetD = e.target;
+              const checked = targetD.checked;
+
+              updateField("logSearchEnabled", checked);
+            }}
+            indicatorLabels={["Enabled", "Disabled"]}
+          />
+        </Grid>
+      </Grid>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <span className={classes.descriptionText}>
+            Deploys a small PostgreSQL database and stores access logs of all
+            calls into the tenant.
+          </span>
+        </Grid>
+        <Grid xs={12}>
+          <hr className={classes.hrClass} />
+        </Grid>
+        {logSearchEnabled && (
+          <Fragment>
+            <Grid item xs={12}>
+              <SelectWrapper
+                id="log_search_storage_class"
+                name="log_search_storage_class"
+                onChange={(e: SelectChangeEvent<string>) => {
+                  updateField(
+                    "logSearchSelectedStorageClass",
+                    e.target.value as string
+                  );
+                }}
+                label="Log Search Storage Class"
+                value={logSearchSelectedStorageClass}
+                options={configureSTClasses}
+                disabled={configureSTClasses.length < 1}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <div className={classes.multiContainer}>
+                <InputBoxWrapper
+                  type="number"
+                  id="log_search_volume_size"
+                  name="log_search_volume_size"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    updateField("logSearchVolumeSize", e.target.value);
+                    cleanValidation("log_search_volume_size");
+                  }}
+                  label="Storage Size"
+                  overlayObject={
+                    <InputUnitMenu
+                      id={"size-unit"}
+                      onUnitChange={() => {}}
+                      unitSelected={"Gi"}
+                      unitsList={[{ label: "Gi", value: "Gi" }]}
+                      disabled={true}
+                    />
+                  }
+                  value={logSearchVolumeSize}
+                  required
+                  error={validationErrors["log_search_volume_size"] || ""}
+                  min="0"
+                />
+              </div>
+            </Grid>
+
+            <fieldset
+              className={`${classes.fieldGroup} ${classes.fieldSpaceTop}`}
+            >
+              <legend className={classes.descriptionText}>
+                SecurityContext for LogSearch
+              </legend>
+
+              <Grid item xs={12}>
+                <div
+                  className={`${classes.multiContainer} ${classes.responsiveSectionItem}`}
+                >
+                  <div className={classes.configSectionItem}>
+                    <InputBoxWrapper
+                      type="number"
+                      id="logSearch_securityContext_runAsUser"
+                      name="logSearch_securityContext_runAsUser"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        updateField("logSearchSecurityContext", {
+                          ...logSearchSecurityContext,
+                          runAsUser: e.target.value,
+                        });
+                        cleanValidation("logSearch_securityContext_runAsUser");
+                      }}
+                      label="Run As User"
+                      value={logSearchSecurityContext.runAsUser}
+                      required
+                      error={
+                        validationErrors[
+                          "logSearch_securityContext_runAsUser"
+                        ] || ""
+                      }
+                      min="0"
+                    />
+                  </div>
+                  <div className={classes.configSectionItem}>
+                    <InputBoxWrapper
+                      type="number"
+                      id="logSearch_securityContext_runAsGroup"
+                      name="logSearch_securityContext_runAsGroup"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        updateField("logSearchSecurityContext", {
+                          ...logSearchSecurityContext,
+                          runAsGroup: e.target.value,
+                        });
+                        cleanValidation("logSearch_securityContext_runAsGroup");
+                      }}
+                      label="Run As Group"
+                      value={logSearchSecurityContext.runAsGroup}
+                      required
+                      error={
+                        validationErrors[
+                          "logSearch_securityContext_runAsGroup"
+                        ] || ""
+                      }
+                      min="0"
+                    />
+                  </div>
+                </div>
+              </Grid>
+              <br />
+              <Grid item xs={12}>
+                <div
+                  className={`${classes.multiContainer} ${classes.responsiveSectionItem}`}
+                >
+                  <div className={classes.configSectionItem}>
+                    <InputBoxWrapper
+                      type="number"
+                      id="logSearch_securityContext_fsGroup"
+                      name="logSearch_securityContext_fsGroup"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        updateField("logSearchSecurityContext", {
+                          ...logSearchSecurityContext,
+                          fsGroup: e.target.value,
+                        });
+                        cleanValidation("logSearch_securityContext_fsGroup");
+                      }}
+                      label="FsGroup"
+                      value={logSearchSecurityContext.fsGroup}
+                      required
+                      error={
+                        validationErrors["logSearch_securityContext_fsGroup"] ||
+                        ""
+                      }
+                      min="0"
+                    />
+                  </div>
+                  <div className={classes.configSectionItem}>
+                    <SelectWrapper
+                      label="FsGroupChangePolicy"
+                      id="securityContext_fsGroupChangePolicy"
+                      name="securityContext_fsGroupChangePolicy"
+                      value={logSearchSecurityContext.fsGroupChangePolicy}
+                      onChange={(e: SelectChangeEvent<string>) => {
+                        updateField("logSearchSecurityContext", {
+                          ...logSearchSecurityContext,
+                          fsGroupChangePolicy: e.target.value,
+                        });
+                      }}
+                      options={[
+                        {
+                          label: "Always",
+                          value: "Always",
+                        },
+                        {
+                          label: "OnRootMismatch",
+                          value: "OnRootMismatch",
+                        },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </Grid>
+              <br />
+              <Grid item xs={12}>
+                <div className={classes.multiContainer}>
+                  <FormSwitchWrapper
+                    value="logSearchSecurityContextRunAsNonRoot"
+                    id="logSearch_securityContext_runAsNonRoot"
+                    name="logSearch_securityContext_runAsNonRoot"
+                    checked={logSearchSecurityContext.runAsNonRoot}
+                    onChange={(e) => {
+                      const targetD = e.target;
+                      const checked = targetD.checked;
+                      updateField("logSearchSecurityContext", {
+                        ...logSearchSecurityContext,
+                        runAsNonRoot: checked,
+                      });
+                    }}
+                    label={"Do not run as Root"}
+                  />
+                </div>
+              </Grid>
+            </fieldset>
+            <fieldset className={classes.fieldGroup}>
+              <legend className={classes.descriptionText}>
+                SecurityContext for PostgreSQL
+              </legend>
+
+              <Grid item xs={12}>
+                <div
+                  className={`${classes.multiContainer} ${classes.responsiveSectionItem}`}
+                >
+                  <div className={classes.configSectionItem}>
+                    <InputBoxWrapper
+                      type="number"
+                      id="postgres_securityContext_runAsUser"
+                      name="postgres_securityContext_runAsUser"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        updateField("logSearchPostgresSecurityContext", {
+                          ...logSearchPostgresSecurityContext,
+                          runAsUser: e.target.value,
+                        });
+                        cleanValidation("postgres_securityContext_runAsUser");
+                      }}
+                      label="Run As User"
+                      value={logSearchPostgresSecurityContext.runAsUser}
+                      required
+                      error={
+                        validationErrors[
+                          "postgres_securityContext_runAsUser"
+                        ] || ""
+                      }
+                      min="0"
+                    />
+                  </div>
+                  <div className={classes.configSectionItem}>
+                    <InputBoxWrapper
+                      type="number"
+                      id="postgres_securityContext_runAsGroup"
+                      name="postgres_securityContext_runAsGroup"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        updateField("logSearchPostgresSecurityContext", {
+                          ...logSearchPostgresSecurityContext,
+                          runAsGroup: e.target.value,
+                        });
+                        cleanValidation("postgres_securityContext_runAsGroup");
+                      }}
+                      label="Run As Group"
+                      value={logSearchPostgresSecurityContext.runAsGroup}
+                      required
+                      error={
+                        validationErrors[
+                          "postgres_securityContext_runAsGroup"
+                        ] || ""
+                      }
+                      min="0"
+                    />
+                  </div>
+                </div>
+              </Grid>
+              <br />
+              <Grid item xs={12}>
+                <div
+                  className={`${classes.multiContainer} ${classes.responsiveSectionItem}`}
+                >
+                  <div className={classes.configSectionItem}>
+                    <InputBoxWrapper
+                      type="number"
+                      id="postgres_securityContext_fsGroup"
+                      name="postgres_securityContext_fsGroup"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        updateField("logSearchPostgresSecurityContext", {
+                          ...logSearchPostgresSecurityContext,
+                          fsGroup: e.target.value,
+                        });
+                        cleanValidation("postgres_securityContext_fsGroup");
+                      }}
+                      label="FsGroup"
+                      value={logSearchPostgresSecurityContext.fsGroup}
+                      required
+                      error={
+                        validationErrors["postgres_securityContext_fsGroup"] ||
+                        ""
+                      }
+                      min="0"
+                    />
+                  </div>
+                  <div className={classes.configSectionItem}>
+                    <SelectWrapper
+                      label="FsGroupChangePolicy"
+                      id="securityContext_fsGroupChangePolicy"
+                      name="securityContext_fsGroupChangePolicy"
+                      value={
+                        logSearchPostgresSecurityContext.fsGroupChangePolicy
+                      }
+                      onChange={(e: SelectChangeEvent<string>) => {
+                        updateField("logSearchPostgresSecurityContext", {
+                          ...logSearchPostgresSecurityContext,
+                          fsGroupChangePolicy: e.target.value,
+                        });
+                      }}
+                      options={[
+                        {
+                          label: "Always",
+                          value: "Always",
+                        },
+                        {
+                          label: "OnRootMismatch",
+                          value: "OnRootMismatch",
+                        },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </Grid>
+              <br />
+              <Grid item xs={12}>
+                <div className={classes.multiContainer}>
+                  <FormSwitchWrapper
+                    value="postgresSecurityContextRunAsNonRoot"
+                    id="postgres_securityContext_runAsNonRoot"
+                    name="postgres_securityContext_runAsNonRoot"
+                    checked={logSearchPostgresSecurityContext.runAsNonRoot}
+                    onChange={(e) => {
+                      const targetD = e.target;
+                      const checked = targetD.checked;
+                      updateField("logSearchPostgresSecurityContext", {
+                        ...logSearchPostgresSecurityContext,
+                        runAsNonRoot: checked,
+                      });
+                    }}
+                    label={"Do not run as Root"}
+                  />
+                </div>
+              </Grid>
+            </fieldset>
+          </Fragment>
+        )}
+      </Grid>
     </Paper>
   );
 };
 
-const mapState = (state: AppState) => ({
-  storageClasses: state.tenants.createTenant.storageClasses,
-  logSearchEnabled:
-    state.tenants.createTenant.fields.configure.logSearchEnabled,
-  logSearchVolumeSize:
-    state.tenants.createTenant.fields.configure.logSearchVolumeSize,
-  logSearchSizeFactor:
-    state.tenants.createTenant.fields.configure.logSearchSizeFactor,
-  logSearchSelectedStorageClass:
-    state.tenants.createTenant.fields.configure.logSearchSelectedStorageClass,
-  logSearchImage: state.tenants.createTenant.fields.configure.logSearchImage,
-  logSearchPostgresImage:
-    state.tenants.createTenant.fields.configure.logSearchPostgresImage,
-  logSearchPostgresInitImage:
-    state.tenants.createTenant.fields.configure.logSearchPostgresInitImage,
-  selectedStorageClass:
-    state.tenants.createTenant.fields.nameTenant.selectedStorageClass,
-  tenantSecurityContext:
-    state.tenants.createTenant.fields.configure.tenantSecurityContext,
-  logSearchSecurityContext:
-    state.tenants.createTenant.fields.configure.logSearchSecurityContext,
-  logSearchPostgresSecurityContext:
-    state.tenants.createTenant.fields.configure
-      .logSearchPostgresSecurityContext,
-});
-
-const connector = connect(mapState, {
-  updateAddField,
-  isPageValid,
-});
-
-export default withStyles(styles)(connector(ConfigLogSearch));
+export default withStyles(styles)(ConfigLogSearch);

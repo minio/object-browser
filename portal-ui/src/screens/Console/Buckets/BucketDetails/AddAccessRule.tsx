@@ -25,19 +25,13 @@ import {
   formFieldStyles,
   modalStyleUtils,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { connect } from "react-redux";
+
 import api from "../../../../common/api";
 import { ErrorResponseHandler } from "../../../../common/types";
-import { setErrorSnackMessage } from "../../../../actions";
-import { AppState } from "../../../../store";
 import SelectWrapper from "../../Common/FormComponents/SelectWrapper/SelectWrapper";
 import { AddAccessRuleIcon } from "../../../../icons";
-
-const mapState = (state: AppState) => ({
-  session: state.console.session,
-});
-
-const connector = connect(mapState, { setErrorSnackMessage });
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 interface IAddAccessRule {
   classes: any;
@@ -58,6 +52,8 @@ const AddAccessRule = ({
   classes,
   bucket,
 }: IAddAccessRule) => {
+  const dispatch = useAppDispatch();
+
   const [prefix, setPrefix] = useState("");
   const [selectedAccess, setSelectedAccess] = useState<any>("readonly");
 
@@ -82,7 +78,7 @@ const AddAccessRule = ({
         onClose();
       })
       .catch((err: ErrorResponseHandler) => {
-        setErrorSnackMessage(err);
+        dispatch(setErrorSnackMessage(err));
         onClose();
       });
   };
@@ -147,4 +143,4 @@ const AddAccessRule = ({
   );
 };
 
-export default withStyles(styles)(connector(AddAccessRule));
+export default withStyles(styles)(AddAccessRule);

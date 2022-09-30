@@ -15,9 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { Box, DialogContentText, Grid } from "@mui/material";
 import PageHeader from "../../Common/PageHeader/PageHeader";
 import PageLayout from "../../Common/Layout/PageLayout";
-import { Box, DialogContentText } from "@mui/material";
 import useApi from "../../Common/Hooks/useApi";
 import ReplicationSites from "./ReplicationSites";
 import TrashIcon from "../../../../icons/TrashIcon";
@@ -29,13 +31,16 @@ import {
   ConfirmDeleteIcon,
   RecoverIcon,
 } from "../../../../icons";
-import { connect } from "react-redux";
-import { setErrorSnackMessage, setSnackBarMessage } from "../../../../actions";
 import { ErrorResponseHandler } from "../../../../common/types";
 import HelpBox from "../../../../common/HelpBox";
 import ConfirmDialog from "../../Common/ModalWrapper/ConfirmDialog";
-import history from "../../../../history";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
+import {
+  setErrorSnackMessage,
+  setSnackBarMessage,
+} from "../../../../systemSlice";
+import AButton from "../../Common/AButton/AButton";
+import { useAppDispatch } from "../../../../store";
 
 export type ReplicationSite = {
   deploymentID: string;
@@ -44,11 +49,10 @@ export type ReplicationSite = {
   isCurrent?: boolean;
 };
 
-const SiteReplication = ({
-  setSnackBarMessage,
-}: {
-  setSnackBarMessage: (msg: string) => void;
-}) => {
+const SiteReplication = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [sites, setSites] = useState([]);
 
   const [deleteAll, setIsDeleteAll] = useState(false);
@@ -83,11 +87,11 @@ const SiteReplication = ({
   const [isRemoving, invokeSiteRemoveApi] = useApi(
     (res: any) => {
       setIsDeleteAll(false);
-      setSnackBarMessage(`Successfully deleted.`);
+      dispatch(setSnackBarMessage(`Successfully deleted.`));
       getSites();
     },
     (err: ErrorResponseHandler) => {
-      setErrorSnackMessage(err);
+      dispatch(setErrorSnackMessage(err));
     }
   );
 
@@ -137,7 +141,7 @@ const SiteReplication = ({
                 icon={<RecoverIcon />}
                 onClick={(e) => {
                   e.preventDefault();
-                  history.push(IAM_PAGES.SITE_REPLICATION_STATUS);
+                  navigate(IAM_PAGES.SITE_REPLICATION_STATUS);
                 }}
               />
             </Box>
@@ -150,7 +154,7 @@ const SiteReplication = ({
             disabled={isRemoving}
             icon={<AddIcon />}
             onClick={() => {
-              history.push(IAM_PAGES.SITE_REPLICATION_ADD);
+              navigate(IAM_PAGES.SITE_REPLICATION_ADD);
             }}
           />
         </Box>
@@ -174,64 +178,91 @@ const SiteReplication = ({
           </Box>
         ) : null}
         {!hasSites && !isSiteInfoLoading ? (
-          <Box
-            sx={{
-              padding: "30px",
-              border: "1px solid #eaeaea",
-              marginTop: "15px",
-              marginBottom: "15px",
-              height: "calc( 100vh - 450px )",
-            }}
+          <Grid
+            container
+            justifyContent={"center"}
+            alignContent={"center"}
+            alignItems={"center"}
           >
-            Site Replication is not configured.
-          </Box>
+            <Grid item xs={8}>
+              <HelpBox
+                title={"Site Replication"}
+                iconComponent={<ClustersIcon />}
+                help={
+                  <Fragment>
+                    This feature allows multiple independent MinIO sites (or
+                    clusters) that are using the same external IDentity Provider
+                    (IDP) to be configured as replicas.
+                    <br />
+                    <br />
+                    To get started,{" "}
+                    <AButton
+                      onClick={() => {
+                        navigate(IAM_PAGES.SITE_REPLICATION_ADD);
+                      }}
+                    >
+                      Add a Replication Site
+                    </AButton>
+                    .
+                    <br />
+                    You can learn more at our{" "}
+                    <a
+                      href="https://docs.min.io/minio/baremetal/replication/site-replication-overview.html?ref=con"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      documentation
+                    </a>
+                    .
+                  </Fragment>
+                }
+              />
+            </Grid>
+          </Grid>
         ) : null}
-
-        <HelpBox
-          title={"Site Replication"}
-          iconComponent={<ClustersIcon />}
-          help={
-            <Fragment>
-              This feature allows multiple independent MinIO sites (or clusters)
-              that are using the same external IDentity Provider (IDP) to be
-              configured as replicas. In this situation the set of replica sites
-              are referred to as peer sites or just sites.
-              <br />
-              <Box>
-                <ul>
-                  <li>
-                    Initially, only one of the sites added for replication may
-                    have data. After site-replication is successfully
-                    configured, this data is replicated to the other (initially
-                    empty) sites. Subsequently, objects may be written to any of
-                    the sites, and they will be replicated to all other sites.
-                  </li>
-                  <li>
-                    All sites must have the same deployment credentials (i.e.
-                    MINIO_ROOT_USER, MINIO_ROOT_PASSWORD).
-                  </li>
-                  <li>
-                    All sites must be using the same external IDP(s) if any.
-                  </li>
-                  <li>
-                    For SSE-S3 or SSE-KMS encryption via KMS, all sites must
-                    have access to a central KMS deployment. server.
-                  </li>
-                </ul>
-              </Box>
-              <br />
-              You can learn more at our{" "}
-              <a
-                href="https://github.com/minio/minio/tree/master/docs/site-replication?ref=con"
-                target="_blank"
-                rel="noreferrer"
-              >
-                documentation
-              </a>
-              .
-            </Fragment>
-          }
-        />
+        {hasSites && !isSiteInfoLoading ? (
+          <HelpBox
+            title={"Site Replication"}
+            iconComponent={<ClustersIcon />}
+            help={
+              <Fragment>
+                This feature allows multiple independent MinIO sites (or
+                clusters) that are using the same external IDentity Provider
+                (IDP) to be configured as replicas. In this situation the set of
+                replica sites are referred to as peer sites or just sites.
+                <br />
+                <br />
+                Initially, only one of the sites added for replication may have
+                data. After site-replication is successfully configured, this
+                data is replicated to the other (initially empty) sites.
+                Subsequently, objects may be written to any of the sites, and
+                they will be replicated to all other sites.
+                <br />
+                <br />
+                All sites must have the same deployment credentials (i.e.
+                MINIO_ROOT_USER, MINIO_ROOT_PASSWORD).
+                <br />
+                <br />
+                All sites must be using the same external IDP(s) if any.
+                <br />
+                <br />
+                For SSE-S3 or SSE-KMS encryption via KMS, all sites must have
+                access to a central KMS deployment server.
+                <br />
+                <br />
+                You can learn more at our{" "}
+                <a
+                  href="https://github.com/minio/minio/tree/master/docs/site-replication?ref=con"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  documentation
+                </a>
+                .
+              </Fragment>
+            }
+          />
+        ) : null}
 
         {deleteAll ? (
           <ConfirmDialog
@@ -259,9 +290,4 @@ const SiteReplication = ({
   );
 };
 
-const connector = connect(null, {
-  setErrorSnackMessage,
-  setSnackBarMessage,
-});
-
-export default connector(SiteReplication);
+export default SiteReplication;

@@ -14,8 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import React, { Fragment, useEffect, useState, useRef } from "react";
 import {
   Area,
   AreaChart,
@@ -25,22 +24,23 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery, Grid } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
-import ZoomOutMapIcon from "@mui/icons-material/ZoomOutMap";
 import { ILinearGraphConfiguration } from "./types";
 import { widgetCommon } from "../../../Common/FormComponents/common/styleLibrary";
 import { IDashboardPanel } from "../types";
-import { setErrorSnackMessage } from "../../../../../actions";
 import { widgetDetailsToPanel } from "../utils";
 import { ErrorResponseHandler } from "../../../../../common/types";
 import api from "../../../../../common/api";
 import LineChartTooltip from "./tooltips/LineChartTooltip";
-import { openZoomPage } from "../../actions";
 import { useTheme } from "@mui/styles";
 import Loader from "../../../Common/Loader/Loader";
+import ExpandGraphLink from "./ExpandGraphLink";
+import { setErrorSnackMessage } from "../../../../../systemSlice";
+import { useAppDispatch } from "../../../../../store";
+import DownloadWidgetDataButton from "../../DownloadWidgetDataButton";
 
 interface ILinearGraphWidget {
   classes: any;
@@ -49,25 +49,17 @@ interface ILinearGraphWidget {
   timeStart: any;
   timeEnd: any;
   propLoading: boolean;
-  displayErrorMessage: any;
   apiPrefix: string;
   hideYAxis?: boolean;
   yAxisFormatter?: (item: string) => string;
-  xAxisFormatter?: (item: string) => string;
+  xAxisFormatter?: (item: string, var1: boolean, var2: boolean) => string;
   areaWidget?: boolean;
   zoomActivated?: boolean;
-  openZoomPage: typeof openZoomPage;
 }
 
 const styles = (theme: Theme) =>
   createStyles({
     ...widgetCommon,
-    containerElements: {
-      display: "flex",
-      flexDirection: "row",
-      height: "100%",
-      flexGrow: 1,
-    },
     verticalAlignment: {
       flexDirection: "column",
     },
@@ -102,7 +94,6 @@ const styles = (theme: Theme) =>
 const LinearGraphWidget = ({
   classes,
   title,
-  displayErrorMessage,
   timeStart,
   timeEnd,
   propLoading,
@@ -111,14 +102,18 @@ const LinearGraphWidget = ({
   hideYAxis = false,
   areaWidget = false,
   yAxisFormatter = (item: string) => item,
-  xAxisFormatter = (item: string) => item,
+  xAxisFormatter = (item: string, var1: boolean, var2: boolean) => item,
   zoomActivated = false,
-  openZoomPage,
 }: ILinearGraphWidget) => {
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState<boolean>(true);
+  const [hover, setHover] = useState<boolean>(false);
   const [data, setData] = useState<object[]>([]);
+  const [csvData, setCsvData] = useState<object[]>([]);
   const [dataMax, setDataMax] = useState<number>(0);
   const [result, setResult] = useState<IDashboardPanel | null>(null);
+
+  const componentRef = useRef<HTMLElement>();
 
   useEffect(() => {
     if (propLoading) {
@@ -172,13 +167,28 @@ const LinearGraphWidget = ({
           setDataMax(maxVal);
         })
         .catch((err: ErrorResponseHandler) => {
-          displayErrorMessage(err);
+          dispatch(setErrorSnackMessage(err));
           setLoading(false);
         });
     }
-  }, [loading, panelItem, timeEnd, timeStart, displayErrorMessage, apiPrefix]);
+  }, [loading, panelItem, timeEnd, timeStart, dispatch, apiPrefix]);
 
   let intervalCount = Math.floor(data.length / 5);
+
+  const onHover = () => {
+    setHover(true);
+  };
+  const onStopHover = () => {
+    setHover(false);
+  };
+  useEffect(() => {
+    var dateFormatData = data;
+    dateFormatData.forEach((element: any) => {
+      var date = new Date(element.name * 1000);
+      element.name = date;
+    });
+    setCsvData(dateFormatData);
+  }, [data]);
 
   const linearConfiguration = result
     ? (result?.widgetConfiguration as ILinearGraphConfiguration[])
@@ -196,25 +206,56 @@ const LinearGraphWidget = ({
   const theme = useTheme();
   const biggerThanMd = useMediaQuery(theme.breakpoints.up("md"));
 
+  let dspLongDate = false;
+
+  if (zoomActivated) {
+    dspLongDate = true;
+  }
+
   return (
-    <div className={zoomActivated ? "" : classes.singleValueContainer}>
+    <Box
+      className={zoomActivated ? "" : classes.singleValueContainer}
+      onMouseOver={onHover}
+      onMouseLeave={onStopHover}
+    >
       {!zoomActivated && (
-        <div className={classes.titleContainer}>
-          {title}{" "}
-          <button
-            onClick={() => {
-              openZoomPage(panelItem);
-            }}
-            className={classes.zoomChartIcon}
+        <Grid container alignItems={"left"}>
+          <Grid item xs={10} alignItems={"start"}>
+            <div className={classes.titleContainer}>{title}</div>
+          </Grid>
+          <Grid
+            item
+            xs={1}
+            display={"flex"}
+            justifyContent={"flex-end"}
+            alignContent={"flex-end"}
           >
-            <ZoomOutMapIcon />
-          </button>
-        </div>
+            {hover && <ExpandGraphLink panelItem={panelItem} />}
+          </Grid>
+          <Grid item xs={1} display={"flex"} justifyContent={"flex-end"}>
+            <DownloadWidgetDataButton
+              title={title}
+              componentRef={componentRef}
+              data={csvData}
+            />
+          </Grid>
+        </Grid>
       )}
-      <div
-        className={
-          zoomActivated ? classes.verticalAlignment : classes.containerElements
+      <Box
+        sx={
+          zoomActivated
+            ? { flexDirection: "column" }
+            : {
+                height: "100%",
+                display: "grid",
+                gridTemplateColumns: {
+                  md: "1fr 1fr",
+                  sm: "1fr",
+                },
+              }
         }
+        style={areaWidget ? { gridTemplateColumns: "1fr" } : {}}
+        ref={componentRef}
       >
         {loading && <Loader className={classes.loadingAlign} />}
         {!loading && (
@@ -237,33 +278,37 @@ const LinearGraphWidget = ({
                   {areaWidget && (
                     <defs>
                       <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#2781B0" stopOpacity={1} />
                         <stop
-                          offset="0%"
-                          stopColor="#ABC8F2"
-                          stopOpacity={0.9}
+                          offset="100%"
+                          stopColor="#ffffff"
+                          stopOpacity={0}
                         />
+
                         <stop
                           offset="95%"
-                          stopColor="#ABC8F2"
-                          stopOpacity={0}
+                          stopColor="#ffffff"
+                          stopOpacity={0.8}
                         />
                       </linearGradient>
                     </defs>
                   )}
                   <CartesianGrid
-                    strokeDasharray={areaWidget ? "0 0" : "3 3"}
+                    strokeDasharray={areaWidget ? "2 2" : "5 5"}
                     strokeWidth={1}
-                    strokeOpacity={0.5}
-                    stroke={"#07264A30"}
+                    strokeOpacity={1}
+                    stroke={"#eee0e0"}
                     vertical={!areaWidget}
                   />
                   <XAxis
                     dataKey="name"
-                    tickFormatter={(value: any) => xAxisFormatter(value)}
+                    tickFormatter={(value: any) =>
+                      xAxisFormatter(value, dspLongDate, true)
+                    }
                     interval={intervalCount}
                     tick={{
-                      fontSize: "70%",
-                      fontWeight: "bold",
+                      fontSize: "68%",
+                      fontWeight: "normal",
                       color: "#404143",
                     }}
                     tickCount={10}
@@ -275,8 +320,8 @@ const LinearGraphWidget = ({
                     hide={hideYAxis}
                     tickFormatter={(value: any) => yAxisFormatter(value)}
                     tick={{
-                      fontSize: "70%",
-                      fontWeight: "bold",
+                      fontSize: "68%",
+                      fontWeight: "normal",
                       color: "#404143",
                     }}
                     stroke={"#082045"}
@@ -287,10 +332,12 @@ const LinearGraphWidget = ({
                         key={`area-${section.dataKey}-${index.toString()}`}
                         type="monotone"
                         dataKey={section.dataKey}
-                        stroke={section.lineColor}
+                        isAnimationActive={false}
+                        stroke={!areaWidget ? section.lineColor : "#D7E5F8"}
                         fill={areaWidget ? "url(#colorUv)" : section.fillColor}
-                        fillOpacity={areaWidget ? 0.3 : 0}
-                        strokeWidth={areaWidget ? 0 : 2}
+                        fillOpacity={areaWidget ? 0.65 : 0}
+                        strokeWidth={!areaWidget ? 3 : 0}
+                        strokeLinecap={"round"}
                         dot={areaWidget ? <CustomizedDot /> : false}
                       />
                     );
@@ -342,14 +389,9 @@ const LinearGraphWidget = ({
             )}
           </React.Fragment>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
-const connector = connect(null, {
-  displayErrorMessage: setErrorSnackMessage,
-  openZoomPage: openZoomPage,
-});
-
-export default withStyles(styles)(connector(LinearGraphWidget));
+export default withStyles(styles)(LinearGraphWidget);

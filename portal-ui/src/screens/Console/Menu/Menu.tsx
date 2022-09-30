@@ -15,25 +15,29 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Drawer } from "@mui/material";
 import withStyles from "@mui/styles/withStyles";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import clsx from "clsx";
-import { AppState } from "../../../store";
-import { setMenuOpen, userLoggedIn } from "../../../actions";
+import { AppState, useAppDispatch } from "../../../store";
 
 import { ErrorResponseHandler } from "../../../common/types";
 import { clearSession } from "../../../common/utils";
-
-import history from "../../../history";
 import api from "../../../common/api";
 
-import { resetSession } from "../actions";
 import MenuToggle from "./MenuToggle";
 import ConsoleMenuList from "./ConsoleMenuList";
 import { validRoutes } from "../valid-routes";
+import {
+  menuOpen,
+  selDirectPVMode,
+  selOpMode,
+  userLogged,
+} from "../../../systemSlice";
+import { resetSession, selFeatures } from "../consoleSlice";
 
 const drawerWidth = 250;
 
@@ -44,7 +48,7 @@ const styles = (theme: Theme) =>
       flexShrink: 0,
       whiteSpace: "nowrap",
       background:
-        "transparent linear-gradient(90deg, #073052 0%, #081C42 100%) 0% 0% no-repeat padding-box !important",
+        "transparent linear-gradient(90deg, #A4493D 0%, #551C27 100%) 0% 0% no-repeat padding-box !important",
       boxShadow: "0px 3px 7px #00000014",
       "& .MuiPaper-root": {
         backgroundColor: "inherit",
@@ -62,7 +66,7 @@ const styles = (theme: Theme) =>
         borderRadius: 0,
       },
       "& ::-webkit-scrollbar-thumb:hover": {
-        background: "#081C42",
+        background: "#5A6375",
       },
     },
     drawerOpen: {
@@ -86,28 +90,28 @@ const styles = (theme: Theme) =>
 
 interface IMenuProps {
   classes?: any;
-  userLoggedIn: typeof userLoggedIn;
-  operatorMode?: boolean;
-  sidebarOpen: boolean;
-  setMenuOpen: typeof setMenuOpen;
-  features?: string[] | null;
 }
 
-const Menu = ({
-  userLoggedIn,
-  classes,
-  operatorMode = false,
-  sidebarOpen,
-  setMenuOpen,
-  features,
-}: IMenuProps) => {
+const Menu = ({ classes }: IMenuProps) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const features = useSelector(selFeatures);
+
+  const sidebarOpen = useSelector(
+    (state: AppState) => state.system.sidebarOpen
+  );
+  const operatorMode = useSelector(selOpMode);
+  const directPVMode = useSelector(selDirectPVMode);
+
   const logout = () => {
     const deleteSession = () => {
       clearSession();
-      userLoggedIn(false);
+      dispatch(userLogged(false));
       localStorage.setItem("userLoggedIn", "");
-      resetSession();
-      history.push("login");
+      localStorage.setItem("redirect-path", "");
+      dispatch(resetSession());
+      navigate(`login`);
     };
     api
       .invoke("POST", `/api/v1/logout`)
@@ -119,7 +123,7 @@ const Menu = ({
         deleteSession();
       });
   };
-  const allowedMenuItems = validRoutes(features, operatorMode);
+  const allowedMenuItems = validRoutes(features, operatorMode, directPVMode);
 
   return (
     <Drawer
@@ -138,9 +142,8 @@ const Menu = ({
     >
       <MenuToggle
         onToggle={(nextState) => {
-          setMenuOpen(nextState);
+          dispatch(menuOpen(nextState));
         }}
-        isOperatorMode={operatorMode}
         isOpen={sidebarOpen}
       />
 
@@ -152,15 +155,5 @@ const Menu = ({
     </Drawer>
   );
 };
-const mapState = (state: AppState) => ({
-  sidebarOpen: state.system.sidebarOpen,
-  operatorMode: state.system.operatorMode,
-  features: state.console.session.features,
-});
 
-const connector = connect(mapState, {
-  userLoggedIn,
-  setMenuOpen,
-});
-
-export default connector(withStyles(styles)(Menu));
+export default withStyles(styles)(Menu);

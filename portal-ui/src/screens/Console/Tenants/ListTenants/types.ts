@@ -17,14 +17,10 @@
 import { SubnetInfo } from "../../License/types";
 import {
   IAffinityModel,
-  IResourceModel,
+  IDomainsRequest,
   ITolerationModel,
 } from "../../../../common/types";
-import {
-  ICertificateInfo,
-  ISecurityContext,
-  NodeMaxAllocatableResources,
-} from "../types";
+import { ICertificateInfo, ISecurityContext } from "../types";
 
 export interface IEvent {
   namespace: string;
@@ -115,24 +111,24 @@ export interface ITenantEncryptionResponse {
   server: ICertificateInfo[];
   client: ICertificateInfo[];
   /*
-            gemalto:
-              type: object
-              $ref: "#/definitions/gemaltoConfiguration"
-            aws:
-              type: object
-              $ref: "#/definitions/awsConfiguration"
-            vault:
-              type: object
-              $ref: "#/definitions/vaultConfiguration"
-            gcp:
-              type: object
-              $ref: "#/definitions/gcpConfiguration"
-            azure:
-              type: object
-              $ref: "#/definitions/azureConfiguration"
-            securityContext:
-              type: object
-              $ref: "#/definitions/securityContext"*/
+              gemalto:
+                type: object
+                $ref: "#/definitions/gemaltoConfiguration"
+              aws:
+                type: object
+                $ref: "#/definitions/awsConfiguration"
+              vault:
+                type: object
+                $ref: "#/definitions/vaultConfiguration"
+              gcp:
+                type: object
+                $ref: "#/definitions/gcpConfiguration"
+              azure:
+                type: object
+                $ref: "#/definitions/azureConfiguration"
+              securityContext:
+                type: object
+                $ref: "#/definitions/securityContext"*/
 }
 
 export interface ITenantTier {
@@ -170,6 +166,7 @@ export interface ITenant {
   capacity?: number;
   capacity_usage?: number;
   tiers?: ITenantTier[];
+  domains?: IDomainsRequest;
   // computed
   total_capacity: string;
   subnet_license: SubnetInfo;
@@ -202,6 +199,7 @@ export interface ITenantMonitoringStruct {
   prometheusEnabled: boolean;
   monitoringCPURequest: string;
   monitoringMemRequest: string;
+  securityContext: ISecurityContext;
 }
 
 export interface IKeyValue {
@@ -223,6 +221,7 @@ export interface ITenantMonitoringStruct {
 }
 
 export interface ITenantLogsStruct {
+  auditLoggingEnabled: boolean;
   image: string;
   labels: IKeyValue[];
   annotations: IKeyValue[];
@@ -230,6 +229,7 @@ export interface ITenantLogsStruct {
   diskCapacityGB: number;
   serviceAccountName: string;
   dbImage: string;
+  dbInitImage: string;
   dbLabels: IKeyValue[];
   dbAnnotations: IKeyValue[];
   dbNodeSelector: IKeyValue[];
@@ -239,6 +239,8 @@ export interface ITenantLogsStruct {
   logMemRequest: string;
   logDBCPURequest: string;
   logDBMemRequest: string;
+  securityContext: ISecurityContext;
+  dbSecurityContext: ISecurityContext;
 }
 
 export interface ValueUnit {
@@ -273,4 +275,11 @@ export interface IEditPoolRequest {
 
 export interface IPlotBarValues {
   [key: string]: CapacityValue;
+}
+
+export interface ITenantAuditLogs {
+  classes: any;
+  labels: IKeyValue[];
+  annotations: IKeyValue[];
+  nodeSelector: IKeyValue[];
 }

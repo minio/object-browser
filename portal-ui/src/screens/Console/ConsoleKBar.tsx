@@ -16,17 +16,12 @@
 import * as React from "react";
 import { KBarProvider } from "kbar";
 import Console from "./Console";
-import { AppState } from "../../store";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import CommandBar from "./CommandBar";
+import { selFeatures } from "./consoleSlice";
 
-const ConsoleKBar = ({
-  features,
-  operatorMode,
-}: {
-  operatorMode: boolean;
-  features: string[] | null;
-}) => {
+const ConsoleKBar = () => {
+  const features = useSelector(selFeatures);
   // if we are hiding the menu also disable the k-bar so just return console
   if (features?.includes("hide-menu")) {
     return <Console />;
@@ -38,17 +33,10 @@ const ConsoleKBar = ({
         enableHistory: true,
       }}
     >
-      <CommandBar operatorMode={operatorMode} features={features} />
+      <CommandBar />
       <Console />
     </KBarProvider>
   );
 };
 
-const mapState = (state: AppState) => ({
-  operatorMode: state.system.operatorMode,
-  features: state.console.session.features,
-});
-
-const connector = connect(mapState, null);
-
-export default connector(ConsoleKBar);
+export default ConsoleKBar;

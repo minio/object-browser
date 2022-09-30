@@ -33,7 +33,7 @@ import {
   prettyNumber,
 } from "../../../../common/utils";
 import CheckboxWrapper from "../../Common/FormComponents/CheckboxWrapper/CheckboxWrapper";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   IAM_PERMISSIONS,
   IAM_ROLES,
@@ -47,7 +47,7 @@ const styles = (theme: Theme) =>
     root: {
       marginBottom: 30,
       padding: 20,
-      color: theme.palette.primary.main,
+      color: theme.palette.secondary.contrastText,
       border: "#E5E5E5 1px solid",
       borderRadius: 2,
       "& .min-icon": {
@@ -63,7 +63,7 @@ const styles = (theme: Theme) =>
         overflowWrap: "break-word",
         wordBreak: "break-all",
         font: "normal normal bold 24px/27px Lato",
-        color: theme.palette.primary.main,
+        color: theme.palette.primary.dark,
 
         "& .MuiTypography-root": {
           fontSize: 19,
@@ -89,15 +89,6 @@ const styles = (theme: Theme) =>
       "& div": {
         position: "absolute",
       },
-    },
-    viewButton: {
-      width: 111,
-      color: "white",
-      marginLeft: 8,
-      fontSize: 12,
-      fontWeight: "normal",
-      boxShadow: "unset",
-      borderRadius: 4,
     },
     manageButton: {
       borderRadius: 4,
@@ -172,6 +163,7 @@ interface IBucketListItem {
   onSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
   selected: boolean;
   bulkSelect: boolean;
+  noManage?: boolean;
 }
 
 const BucketListItem = ({
@@ -180,13 +172,16 @@ const BucketListItem = ({
   onSelect,
   selected,
   bulkSelect,
+  noManage = false,
 }: IBucketListItem) => {
+  const navigate = useNavigate();
+
   const usage = niceBytes(`${bucket.size}` || "0");
   const usageScalar = usage.split(" ")[0];
   const usageUnit = usage.split(" ")[1];
 
   const quota = get(bucket, "details.quota.quota", "0");
-  const quotaForString = calculateBytes(quota);
+  const quotaForString = calculateBytes(quota, true, false);
 
   const accessToStr = (bucket: Bucket): string => {
     if (bucket.rw_access?.read && !bucket.rw_access?.write) {
@@ -245,37 +240,31 @@ const BucketListItem = ({
             </Grid>
           </Grid>
           <Grid item xs={12} sm={5} className={classes.bucketActionButtons}>
-            <SecureComponent
-              scopes={IAM_PERMISSIONS[IAM_ROLES.BUCKET_ADMIN]}
-              resource={bucket.name}
-            >
-              <Link
-                to={`/buckets/${bucket.name}/admin`}
-                style={{ textDecoration: "none" }}
+            {!noManage && (
+              <SecureComponent
+                scopes={IAM_PERMISSIONS[IAM_ROLES.BUCKET_ADMIN]}
+                resource={bucket.name}
               >
                 <RBIconButton
                   tooltip={"Manage"}
-                  onClick={() => {}}
+                  onClick={() => navigate(`/buckets/${bucket.name}/admin`)}
                   text={"Manage"}
                   icon={<SettingsIcon />}
                   color={"primary"}
                   variant={"outlined"}
+                  id={`manage-${bucket.name}`}
                 />
-              </Link>
-            </SecureComponent>
-            <Link
-              to={`/buckets/${bucket.name}/browse`}
-              style={{ textDecoration: "none" }}
-            >
-              <RBIconButton
-                tooltip={"Browse"}
-                onClick={() => {}}
-                text={"Browse"}
-                icon={<ArrowRightIcon />}
-                color={"primary"}
-                variant={"contained"}
-              />
-            </Link>
+              </SecureComponent>
+            )}
+            <RBIconButton
+              tooltip={"Browse"}
+              onClick={() => navigate(`/buckets/${bucket.name}/browse`)}
+              text={"Browse"}
+              icon={<ArrowRightIcon />}
+              color={"primary"}
+              variant={"contained"}
+              id={`browse-${bucket.name}`}
+            />
             <Box display={{ xs: "none", sm: "block" }}>
               <div style={{ marginBottom: 10 }} />
             </Box>

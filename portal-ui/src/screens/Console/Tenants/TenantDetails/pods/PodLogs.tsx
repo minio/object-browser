@@ -15,9 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
-import { CellMeasurer, CellMeasurerCache, List } from "react-virtualized";
+import {
+  AutoSizer,
+  CellMeasurer,
+  CellMeasurerCache,
+  List,
+} from "react-virtualized";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { TextField } from "@mui/material";
@@ -32,10 +37,9 @@ import {
   containerForHeader,
   searchField,
 } from "../../../Common/FormComponents/common/styleLibrary";
-import { setErrorSnackMessage } from "../../../../../actions";
 import { ErrorResponseHandler } from "../../../../../common/types";
-import { AppState } from "../../../../../store";
-import { AutoSizer } from "react-virtualized";
+import { AppState, useAppDispatch } from "../../../../../store";
+import { setErrorSnackMessage } from "../../../../../systemSlice";
 
 interface IPodLogsProps {
   classes: any;
@@ -43,8 +47,6 @@ interface IPodLogsProps {
   namespace: string;
   podName: string;
   propLoading: boolean;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  loadingTenant: boolean;
 }
 
 const styles = (theme: Theme) =>
@@ -87,9 +89,11 @@ const PodLogs = ({
   namespace,
   podName,
   propLoading,
-  setErrorSnackMessage,
-  loadingTenant,
 }: IPodLogsProps) => {
+  const dispatch = useAppDispatch();
+  const loadingTenant = useSelector(
+    (state: AppState) => state.tenants.loadingTenant
+  );
   const [highlight, setHighlight] = useState<string>("");
   const [logLines, setLogLines] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -167,14 +171,15 @@ const PodLogs = ({
           setLoading(false);
         })
         .catch((err: ErrorResponseHandler) => {
-          setErrorSnackMessage(err);
+          dispatch(setErrorSnackMessage(err));
           setLoading(false);
         });
     }
-  }, [loading, podName, namespace, tenant, setErrorSnackMessage]);
+  }, [loading, podName, namespace, tenant, dispatch]);
 
   function cellRenderer({ columnIndex, key, parent, index, style }: any) {
     return (
+      // @ts-ignore
       <CellMeasurer
         cache={cache}
         columnIndex={columnIndex}
@@ -222,8 +227,10 @@ const PodLogs = ({
         <Paper>
           <div className={classes.logList}>
             {logLines.length >= 1 && (
+              // @ts-ignore
               <AutoSizer>
                 {({ width, height }) => (
+                  // @ts-ignore
                   <List
                     rowHeight={(item) => cache.rowHeight(item)}
                     overscanRowCount={15}
@@ -242,12 +249,4 @@ const PodLogs = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  loadingTenant: state.tenants.tenantDetails.loadingTenant,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(PodLogs));
+export default withStyles(styles)(PodLogs);

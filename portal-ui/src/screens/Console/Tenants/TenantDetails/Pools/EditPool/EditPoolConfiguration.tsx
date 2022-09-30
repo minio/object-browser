@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -25,8 +25,8 @@ import {
   modalBasic,
   wizardCommon,
 } from "../../../../Common/FormComponents/common/styleLibrary";
-import { isEditPoolPageValid, setEditPoolField } from "../../../actions";
-import { AppState } from "../../../../../../store";
+
+import { AppState, useAppDispatch } from "../../../../../../store";
 import { clearValidationError } from "../../../utils";
 import {
   commonFormValidation,
@@ -34,14 +34,10 @@ import {
 } from "../../../../../../utils/validationFunctions";
 import FormSwitchWrapper from "../../../../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
 import InputBoxWrapper from "../../../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
-import { ISecurityContext } from "../../../types";
+import { isEditPoolPageValid, setEditPoolField } from "./editPoolSlice";
 
 interface IConfigureProps {
-  setEditPoolField: typeof setEditPoolField;
-  isEditPoolPageValid: typeof isEditPoolPageValid;
   classes: any;
-  securityContextEnabled: boolean;
-  securityContext: ISecurityContext;
 }
 
 const styles = (theme: Theme) =>
@@ -78,29 +74,35 @@ const styles = (theme: Theme) =>
       },
     },
 
-    fieldSpaceTop: {
-      marginTop: 15,
-    },
-
     ...modalBasic,
     ...wizardCommon,
   });
 
-const PoolConfiguration = ({
-  classes,
-  setEditPoolField,
-  securityContextEnabled,
-  isEditPoolPageValid,
-  securityContext,
-}: IConfigureProps) => {
+const PoolConfiguration = ({ classes }: IConfigureProps) => {
+  const dispatch = useAppDispatch();
+
+  const securityContextEnabled = useSelector(
+    (state: AppState) =>
+      state.editPool.fields.configuration.securityContextEnabled
+  );
+  const securityContext = useSelector(
+    (state: AppState) => state.editPool.fields.configuration.securityContext
+  );
+
   const [validationErrors, setValidationErrors] = useState<any>({});
 
   // Common
   const updateField = useCallback(
     (field: string, value: any) => {
-      setEditPoolField("configuration", field, value);
+      dispatch(
+        setEditPoolField({
+          page: "configuration",
+          field: field,
+          value: value,
+        })
+      );
     },
-    [setEditPoolField]
+    [dispatch]
   );
 
   // Validation
@@ -141,10 +143,15 @@ const PoolConfiguration = ({
 
     const commonVal = commonFormValidation(customAccountValidation);
 
-    isEditPoolPageValid("configure", Object.keys(commonVal).length === 0);
+    dispatch(
+      isEditPoolPageValid({
+        page: "configure",
+        status: Object.keys(commonVal).length === 0,
+      })
+    );
 
     setValidationErrors(commonVal);
-  }, [isEditPoolPageValid, securityContextEnabled, securityContext]);
+  }, [dispatch, securityContextEnabled, securityContext]);
 
   const cleanValidation = (fieldName: string) => {
     setValidationErrors(clearValidationError(validationErrors, fieldName));
@@ -272,18 +279,4 @@ const PoolConfiguration = ({
   );
 };
 
-const mapState = (state: AppState) => {
-  const configuration = state.tenants.editPool.fields.configuration;
-
-  return {
-    securityContextEnabled: configuration.securityContextEnabled,
-    securityContext: configuration.securityContext,
-  };
-};
-
-const connector = connect(mapState, {
-  setEditPoolField,
-  isEditPoolPageValid,
-});
-
-export default withStyles(styles)(connector(PoolConfiguration));
+export default withStyles(styles)(PoolConfiguration);

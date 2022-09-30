@@ -16,7 +16,7 @@
 
 import * as roles from "../utils/roles";
 import * as elements from "../utils/elements";
-import { configurationsElement, settingsElement } from "../utils/elements-menu";
+import { configurationsElement } from "../utils/elements-menu";
 
 fixture("For user with Settings permissions")
   .page("http://localhost:9090")
@@ -25,12 +25,7 @@ fixture("For user with Settings permissions")
   });
 
 test("Settings sidebar item exists", async (t) => {
-  await t
-    .expect(settingsElement.exists)
-    .ok()
-    .click(settingsElement)
-    .expect(configurationsElement.exists)
-    .ok();
+  await t.expect(configurationsElement.exists).ok();
 });
 
 test("Settings window exists in Settings page", async (t) => {
@@ -42,40 +37,15 @@ test("Settings window exists in Settings page", async (t) => {
 });
 
 test("All vertical tab items exist", async (t) => {
-  const settingsRegionTabExists = elements.settingsRegionTab.exists;
-  const settingsCacheTabExists = elements.settingsCacheTab.exists;
   const settingsCompressionTabExists = elements.settingsCompressionTab.exists;
-  const settingsApiTabExists = elements.settingsApiTab.exists;
-  const settingsHealTabExists = elements.settingsHealTab.exists;
-  const settingsScannerTabExists = elements.settingsScannerTab.exists;
-  const settingsEtcdTabExists = elements.settingsEtcdTab.exists;
   const settingsOpenIdTabExists = elements.settingsOpenIdTab.exists;
   const settingsLdapTabExists = elements.settingsLdapTab.exists;
-  const settingsLoggerWebhookTabExists =
-    elements.settingsLoggerWebhookTab.exists;
-  const settingsAuditWebhookTabExists = elements.settingsAuditWebhookTab.exists;
   await t
     .navigateTo("http://localhost:9090/settings/configurations")
-    .expect(settingsRegionTabExists)
-    .ok()
-    .expect(settingsCacheTabExists)
-    .ok()
     .expect(settingsCompressionTabExists)
-    .ok()
-    .expect(settingsApiTabExists)
-    .ok()
-    .expect(settingsHealTabExists)
-    .ok()
-    .expect(settingsScannerTabExists)
-    .ok()
-    .expect(settingsEtcdTabExists)
     .ok()
     .expect(settingsOpenIdTabExists)
     .ok()
     .expect(settingsLdapTabExists)
     .ok()
-    .expect(settingsLoggerWebhookTabExists)
-    .ok()
-    .expect(settingsAuditWebhookTabExists)
-    .ok();
 });

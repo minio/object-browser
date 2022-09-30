@@ -15,8 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment } from "react";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
+import { useLocation } from "react-router-dom";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import {
@@ -26,28 +27,16 @@ import {
   tenantDetailsStyles,
 } from "../../Common/FormComponents/common/styleLibrary";
 import Grid from "@mui/material/Grid";
-import { setErrorSnackMessage } from "../../../../actions";
-import { AppState } from "../../../../store";
-import {
-  setOpenPoolDetails,
-  setSelectedPool,
-  setTenantDetailsLoad,
-} from "../actions";
+
+import { AppState, useAppDispatch } from "../../../../store";
+
 import PoolsListing from "./Pools/Details/PoolsListing";
 import PoolDetails from "./Pools/Details/PoolDetails";
 import BackLink from "../../../../common/BackLink";
+import { setOpenPoolDetails } from "../tenantsSlice";
 
 interface IPoolsSummary {
   classes: any;
-  loadingTenant: boolean;
-  history: any;
-  match: any;
-  selectedPool: string | null;
-  poolDetailsOpen: boolean;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  setTenantDetailsLoad: typeof setTenantDetailsLoad;
-  setSelectedPool: typeof setSelectedPool;
-  setOpenPoolDetails: typeof setOpenPoolDetails;
 }
 
 const styles = (theme: Theme) =>
@@ -58,24 +47,27 @@ const styles = (theme: Theme) =>
     ...containerForHeader(theme.spacing(4)),
   });
 
-const PoolsSummary = ({
-  classes,
-  history,
-  selectedPool,
-  match,
-  poolDetailsOpen,
-  setOpenPoolDetails,
-}: IPoolsSummary) => {
+const PoolsSummary = ({ classes }: IPoolsSummary) => {
+  const dispatch = useAppDispatch();
+  const { pathname = "" } = useLocation();
+
+  const selectedPool = useSelector(
+    (state: AppState) => state.tenants.selectedPool
+  );
+  const poolDetailsOpen = useSelector(
+    (state: AppState) => state.tenants.poolDetailsOpen
+  );
+
   return (
     <Fragment>
       {poolDetailsOpen && (
         <Grid item xs={12}>
           <BackLink
             executeOnClick={() => {
-              setOpenPoolDetails(false);
+              dispatch(setOpenPoolDetails(false));
             }}
-            label={"Back to Pools list"}
-            to={match.url}
+            label={"Pools list"}
+            to={pathname}
           />
         </Grid>
       )}
@@ -84,13 +76,12 @@ const PoolsSummary = ({
       </h1>
       <Grid container>
         {poolDetailsOpen ? (
-          <PoolDetails history={history} />
+          <PoolDetails />
         ) : (
           <PoolsListing
             setPoolDetailsView={() => {
-              setOpenPoolDetails(true);
+              dispatch(setOpenPoolDetails(true));
             }}
-            history={history}
           />
         )}
       </Grid>
@@ -98,19 +89,4 @@ const PoolsSummary = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  loadingTenant: state.tenants.tenantDetails.loadingTenant,
-  selectedTenant: state.tenants.tenantDetails.currentTenant,
-  selectedPool: state.tenants.tenantDetails.selectedPool,
-  tenant: state.tenants.tenantDetails.tenantInfo,
-  poolDetailsOpen: state.tenants.tenantDetails.poolDetailsOpen,
-});
-
-const connector = connect(mapState, {
-  setErrorSnackMessage,
-  setTenantDetailsLoad,
-  setSelectedPool,
-  setOpenPoolDetails,
-});
-
-export default withStyles(styles)(connector(PoolsSummary));
+export default withStyles(styles)(PoolsSummary);

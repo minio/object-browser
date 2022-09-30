@@ -15,23 +15,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { AddIcon, ClustersIcon, RemoveIcon } from "../../../../icons";
-import { ReplicationSite } from "./SiteReplication";
-import InputBoxWrapper from "../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import Grid from "@mui/material/Grid";
 import { Box, Button, LinearProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
 import RBIconButton from "../../Buckets/BucketDetails/SummaryItems/RBIconButton";
 import useApi from "../../Common/Hooks/useApi";
-import { connect } from "react-redux";
-import { setErrorSnackMessage, setSnackBarMessage } from "../../../../actions";
-import { ErrorResponseHandler } from "../../../../common/types";
+import { AddIcon, ClustersIcon, RemoveIcon } from "../../../../icons";
+import InputBoxWrapper from "../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import PageHeader from "../../Common/PageHeader/PageHeader";
 import BackLink from "../../../../common/BackLink";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
 import PageLayout from "../../Common/Layout/PageLayout";
-import ScreenTitle from "../../Common/ScreenTitle/ScreenTitle";
 import HelpBox from "../../../../common/HelpBox";
-import history from "../../../../history";
+import SectionTitle from "../../Common/SectionTitle";
+import {
+  setErrorSnackMessage,
+  setSnackBarMessage,
+} from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 type SiteInputRow = {
   name: string;
@@ -53,15 +55,10 @@ const isValidEndPoint = (ep: string) => {
     return "Invalid Endpoint";
   }
 };
-const AddReplicationSites = ({
-  setErrorSnackMessage,
-  setSnackBarMessage,
-}: {
-  existingSites: ReplicationSite[];
-  onClose: () => void;
-  setErrorSnackMessage: (err: ErrorResponseHandler) => void;
-  setSnackBarMessage: (msg: string) => void;
-}) => {
+const AddReplicationSites = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [existingSites, setExistingSites] = useState<SiteInputRow[]>([]);
 
   const [accessKey, setAccessKey] = useState<string>("");
@@ -130,19 +127,21 @@ const AddReplicationSites = ({
   const [isAdding, invokeSiteAddApi] = useApi(
     (res: any) => {
       if (res.success) {
-        setSnackBarMessage(res.status);
+        dispatch(setSnackBarMessage(res.status));
         resetForm();
         getSites();
-        history.push(IAM_PAGES.SITE_REPLICATION);
+        navigate(IAM_PAGES.SITE_REPLICATION);
       } else {
-        setErrorSnackMessage({
-          errorMessage: "Error",
-          detailedError: res.status,
-        });
+        dispatch(
+          setErrorSnackMessage({
+            errorMessage: "Error",
+            detailedError: res.status,
+          })
+        );
       }
     },
     (err: any) => {
-      setErrorSnackMessage(err);
+      dispatch(setErrorSnackMessage(err));
     }
   );
 
@@ -191,10 +190,6 @@ const AddReplicationSites = ({
         }
       />
       <PageLayout>
-        <ScreenTitle title={"Add Sites for Replication"} icon={ClustersIcon} />
-
-        {isSiteInfoLoading || isAdding ? <LinearProgress /> : null}
-
         <Box
           sx={{
             display: "grid",
@@ -204,9 +199,15 @@ const AddReplicationSites = ({
               md: "2fr 1.2fr",
               xs: "1fr",
             },
+            border: "1px solid #eaeaea",
           }}
         >
           <Box>
+            <SectionTitle icon={<ClustersIcon />}>
+              Add Sites for Replication
+            </SectionTitle>
+
+            {isSiteInfoLoading || isAdding ? <LinearProgress /> : null}
             <form
               noValidate
               autoComplete="off"
@@ -222,10 +223,11 @@ const AddReplicationSites = ({
                     display: "flex",
                     alignItems: "center",
                     fontSize: "12px",
+                    marginTop: 2,
                   }}
                 >
                   <Box sx={{ fontWeight: 600 }}>Note:</Box>{" "}
-                  <Box sx={{ marginLeft: "8px" }}>
+                  <Box sx={{ marginLeft: 1 }}>
                     Access Key and Secret Key should be same on all sites.
                   </Box>
                 </Box>
@@ -517,6 +519,7 @@ const AddReplicationSites = ({
                       borderRadius: "50%",
                       marginRight: "18px",
                       padding: "3px",
+                      paddingLeft: "2px",
                       "& .min-icon": {
                         height: "11px",
                         width: "11px",
@@ -569,28 +572,18 @@ const AddReplicationSites = ({
                   <Box>
                     The following changes are replicated to all other sites
                   </Box>
-                  <Box className="step-row">
-                    <div className="step-text">
-                      Creation and deletion of buckets and objects
-                    </div>
-                  </Box>
-                  <Box className="step-row">
-                    <div className="step-text">
+                  <ul>
+                    <li>Creation and deletion of buckets and objects</li>
+                    <li>
                       Creation and deletion of all IAM users, groups, policies
                       and their mappings to users or groups
-                    </div>
-                  </Box>
-                  <Box className="step-row">
-                    <div className="step-text">Creation of STS credentials</div>
-                  </Box>
-                  <Box className="step-row">
-                    <div className="step-text">
+                    </li>
+                    <li>Creation of STS credentials</li>
+                    <li>
                       Creation and deletion of service accounts (except those
                       owned by the root user)
-                    </div>
-                  </Box>
-                  <Box className="step-row">
-                    <div className="step-text">
+                    </li>
+                    <li>
                       Changes to Bucket features such as
                       <ul>
                         <li>Bucket Policies</li>
@@ -598,18 +591,16 @@ const AddReplicationSites = ({
                         <li>Bucket Object-Lock configurations</li>
                         <li>Bucket Encryption configuration</li>
                       </ul>
-                    </div>
-                  </Box>
+                    </li>
 
-                  <Box className="step-row">
-                    <div className="step-text">
+                    <li>
                       The following Bucket features will NOT be replicated
                       <ul>
                         <li>Bucket notification configuration</li>
                         <li>Bucket lifecycle (ILM) configuration</li>
                       </ul>
-                    </div>
-                  </Box>
+                    </li>
+                  </ul>
                 </Box>
               </Fragment>
             }
@@ -620,8 +611,4 @@ const AddReplicationSites = ({
   );
 };
 
-const connector = connect(null, {
-  setErrorSnackMessage,
-  setSnackBarMessage,
-});
-export default connector(AddReplicationSites);
+export default AddReplicationSites;

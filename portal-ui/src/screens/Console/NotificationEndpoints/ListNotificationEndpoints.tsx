@@ -15,7 +15,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
+import { useNavigate } from "react-router-dom";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -28,10 +29,10 @@ import {
   NotificationEndpointsList,
   TransformedEndpointItem,
 } from "./types";
-import { notificationTransform } from "./utils";
+import { getNotificationConfigKey, notificationTransform } from "./utils";
 import { AddIcon, LambdaIcon } from "../../../icons";
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
-import { setErrorSnackMessage } from "../../../actions";
+
 import {
   actionsTray,
   containerForHeader,
@@ -42,17 +43,21 @@ import {
 import { ErrorResponseHandler } from "../../../common/types";
 import api from "../../../common/api";
 import RefreshIcon from "../../../icons/RefreshIcon";
-import history from "../../../history";
 import HelpBox from "../../../common/HelpBox";
 import AButton from "../Common/AButton/AButton";
 import PageLayout from "../Common/Layout/PageLayout";
 import SearchBox from "../Common/SearchBox";
 import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
 import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
+import {
+  setErrorSnackMessage,
+  setServerNeedsRestart,
+} from "../../../systemSlice";
+import { useAppDispatch } from "../../../store";
+import ConfirmDeleteTargetModal from "./ConfirmDeleteTargetModal";
 
 interface IListNotificationEndpoints {
   classes: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -79,14 +84,17 @@ const styles = (theme: Theme) =>
     },
   });
 
-const ListNotificationEndpoints = ({
-  classes,
-  setErrorSnackMessage,
-}: IListNotificationEndpoints) => {
+const ListNotificationEndpoints = ({ classes }: IListNotificationEndpoints) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   //Local States
   const [records, setRecords] = useState<TransformedEndpointItem[]>([]);
   const [filter, setFilter] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [isDelConfirmOpen, setIsDelConfirmOpen] = useState<boolean>(false);
+  const [selNotifyEndPoint, setSelNotifyEndpoint] =
+    useState<TransformedEndpointItem | null>();
 
   //Effects
   // load records on mount
@@ -104,17 +112,50 @@ const ListNotificationEndpoints = ({
             setIsLoading(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
             setIsLoading(false);
           });
       };
       fetchRecords();
     }
-  }, [isLoading, setErrorSnackMessage]);
+  }, [isLoading, dispatch]);
 
   useEffect(() => {
     setIsLoading(true);
   }, []);
+
+  const resetNotificationConfig = (
+    ep: TransformedEndpointItem | undefined | null
+  ) => {
+    if (ep?.name) {
+      const configKey = getNotificationConfigKey(ep.name);
+      let accountId = `:${ep.account_id}`;
+      if (configKey) {
+        api
+          .invoke("POST", `/api/v1/configs/${configKey}${accountId}/reset`)
+          .then((res) => {
+            dispatch(setServerNeedsRestart(true));
+            setSelNotifyEndpoint(null);
+            setIsDelConfirmOpen(false);
+          })
+          .catch((err: ErrorResponseHandler) => {
+            setIsDelConfirmOpen(false);
+            dispatch(setErrorSnackMessage(err));
+          });
+      } else {
+        setSelNotifyEndpoint(null);
+        setIsDelConfirmOpen(false);
+        console.log(`Unable to find Config key for ${ep.name}`);
+      }
+    }
+  };
+
+  const confirmDelNotifyEndpoint = (record: TransformedEndpointItem) => {
+    setSelNotifyEndpoint(record);
+    setIsDelConfirmOpen(true);
+  };
+
+  const tableActions = [{ type: "delete", onClick: confirmDelNotifyEndpoint }];
 
   const filteredRecords = records.filter((b: TransformedEndpointItem) => {
     if (filter === "") {
@@ -168,7 +209,7 @@ const ListNotificationEndpoints = ({
               color="primary"
               icon={<AddIcon />}
               onClick={() => {
-                history.push(IAM_PAGES.NOTIFICATIONS_ENDPOINTS_ADD);
+                navigate(IAM_PAGES.NOTIFICATIONS_ENDPOINTS_ADD);
               }}
             />
           </div>
@@ -180,7 +221,7 @@ const ListNotificationEndpoints = ({
               <Fragment>
                 <Grid item xs={12} className={classes.tableBlock}>
                   <TableWrapper
-                    itemActions={[]}
+                    itemActions={tableActions}
                     columns={[
                       {
                         label: "Status",
@@ -203,22 +244,11 @@ const ListNotificationEndpoints = ({
                     iconComponent={<LambdaIcon />}
                     help={
                       <Fragment>
-                        MinIO bucket notifications allow administrators to send
+                        Mantle SDS bucket notifications allow administrators to send
                         notifications to supported external services on certain
-                        object or bucket events. MinIO supports bucket and
+                        object or bucket events. Mantle SDS supports bucket and
                         object-level S3 events similar to the Amazon S3 Event
                         Notifications.
-                        <br />
-                        <br />
-                        You can learn more at our{" "}
-                        <a
-                          href="https://docs.min.io/minio/baremetal/monitoring/bucket-notifications/bucket-notifications.html?ref=con"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          documentation
-                        </a>
-                        .
                       </Fragment>
                     }
                   />
@@ -238,9 +268,9 @@ const ListNotificationEndpoints = ({
                     iconComponent={<LambdaIcon />}
                     help={
                       <Fragment>
-                        MinIO bucket notifications allow administrators to send
+                        Mantle SDS bucket notifications allow administrators to send
                         notifications to supported external services on certain
-                        object or bucket events. MinIO supports bucket and
+                        object or bucket events. Mantle SDS supports bucket and
                         object-level S3 events similar to the Amazon S3 Event
                         Notifications.
                         <br />
@@ -248,7 +278,7 @@ const ListNotificationEndpoints = ({
                         To get started,{" "}
                         <AButton
                           onClick={() => {
-                            history.push(IAM_PAGES.NOTIFICATIONS_ENDPOINTS_ADD);
+                            navigate(IAM_PAGES.NOTIFICATIONS_ENDPOINTS_ADD);
                           }}
                         >
                           Add a Notification Target
@@ -262,15 +292,22 @@ const ListNotificationEndpoints = ({
             )}
           </Fragment>
         )}
+
+        {isDelConfirmOpen ? (
+          <ConfirmDeleteTargetModal
+            onConfirm={() => {
+              resetNotificationConfig(selNotifyEndPoint);
+            }}
+            status={`${selNotifyEndPoint?.status}`}
+            serviceName={`${selNotifyEndPoint?.service_name}`}
+            onClose={() => {
+              setIsDelConfirmOpen(false);
+            }}
+          />
+        ) : null}
       </PageLayout>
     </Fragment>
   );
 };
 
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(null, mapDispatchToProps);
-
-export default withStyles(styles)(connector(ListNotificationEndpoints));
+export default withStyles(styles)(ListNotificationEndpoints);

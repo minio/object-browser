@@ -16,7 +16,7 @@
 
 import React, { Fragment, useEffect, useState } from "react";
 import get from "lodash/get";
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -31,7 +31,7 @@ import {
   typesSelection,
 } from "../../Common/FormComponents/common/styleLibrary";
 import { AddIcon, TiersIcon, TiersNotAvailableIcon } from "../../../../icons";
-import { setErrorSnackMessage } from "../../../../actions";
+
 import { ITierElement, ITierResponse } from "./types";
 import { ErrorResponseHandler } from "../../../../common/types";
 import api from "../../../../common/api";
@@ -45,7 +45,6 @@ import PageLayout from "../../Common/Layout/PageLayout";
 import SearchBox from "../../Common/SearchBox";
 
 import withSuspense from "../../Common/Components/withSuspense";
-import { AppState } from "../../../../store";
 import DistributedOnly from "../../Common/DistributedOnly/DistributedOnly";
 import {
   CONSOLE_UI_RESOURCE,
@@ -55,6 +54,9 @@ import {
 import { SecureComponent } from "../../../../common/SecureComponent";
 import { tierTypes } from "./utils";
 import RBIconButton from "../../Buckets/BucketDetails/SummaryItems/RBIconButton";
+import { selDistSet, setErrorSnackMessage } from "../../../../systemSlice";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../../../store";
 
 const UpdateTierCredentialsModal = withSuspense(
   React.lazy(() => import("./UpdateTierCredentialsModal"))
@@ -62,9 +64,6 @@ const UpdateTierCredentialsModal = withSuspense(
 
 interface IListTiersConfig {
   classes: any;
-  history: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
-  distributedSetup: boolean;
 }
 
 const styles = (theme: Theme) =>
@@ -95,12 +94,11 @@ const styles = (theme: Theme) =>
     ...tableStyles,
   });
 
-const ListTiersConfiguration = ({
-  classes,
-  history,
-  setErrorSnackMessage,
-  distributedSetup,
-}: IListTiersConfig) => {
+const ListTiersConfiguration = ({ classes }: IListTiersConfig) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const distributedSetup = useSelector(selDistSet);
   const [records, setRecords] = useState<ITierElement[]>([]);
   const [filter, setFilter] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -121,7 +119,7 @@ const ListTiersConfiguration = ({
               setIsLoading(false);
             })
             .catch((err: ErrorResponseHandler) => {
-              setErrorSnackMessage(err);
+              dispatch(setErrorSnackMessage(err));
               setIsLoading(false);
             });
         };
@@ -130,7 +128,7 @@ const ListTiersConfiguration = ({
         setIsLoading(false);
       }
     }
-  }, [isLoading, setErrorSnackMessage, distributedSetup]);
+  }, [isLoading, dispatch, distributedSetup]);
 
   const filteredRecords = records.filter((b: ITierElement) => {
     if (filter === "") {
@@ -143,7 +141,7 @@ const ListTiersConfiguration = ({
   });
 
   const addTier = () => {
-    history.push(IAM_PAGES.TIERS_ADD);
+    navigate(IAM_PAGES.TIERS_ADD);
   };
 
   const renderTierName = (item: ITierElement) => {
@@ -399,23 +397,12 @@ const ListTiersConfiguration = ({
                         iconComponent={<TiersIcon />}
                         help={
                           <Fragment>
-                            Tiers are used by the MinIO Object Lifecycle
+                            Tiers are used by the Mantle SDS Object Lifecycle
                             Management which allows creating rules for time or
                             date based automatic transition or expiry of
-                            objects. For object transition, MinIO automatically
+                            objects. For object transition, Mantle SDS automatically
                             moves the object to a configured remote storage
                             tier.
-                            <br />
-                            <br />
-                            You can learn more at our{" "}
-                            <a
-                              href="https://docs.min.io/minio/baremetal/lifecycle-management/lifecycle-management-overview.html?ref=con"
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              documentation
-                            </a>
-                            .
                           </Fragment>
                         }
                       />
@@ -460,14 +447,4 @@ const ListTiersConfiguration = ({
   );
 };
 
-const mapState = (state: AppState) => ({
-  distributedSetup: state.system.distributedSetup,
-});
-
-const mapDispatchToProps = {
-  setErrorSnackMessage,
-};
-
-const connector = connect(mapState, mapDispatchToProps);
-
-export default withStyles(styles)(connector(ListTiersConfiguration));
+export default withStyles(styles)(ListTiersConfiguration);

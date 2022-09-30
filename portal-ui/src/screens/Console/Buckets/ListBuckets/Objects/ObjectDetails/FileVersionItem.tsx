@@ -31,18 +31,24 @@ import {
 } from "../../../../../../icons";
 import { niceBytes } from "../../../../../../common/utils";
 import SpecificVersionPill from "./SpecificVersionPill";
+import CheckboxWrapper from "../../../../Common/FormComponents/CheckboxWrapper/CheckboxWrapper";
 
 interface IFileVersionItem {
   fileName: string;
   versionInfo: IFileInfo;
   index: number;
   isSelected?: boolean;
+  checkable: boolean;
+  isChecked: boolean;
+  onCheck: (versionID: string) => void;
   onShare: (versionInfo: IFileInfo) => void;
   onDownload: (versionInfo: IFileInfo) => void;
   onRestore: (versionInfo: IFileInfo) => void;
   onPreview: (versionInfo: IFileInfo) => void;
   globalClick: (versionInfo: IFileInfo) => void;
   classes: any;
+  key: any;
+  style: any;
 }
 
 const styles = (theme: Theme) =>
@@ -55,6 +61,10 @@ const styles = (theme: Theme) =>
       "&.deleted": {
         color: "#868686",
       },
+      "@media (max-width: 799px)": {
+        padding: "5px 0px",
+        margin: 0,
+      },
     },
     intermediateLayer: {
       margin: "0 1.5rem 0 1.5rem",
@@ -62,6 +72,15 @@ const styles = (theme: Theme) =>
         backgroundColor: "#F8F8F8",
         "& > div": {
           borderBottomColor: "#F8F8F8",
+        },
+      },
+      "@media (max-width: 799px)": {
+        margin: 0,
+        "&:hover, &.selected": {
+          backgroundColor: "transparent",
+          "& > div": {
+            borderBottomColor: "#E2E2E2",
+          },
         },
       },
     },
@@ -77,21 +96,42 @@ const styles = (theme: Theme) =>
         minHeight: 18,
         marginRight: 10,
       },
+      "@media (max-width: 799px)": {
+        fontSize: 14,
+        "& svg.min-icon": {
+          display: "none",
+        },
+      },
     },
     buttonContainer: {
       textAlign: "right",
       "& button": {
         marginLeft: "1.5rem",
       },
+      "@media (max-width: 600px)": {
+        "& button": {
+          marginLeft: "5px",
+        },
+      },
     },
     versionID: {
       fontSize: "12px",
       margin: "2px 0",
+      whiteSpace: "nowrap",
+      textOverflow: "ellipsis",
+      maxWidth: "95%",
+      overflow: "hidden",
     },
     versionData: {
       marginRight: "10px",
       fontSize: 12,
       color: "#868686",
+      "@media (max-width: 799px)": {
+        textOverflow: "ellipsis",
+        maxWidth: "95%",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+      },
     },
     ctrItem: {
       position: "relative",
@@ -104,6 +144,22 @@ const styles = (theme: Theme) =>
         backgroundColor: "#F8F8F8",
         left: "24px",
       },
+      "@media (max-width: 799px)": {
+        "&::before": {
+          display: "none",
+        },
+      },
+    },
+    collapsableInfo: {
+      "@media (max-width: 799px)": {
+        display: "flex",
+        flexDirection: "column",
+      },
+    },
+    versionItem: {
+      "@media (max-width: 799px)": {
+        display: "none",
+      },
     },
   });
 
@@ -112,12 +168,17 @@ const FileVersionItem = ({
   fileName,
   versionInfo,
   isSelected,
+  checkable,
+  isChecked,
+  onCheck,
   onShare,
   onDownload,
   onRestore,
   onPreview,
   globalClick,
   index,
+  key,
+  style,
 }: IFileVersionItem) => {
   const disableButtons = versionInfo.is_delete_marker;
 
@@ -162,6 +223,8 @@ const FileVersionItem = ({
       onClick={() => {
         globalClick(versionInfo);
       }}
+      key={key}
+      style={style}
     >
       <Grid
         item
@@ -179,11 +242,34 @@ const FileVersionItem = ({
         >
           <Grid item xs={12} justifyContent={"space-between"}>
             <Grid container>
-              <Grid item xs={4} className={classes.versionContainer}>
+              <Grid item xs md={4} className={classes.versionContainer}>
+                {checkable && (
+                  <CheckboxWrapper
+                    checked={isChecked}
+                    id={`select-${versionInfo.version_id}`}
+                    label={""}
+                    name={`select-${versionInfo.version_id}`}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      onCheck(versionInfo.version_id || "");
+                    }}
+                    value={versionInfo.version_id || ""}
+                    disabled={versionInfo.is_delete_marker}
+                    overrideCheckboxStyles={{
+                      paddingLeft: 0,
+                      height: 34,
+                      width: 25,
+                    }}
+                    noTopMargin
+                  />
+                )}
                 {displayFileIconName(fileName, true)} v{index.toString()}
-                {pill && <SpecificVersionPill type={pill} />}
+                <span className={classes.versionItem}>
+                  {pill && <SpecificVersionPill type={pill} />}
+                </span>
               </Grid>
-              <Grid item xs={8} className={classes.buttonContainer}>
+              <Grid item xs={10} md={8} className={classes.buttonContainer}>
                 {versionItemButtons.map((button, index) => {
                   return (
                     <Tooltip
@@ -232,7 +318,7 @@ const FileVersionItem = ({
           <Grid item xs={12} className={classes.versionID}>
             {versionInfo.version_id !== "null" ? versionInfo.version_id : "-"}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} className={classes.collapsableInfo}>
             <span className={classes.versionData}>
               <strong>Last modified:</strong>{" "}
               <reactMoment.default>

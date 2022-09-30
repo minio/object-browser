@@ -15,9 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { Fragment, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import Grid from "@mui/material/Grid";
-import { LinearProgress } from "@mui/material";
+import { LinearProgress, SelectChangeEvent } from "@mui/material";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -29,11 +29,10 @@ import {
   containerForHeader,
   searchField,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { setErrorSnackMessage } from "../../../../actions";
+
 import { AddIcon, TenantsIcon } from "../../../../icons";
 import { ErrorResponseHandler } from "../../../../common/types";
 import api from "../../../../common/api";
-import history from "../../../../history";
 import RefreshIcon from "../../../../icons/RefreshIcon";
 import PageHeader from "../../Common/PageHeader/PageHeader";
 import TenantListItem from "./TenantListItem";
@@ -45,6 +44,10 @@ import VirtualizedList from "../../Common/VirtualizedList/VirtualizedList";
 import RBIconButton from "../../Buckets/BucketDetails/SummaryItems/RBIconButton";
 import SearchBox from "../../Common/SearchBox";
 import PageLayout from "../../Common/Layout/PageLayout";
+import { setErrorSnackMessage } from "../../../../systemSlice";
+import SelectWrapper from "../../Common/FormComponents/SelectWrapper/SelectWrapper";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../../../store";
 
 const CredentialsPrompt = withSuspense(
   React.lazy(() => import("../../Common/CredentialsPrompt/CredentialsPrompt"))
@@ -52,7 +55,6 @@ const CredentialsPrompt = withSuspense(
 
 interface ITenantsList {
   classes: any;
-  setErrorSnackMessage: typeof setErrorSnackMessage;
 }
 
 const styles = (theme: Theme) =>
@@ -60,14 +62,6 @@ const styles = (theme: Theme) =>
     ...actionsTray,
     ...searchField,
     ...containerForHeader(theme.spacing(4)),
-    addTenant: {
-      marginRight: 8,
-    },
-    theaderSearchLabel: {
-      color: theme.palette.grey["400"],
-      fontSize: 14,
-      fontWeight: "bold",
-    },
     theaderSearch: {
       borderColor: theme.palette.grey["200"],
       "& .MuiInputBase-input": {
@@ -90,22 +84,41 @@ const styles = (theme: Theme) =>
       marginRight: 10,
       marginLeft: 10,
     },
-    mainActions: {
-      textAlign: "right",
-      marginBottom: 8,
-    },
     tenantsList: {
       height: "calc(100vh - 195px)",
     },
+    sortByContainer: {
+      display: "flex",
+      justifyContent: "flex-end",
+      marginBottom: 10,
+    },
+    innerSort: {
+      maxWidth: 200,
+      width: "95%",
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    sortByLabel: {
+      whiteSpace: "nowrap",
+      fontSize: 14,
+      color: "#838383",
+      fontWeight: "bold",
+      marginRight: 10,
+    },
   });
 
-const ListTenants = ({ classes, setErrorSnackMessage }: ITenantsList) => {
+const ListTenants = ({ classes }: ITenantsList) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [filterTenants, setFilterTenants] = useState<string>("");
-  const [records, setRecords] = useState<any[]>([]);
+  const [records, setRecords] = useState<ITenant[]>([]);
   const [showNewCredentials, setShowNewCredentials] = useState<boolean>(false);
   const [createdAccount, setCreatedAccount] =
     useState<NewServiceAccount | null>(null);
+  const [sortValue, setSortValue] = useState<string>("name");
 
   const closeCredentialsModal = () => {
     setShowNewCredentials(false);
@@ -121,6 +134,67 @@ const ListTenants = ({ classes, setErrorSnackMessage }: ITenantsList) => {
       } else {
         return false;
       }
+    }
+  });
+
+  filteredRecords.sort((a, b) => {
+    switch (sortValue) {
+      case "capacity":
+        if (!a.capacity || !b.capacity) {
+          return 0;
+        }
+
+        if (a.capacity > b.capacity) {
+          return 1;
+        }
+
+        if (a.capacity < b.capacity) {
+          return -1;
+        }
+
+        return 0;
+      case "usage":
+        if (!a.capacity_usage || !b.capacity_usage) {
+          return 0;
+        }
+
+        if (a.capacity_usage > b.capacity_usage) {
+          return 1;
+        }
+
+        if (a.capacity_usage < b.capacity_usage) {
+          return -1;
+        }
+
+        return 0;
+      case "active_status":
+        if (a.health_status === "red" && b.health_status !== "red") {
+          return 1;
+        }
+
+        if (a.health_status !== "red" && b.health_status === "red") {
+          return -1;
+        }
+
+        return 0;
+      case "failing_status":
+        if (a.health_status === "green" && b.health_status !== "green") {
+          return 1;
+        }
+
+        if (a.health_status !== "green" && b.health_status === "green") {
+          return -1;
+        }
+
+        return 0;
+      default:
+        if (a.name > b.name) {
+          return 1;
+        }
+        if (a.name < b.name) {
+          return -1;
+        }
+        return 0;
     }
   });
 
@@ -149,13 +223,13 @@ const ListTenants = ({ classes, setErrorSnackMessage }: ITenantsList) => {
             setIsLoading(false);
           })
           .catch((err: ErrorResponseHandler) => {
-            setErrorSnackMessage(err);
+            dispatch(setErrorSnackMessage(err));
             setIsLoading(false);
           });
       };
       fetchRecords();
     }
-  }, [isLoading, setErrorSnackMessage]);
+  }, [isLoading, dispatch]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -212,7 +286,7 @@ const ListTenants = ({ classes, setErrorSnackMessage }: ITenantsList) => {
               tooltip={"Create Tenant"}
               text={"Create Tenant"}
               onClick={() => {
-                history.push("/tenants/add");
+                navigate("/tenants/add");
               }}
               icon={<AddIcon />}
               color="primary"
@@ -227,10 +301,45 @@ const ListTenants = ({ classes, setErrorSnackMessage }: ITenantsList) => {
           {!isLoading && (
             <Fragment>
               {filteredRecords.length !== 0 && (
-                <VirtualizedList
-                  rowRenderFunction={renderItemLine}
-                  totalItems={filteredRecords.length}
-                />
+                <Fragment>
+                  <Grid item xs={12} className={classes.sortByContainer}>
+                    <div className={classes.innerSort}>
+                      <span className={classes.sortByLabel}>Sort by</span>
+                      <SelectWrapper
+                        id={"sort-by"}
+                        label={""}
+                        value={sortValue}
+                        onChange={(e: SelectChangeEvent<string>) => {
+                          setSortValue(e.target.value as string);
+                        }}
+                        name={"sort-by"}
+                        options={[
+                          { label: "Name", value: "name" },
+                          {
+                            label: "Capacity",
+                            value: "capacity",
+                          },
+                          {
+                            label: "Usage",
+                            value: "usage",
+                          },
+                          {
+                            label: "Active Status",
+                            value: "active_status",
+                          },
+                          {
+                            label: "Failing Status",
+                            value: "failing_status",
+                          },
+                        ]}
+                      />
+                    </div>
+                  </Grid>
+                  <VirtualizedList
+                    rowRenderFunction={renderItemLine}
+                    totalItems={filteredRecords.length}
+                  />
+                </Fragment>
               )}
               {filteredRecords.length === 0 && (
                 <Grid
@@ -254,7 +363,7 @@ const ListTenants = ({ classes, setErrorSnackMessage }: ITenantsList) => {
                           To get started,&nbsp;
                           <AButton
                             onClick={() => {
-                              history.push("/tenants/add");
+                              navigate("/tenants/add");
                             }}
                           >
                             Create a Tenant.
@@ -273,8 +382,4 @@ const ListTenants = ({ classes, setErrorSnackMessage }: ITenantsList) => {
   );
 };
 
-const connector = connect(null, {
-  setErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(ListTenants));
+export default withStyles(styles)(ListTenants);

@@ -18,6 +18,7 @@ import request from "superagent";
 import get from "lodash/get";
 import { clearSession } from "../utils";
 import { ErrorResponseHandler } from "../types";
+import { baseUrl } from "../../history";
 
 export class API {
   invoke(method: string, url: string, data?: object) {
@@ -29,17 +30,22 @@ export class API {
       .send(data)
       .then((res) => res.body)
       .catch((err) => {
-        // if we get unauthorized, kick out the user
-        if (err.status === 401 && localStorage.getItem("userLoggedIn")) {
+        // if we get unauthorized and we are not doing login, kick out the user
+        if (
+          err.status === 401 &&
+          localStorage.getItem("userLoggedIn") &&
+          !targetURL.includes("api/v1/login")
+        ) {
           if (window.location.pathname !== "/") {
             localStorage.setItem("redirect-path", window.location.pathname);
           }
           clearSession();
           // Refresh the whole page to ensure cache is clear
           // and we dont end on an infinite loop
-          window.location.href = "login";
+          window.location.href = `${baseUrl}login`;
           return;
         }
+
         return this.onError(err);
       });
   }
@@ -66,12 +72,13 @@ export class API {
       const throwMessage: ErrorResponseHandler = {
         errorMessage: capMessage,
         detailedError: capDetailed,
+        statusCode: err.status,
       };
 
       return Promise.reject(throwMessage);
     } else {
       clearSession();
-      window.location.href = "login";
+      window.location.href = `${baseUrl}login`;
     }
   }
 }

@@ -14,54 +14,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
-import PublicIcon from "@mui/icons-material/Public";
-import SdStorageIcon from "@mui/icons-material/SdStorage";
 import CompressIcon from "@mui/icons-material/Compress";
-import CodeIcon from "@mui/icons-material/Code";
-import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import FindReplaceIcon from "@mui/icons-material/FindReplace";
-import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LoginIcon from "@mui/icons-material/Login";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
-import CallToActionIcon from "@mui/icons-material/CallToAction";
 import { IElement, IElementValue } from "./types";
 
 export const configurationElements: IElement[] = [
   {
-    icon: <PublicIcon />,
-    configuration_id: "region",
-    configuration_label: "Region",
-  },
-  {
-    icon: <SdStorageIcon />,
-    configuration_id: "cache",
-    configuration_label: "Cache",
-  },
-  {
     icon: <CompressIcon />,
     configuration_id: "compression",
     configuration_label: "Compression",
-  },
-  {
-    icon: <CodeIcon />,
-    configuration_id: "api",
-    configuration_label: "API",
-  },
-  {
-    icon: <LocalHospitalIcon />,
-    configuration_id: "heal",
-    configuration_label: "Heal",
-  },
-  {
-    icon: <FindReplaceIcon />,
-    configuration_id: "scanner",
-    configuration_label: "Scanner",
-  },
-  {
-    icon: <VpnKeyIcon />,
-    configuration_id: "etcd",
-    configuration_label: "Etcd",
   },
   {
     icon: <LockOpenIcon />,
@@ -73,106 +35,9 @@ export const configurationElements: IElement[] = [
     configuration_id: "identity_ldap",
     configuration_label: "Identity LDAP",
   },
-  {
-    icon: <CallToActionIcon />,
-    configuration_id: "logger_webhook",
-    configuration_label: "Logger Webhook",
-  },
-  {
-    icon: <PendingActionsIcon />,
-    configuration_id: "audit_webhook",
-    configuration_label: "Audit Webhook",
-  },
 ];
 
 export const fieldsConfigurations: any = {
-  region: [
-    {
-      name: "name",
-      required: true,
-      label: "Server Location",
-      tooltip: 'Name of the location of the server e.g. "us-west-rack2"',
-      type: "string",
-      placeholder: "e.g. us-west-rack-2",
-    },
-    {
-      name: "comment",
-      required: false,
-      label: "Comment",
-      tooltip: "You can add a comment to this setting",
-      type: "comment",
-      placeholder: "Enter custom notes if any",
-    },
-  ],
-  cache: [
-    {
-      name: "drives",
-      required: true,
-      label: "Drives",
-      tooltip:
-        'Mountpoints e.g. "/optane1" or "/optane2", you can write one per field',
-      type: "csv",
-      placeholder: "Enter Mount Point",
-    },
-    {
-      name: "expiry",
-      required: false,
-      label: "Expiry",
-      tooltip: 'Cache expiry duration in days e.g. "90"',
-      type: "number",
-      placeholder: "Enter Number of Days",
-    },
-    {
-      name: "quota",
-      required: false,
-      label: "Quota",
-      tooltip: 'Limit cache drive usage in percentage e.g. "90"',
-      type: "number",
-      placeholder: "Enter in %",
-    },
-    {
-      name: "exclude",
-      required: false,
-      label: "Exclude",
-      tooltip:
-        'Wildcard exclusion patterns e.g. "bucket/*.tmp" or "*.exe", you can write one per field',
-      type: "csv",
-      placeholder: "Enter Wildcard Exclusion Patterns",
-    },
-    {
-      name: "after",
-      required: false,
-      label: "After",
-      tooltip: "Minimum number of access before caching an object",
-      type: "number",
-      placeholder: "Enter Number of Attempts",
-    },
-    {
-      name: "watermark_low",
-      required: false,
-      label: "Watermark Low",
-      tooltip: "Watermark Low",
-      type: "number",
-      placeholder: "Enter Watermark Low",
-    },
-    {
-      name: "watermark_high",
-      required: false,
-      label: "Watermark High",
-      tooltip: "Watermark High",
-      type: "number",
-      placeholder: "Enter Watermark High",
-    },
-    {
-      name: "comment",
-      required: false,
-      label: "Comment",
-      tooltip: "You can add a comment to this setting",
-      type: "comment",
-      multiline: true,
-      placeholder: "Enter custom notes if any",
-    },
-  ],
   compression: [
     {
       name: "extensions",
@@ -193,147 +58,6 @@ export const fieldsConfigurations: any = {
       type: "csv",
       placeholder: "Enter a Mime Type",
       withBorder: true,
-    },
-  ],
-  api: [
-    {
-      name: "requests_max",
-      required: false,
-      label: "Requests Max",
-      tooltip: "Maximum number of concurrent requests, e.g. '1600'",
-      type: "number",
-      placeholder: "Enter Requests Max",
-    },
-    {
-      name: "cors_allow_origin",
-      required: false,
-      label: "Cors Allow Origin",
-      tooltip: "list of origins allowed for CORS requests",
-      type: "csv",
-      placeholder: "Enter allowed origin e.g. https://example.com",
-    },
-    {
-      name: "replication_workers",
-      required: false,
-      label: "Replication Workers",
-      tooltip: "Number of replication workers, defaults to 100",
-      type: "number",
-      placeholder: "Enter Replication Workers",
-    },
-    {
-      name: "replication_failed_workers",
-      required: false,
-      label: "Replication Failed Workers",
-      tooltip:
-        "Number of replication workers for recently failed replicas, defaults to 4",
-      type: "number",
-      placeholder: "Enter Replication Failed Workers",
-    },
-  ],
-  heal: [
-    {
-      name: "bitrotscan",
-      required: false,
-      label: "Bitrot Scan",
-      tooltip:
-        "Perform bitrot scan on disks when checking objects during scanner",
-      type: "on|off",
-    },
-    {
-      name: "max_sleep",
-      required: false,
-      label: "Max Sleep",
-      tooltip:
-        "Maximum sleep duration between objects to slow down heal operation. eg. 2s",
-      type: "duration",
-      placeholder: "Enter Max Sleep duration",
-    },
-    {
-      name: "max_io",
-      required: false,
-      label: "Max IO",
-      tooltip:
-        "Maximum IO requests allowed between objects to slow down heal operation. eg. 3",
-      type: "number",
-      placeholder: "Enter Max IO",
-    },
-  ],
-  scanner: [
-    {
-      name: "delay",
-      required: false,
-      label: "Delay multiplier",
-      tooltip: "Scanner delay multiplier, defaults to '10.0'",
-      type: "number",
-      placeholder: "Enter Delay",
-    },
-    {
-      name: "max_wait",
-      required: false,
-      label: "Max Wait",
-      tooltip: "Maximum wait time between operations, defaults to '15s'",
-      type: "duration",
-      placeholder: "Enter Max Wait",
-    },
-    {
-      name: "cycle",
-      required: false,
-      label: "Cycle",
-      tooltip: "Time duration between scanner cycles, defaults to '1m'",
-      type: "duration",
-      placeholder: "Enter Cycle",
-    },
-  ],
-  etcd: [
-    {
-      name: "endpoints",
-      required: true,
-      label: "Endpoints",
-      tooltip:
-        'List of etcd endpoints e.g. "http://localhost:2379", you can write one per field',
-      type: "csv",
-      placeholder: "Enter Endpoint",
-    },
-    {
-      name: "path_prefix",
-      required: false,
-      label: "Path Prefix",
-      tooltip: 'namespace prefix to isolate tenants e.g. "customer1/"',
-      type: "string",
-      placeholder: "Enter Path Prefix",
-    },
-    {
-      name: "coredns_path",
-      required: false,
-      label: "Coredns Path",
-      tooltip: 'Shared bucket DNS records, default is "/skydns"',
-      type: "string",
-      placeholder: "Enter Coredns Path",
-    },
-    {
-      name: "client_cert",
-      required: false,
-      label: "Client Cert",
-      tooltip: "Client cert for mTLS authentication",
-      type: "string",
-      placeholder: "Enter Client Cert",
-    },
-    {
-      name: "client_cert_key",
-      required: false,
-      label: "Client Cert Key",
-      tooltip: "Client cert key for mTLS authentication",
-      type: "string",
-      placeholder: "Enter Client Cert Key",
-    },
-    {
-      name: "comment",
-      required: false,
-      label: "Comment",
-      tooltip: "You can add a comment to this setting",
-      type: "comment",
-      multiline: true,
-      placeholder: "Enter custom notes if any",
     },
   ],
   identity_openid: [
@@ -475,7 +199,7 @@ export const fieldsConfigurations: any = {
       name: "group_search_base_dn",
       required: false,
       label: "Group Search Base DN",
-      tooltip: "list of group search base DNs",
+      tooltip: "List of group search base DNs",
       type: "csv",
       placeholder: "dc=minioad,dc=local",
     },
@@ -486,38 +210,6 @@ export const fieldsConfigurations: any = {
       tooltip: "Optionally add a comment to this setting",
       type: "comment",
       placeholder: "Enter custom notes if any",
-    },
-  ],
-  logger_webhook: [
-    {
-      name: "endpoint",
-      required: true,
-      label: "Endpoint",
-      type: "string",
-      placeholder: "Enter Endpoint",
-    },
-    {
-      name: "auth_token",
-      required: true,
-      label: "Auth Token",
-      type: "string",
-      placeholder: "Enter Auth Token",
-    },
-  ],
-  audit_webhook: [
-    {
-      name: "endpoint",
-      required: true,
-      label: "Endpoint",
-      type: "string",
-      placeholder: "Enter Endpoint",
-    },
-    {
-      name: "auth_token",
-      required: true,
-      label: "Auth Token",
-      type: "string",
-      placeholder: "Enter Auth Token",
     },
   ],
 };

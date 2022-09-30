@@ -22,54 +22,31 @@ import { Theme, useTheme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import { SubnetInfo } from "./types";
 import withStyles from "@mui/styles/withStyles";
-import { Box, Tooltip } from "@mui/material";
+import { Box } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { HelpIconFilled, LicenseDocIcon, OpenSourceIcon } from "../../../icons";
 import {
-  LICENSE_PLANS,
-  FEATURE_ITEMS,
+  AGPLV3Logo,
+  ConsoleEnterprise,
+  ConsoleStandard,
+  LicenseDocIcon,
+} from "../../../icons";
+import {
   COMMUNITY_PLAN_FEATURES,
-  STANDARD_PLAN_FEATURES,
   ENTERPRISE_PLAN_FEATURES,
+  FEATURE_ITEMS,
+  getRenderValue,
+  LICENSE_PLANS,
   PAID_PLANS,
+  STANDARD_PLAN_FEATURES,
 } from "./utils";
 
-const styles = (theme: Theme) =>
-  createStyles({
-    link: {
-      textDecoration: "underline !important",
-      color: theme.palette.info.main,
-    },
-    linkButton: {
-      fontFamily: '"Lato", sans-serif',
-      fontWeight: "normal",
-      textTransform: "none",
-      fontSize: "inherit",
-      height: 0,
-      padding: 0,
-      margin: 0,
-    },
-    tableContainer: {
-      marginLeft: 28,
-    },
-    detailsContainerBorder: {
-      borderLeft: "1px solid #e2e2e2",
-    },
-    detailsTitle: {
-      fontSize: 19,
-      fontWeight: 700,
-      marginBottom: 26,
-      paddingTop: 18,
-      lineHeight: 1,
-    },
-  });
+const styles = (theme: Theme) => createStyles({});
 
 interface IRegisterStatus {
   classes: any;
   activateProductModal: any;
   closeModalAndFetchLicenseInfo: any;
   licenseInfo: SubnetInfo | undefined;
-  setLicenseModal: React.Dispatch<React.SetStateAction<boolean>>;
   operatorMode: boolean;
   currentPlanID: number;
   setActivateProductModal: any;
@@ -86,7 +63,6 @@ const PlanHeader = ({
   isXsViewActive: boolean;
   title: string;
   price?: string;
-  tooltipText?: string;
   onClick: any;
   children: any;
 }) => {
@@ -106,8 +82,8 @@ const PlanHeader = ({
         alignItems: "flex-start",
         justifyContent: "center",
         flexFlow: "column",
-        paddingLeft: "26px",
         borderLeft: "1px solid #eaeaea",
+        borderBottom: "0px !important",
         "& .plan-header": {
           display: "flex",
           alignItems: "center",
@@ -116,41 +92,26 @@ const PlanHeader = ({
         },
 
         "& .title-block": {
-          paddingTop: "20px",
           display: "flex",
-          alignItems: "flex-start",
+          alignItems: "center",
           flexFlow: "column",
           width: "100%",
-
-          marginTop: "auto",
-          marginBottom: "auto",
           "& .title-main": {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flex: 1,
           },
-          "& .min-icon": {
-            marginLeft: "13px",
-            height: "13px",
-            width: "13px",
-          },
-
-          "& .title": {
-            fontSize: "22px",
-            fontWeight: 600,
+          "& .iconContainer": {
+            "& .min-icon": {
+              minWidth: 140,
+              width: "100%",
+              maxHeight: 55,
+              height: "100%",
+            },
           },
         },
 
-        "& .price-line": {
-          fontSize: "16px",
-          fontWeight: 600,
-        },
-        "& .minimum-cost": {
-          fontSize: "14px",
-          fontWeight: 400,
-          marginBottom: "5px",
-        },
         "& .open-source": {
           fontSize: "14px",
           display: "flex",
@@ -181,9 +142,25 @@ const PlanHeader = ({
         "&.active, &.active.xs-active": {
           borderTop: "3px solid #2781B0",
           color: "#ffffff",
+          position: "relative",
 
           "& .min-icon": {
             fill: "#ffffff",
+          },
+
+          "&:before": {
+            content: "' '",
+            position: "absolute",
+            width: "100%",
+            height: "15px",
+            backgroundColor: "#2781B0",
+            display: "block",
+            top: -16,
+          },
+          "& .iconContainer": {
+            "& .min-icon": {
+              marginTop: "-12px",
+            },
           },
         },
         "&.active": {
@@ -212,17 +189,19 @@ const FeatureTitleRowCmp = (props: { featureLabel: any }) => {
 
 const PricingFeatureItem = (props: {
   featureLabel: any;
-  label?: string;
-  detail?: string;
+  label?: any;
+  detail?: any;
   xsLabel?: string;
+  style?: any;
 }) => {
   return (
-    <Box className="feature-item">
+    <Box className="feature-item" style={props.style}>
       <Box className="feature-item-info">
         <div className="xs-only">{props.featureLabel} </div>
         <Box className="plan-feature">
-          <div>{props.label || ""}</div>
-          {props.detail ? <div>{props.detail}</div> : null}
+          <div>{getRenderValue(props.label || "")}</div>
+          {getRenderValue(props.detail)}
+
           <div className="xs-only">{props.xsLabel} </div>
         </Box>
       </Box>
@@ -230,11 +209,7 @@ const PricingFeatureItem = (props: {
   );
 };
 
-const LicensePlans = ({
-  licenseInfo,
-  setLicenseModal,
-  operatorMode,
-}: IRegisterStatus) => {
+const LicensePlans = ({ licenseInfo, operatorMode }: IRegisterStatus) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -255,9 +230,6 @@ const LicensePlans = ({
   let isXsViewEnterprise = xsPlanView === LICENSE_PLANS.ENTERPRISE;
 
   const getCommunityPlanHeader = () => {
-    const tooltipText =
-      "Designed for developers who are building open source applications in compliance with the AGPL v3 license and are able to support themselves. The community version of MinIO has all the functionality of the Standard and Enterprise editions.";
-
     return (
       <PlanHeader
         isActive={isCommunityPlan}
@@ -267,29 +239,16 @@ const LicensePlans = ({
       >
         <Box className="title-block">
           <Box className="title-main">
-            <div className="title">Community</div>
-            <Tooltip title={tooltipText} placement="top-start">
-              <div className="tool-tip">
-                <HelpIconFilled />
-              </div>
-            </Tooltip>
+            <div className="iconContainer">
+              <AGPLV3Logo style={{ width: 117 }} />
+            </div>
           </Box>
-          <div className="cur-plan-text">
-            {isCommunityPlan ? "Current Plan" : ""}
-          </div>
         </Box>
-        <div className="open-source">
-          <OpenSourceIcon />
-          Open Source
-        </div>
       </PlanHeader>
     );
   };
 
   const getStandardPlanHeader = () => {
-    const tooltipText =
-      "Designed for customers who require a commercial license and can mostly self-support but want the peace of mind that comes with the MinIO Subscription Network’s suite of operational capabilities and direct-to-engineer interaction. The Standard version is fully featured but with SLA limitations. ";
-
     return (
       <PlanHeader
         isActive={isStandardPlan}
@@ -299,27 +258,16 @@ const LicensePlans = ({
       >
         <Box className="title-block">
           <Box className="title-main">
-            <div className="title">Standard</div>
-            <Tooltip title={tooltipText} placement="top-start">
-              <div className="tool-tip">
-                <HelpIconFilled />
-              </div>
-            </Tooltip>
+            <div className="iconContainer">
+              <ConsoleStandard />
+            </div>
           </Box>
-          <div className="cur-plan-text">
-            {isStandardPlan ? "Current Plan" : ""}
-          </div>
         </Box>
-        <div className="price-line">$10 per TiB per month</div>
-        <div className="minimum-cost">(Minimum of 100TiB)</div>
       </PlanHeader>
     );
   };
 
   const getEnterpriseHeader = () => {
-    const tooltipText =
-      "Designed for mission critical environments where both a license and strict SLAs are required. The Enterprise version is fully featured but comes with additional capabilities. ";
-
     return (
       <PlanHeader
         isActive={isEnterprisePlan}
@@ -329,19 +277,11 @@ const LicensePlans = ({
       >
         <Box className="title-block">
           <Box className="title-main">
-            <div className="title">Enterprise</div>
-            <Tooltip title={tooltipText} placement="top-start">
-              <div className="tool-tip">
-                <HelpIconFilled />
-              </div>
-            </Tooltip>
+            <div className="iconContainer">
+              <ConsoleEnterprise />
+            </div>
           </Box>
-          <div className="cur-plan-text">
-            {isEnterprisePlan ? "Current Plan" : ""}
-          </div>
         </Box>
-        <div className="price-line">$20 per TiB per month</div>
-        <div className="minimum-cost">(Minimum of 100TiB)</div>
       </PlanHeader>
     );
   };
@@ -361,6 +301,8 @@ const LicensePlans = ({
         target="_blank"
         rel="noopener noreferrer"
         sx={{
+          marginTop: "12px",
+          width: "80%",
           "&.MuiButton-contained": {
             padding: 0,
             paddingLeft: "8px",
@@ -407,8 +349,6 @@ const LicensePlans = ({
           border: "1px solid #eaeaea",
           borderTop: "0px",
           marginBottom: "45px",
-          overflow: "auto",
-          overflowY: "hidden",
           "&::-webkit-scrollbar": {
             width: "5px",
             height: "5px",
@@ -468,17 +408,18 @@ const LicensePlans = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "5px 0px 5px 0px",
+              padding: "5px 0px 25px 0px",
               borderLeft: "1px solid #eaeaea",
             },
             "& .plan-header": {
-              height: "153px",
+              height: "99px",
               borderBottom: "1px solid #eaeaea",
             },
             "& .feature-title": {
               height: "25px",
               paddingLeft: "26px",
               fontSize: "14px",
+
               background: "#E5E5E5",
 
               "@media (max-width: 600px)": {
@@ -495,25 +436,17 @@ const LicensePlans = ({
               alignItems: "center",
               paddingLeft: "26px",
               fontSize: "14px",
-              fontWeight: 600,
             },
             "& .feature-item": {
               display: "flex",
               flexFlow: "column",
-              alignItems: "flex-start",
+              alignItems: "center",
               justifyContent: "center",
               minHeight: "60px",
-              padding: "5px",
+              padding: "0 15px 0 15px",
               borderBottom: "1px solid #eaeaea",
               borderLeft: " 1px solid #eaeaea",
-              paddingLeft: "26px",
               fontSize: "14px",
-
-              "@media (max-width: 900px)": {
-                maxHeight: "30px",
-                overflow: "hidden",
-              },
-
               "& .link-text": {
                 color: "#2781B0",
               },
@@ -528,8 +461,9 @@ const LicensePlans = ({
               flex: 1,
               display: "flex",
               flexFlow: "column",
-              alignItems: "flex-start",
+              alignItems: "center",
               justifyContent: "space-around",
+              textAlign: "center",
 
               "@media (max-width: 600px)": {
                 display: "flex",
@@ -543,7 +477,7 @@ const LicensePlans = ({
                 },
                 "& .plan-feature": {
                   flex: 1,
-                  textAlign: "right",
+                  textAlign: "center",
                   paddingRight: "10px",
                 },
               },
@@ -565,15 +499,6 @@ const LicensePlans = ({
               "& .feature-title": {
                 background: "#F7F7F7",
               },
-
-              "& .title-main": {
-                position: "relative",
-                top: "-17px",
-              },
-              "& .cur-plan-text": {
-                position: "relative",
-                top: "-17px",
-              },
             },
           }}
         >
@@ -594,6 +519,7 @@ const LicensePlans = ({
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "flex-start",
+                        borderBottom: "0px !important",
 
                         "& .link-text": {
                           color: "#2781B0",
@@ -625,11 +551,11 @@ const LicensePlans = ({
                     className={`plan-header`}
                     sx={{
                       fontSize: "14px",
-                      fontWeight: 600,
                       paddingLeft: "26px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "flex-start",
+                      borderBottom: "0px !important",
                     }}
                   >
                     {fi.label}
@@ -647,13 +573,13 @@ const LicensePlans = ({
                       textTransform: "uppercase",
                     }}
                   >
-                    <div>{fi.desc} </div>
+                    <div>{getRenderValue(fi.desc)} </div>
                   </Box>
                 );
               }
               return (
-                <Box key={fi.desc} className="feature-name">
-                  <div>{fi.desc} </div>
+                <Box key={fi.desc} className="feature-name" style={fi.style}>
+                  <div>{getRenderValue(fi.desc)} </div>
                 </Box>
               );
             })}
@@ -666,7 +592,7 @@ const LicensePlans = ({
             >
               {COMMUNITY_PLAN_FEATURES.map((fi, idx) => {
                 const featureLabel = featureList[idx].desc;
-                const { featureTitleRow, isHeader, isOssLicenseLink } = fi;
+                const { featureTitleRow, isHeader } = fi;
 
                 if (isHeader) {
                   return getCommunityPlanHeader();
@@ -680,32 +606,6 @@ const LicensePlans = ({
                   );
                 }
 
-                if (isOssLicenseLink) {
-                  return (
-                    <Box
-                      key={fi.id}
-                      className="feature-item"
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <a
-                        href={"https://www.gnu.org/licenses/agpl-3.0.en.html"}
-                        rel="noreferrer noopener"
-                        className={"link-text"}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setLicenseModal && setLicenseModal(true);
-                        }}
-                      >
-                        GNU AGPL v3
-                      </a>
-                    </Box>
-                  );
-                }
                 return (
                   <PricingFeatureItem
                     key={fi.id}
@@ -713,6 +613,7 @@ const LicensePlans = ({
                     label={fi.label}
                     detail={fi.detail}
                     xsLabel={fi.xsLabel}
+                    style={fi.style}
                   />
                 );
               })}
@@ -751,6 +652,7 @@ const LicensePlans = ({
                   label={fi.label}
                   detail={fi.detail}
                   xsLabel={fi.xsLabel}
+                  style={fi.style}
                 />
               );
             })}
@@ -789,7 +691,7 @@ const LicensePlans = ({
                 return (
                   <Box className="feature-item">
                     <Box className="feature-item-info">
-                      <div className="xs-only"> </div>
+                      <div className="xs-only"></div>
                       <Box className="plan-feature">
                         <CheckCircleIcon />
                       </Box>
@@ -803,6 +705,7 @@ const LicensePlans = ({
                   featureLabel={featureLabel}
                   label={fi.label}
                   detail={fi.detail}
+                  style={fi.style}
                 />
               );
             })}

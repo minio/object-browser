@@ -13,50 +13,67 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import { useDispatch } from "react-redux";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
-import { applyMiddleware, combineReducers, compose, createStore } from "redux";
-import thunk from "redux-thunk";
-import { systemReducer } from "./reducer";
-import { traceReducer } from "./screens/Console/Trace/reducers";
-import { logReducer } from "./screens/Console/Logs/reducers";
-import { healthInfoReducer } from "./screens/Console/HealthInfo/reducers";
-import { watchReducer } from "./screens/Console/Watch/reducers";
-import { consoleReducer } from "./screens/Console/reducer";
-import { bucketsReducer } from "./screens/Console/Buckets/reducers";
-import { objectBrowserReducer } from "./screens/Console/ObjectBrowser/reducers";
-import { tenantsReducer } from "./screens/Console/Tenants/reducer";
-import { directCSIReducer } from "./screens/Console/DirectCSI/reducer";
-import { dashboardReducer } from "./screens/Console/Dashboard/reducer";
+import systemReducer from "./systemSlice";
+import loginReducer from "./screens/LoginPage/loginSlice";
+import traceReducer from "./screens/Console/Trace/traceSlice";
+import logReducer from "./screens/Console/Logs/logsSlice";
+import healthInfoReducer from "./screens/Console/HealthInfo/healthInfoSlice";
+import watchReducer from "./screens/Console/Watch/watchSlice";
+import consoleReducer from "./screens/Console/consoleSlice";
+import bucketsReducer from "./screens/Console/Buckets/ListBuckets/AddBucket/addBucketsSlice";
+import bucketDetailsReducer from "./screens/Console/Buckets/BucketDetails/bucketDetailsSlice";
+import objectBrowserReducer from "./screens/Console/ObjectBrowser/objectBrowserSlice";
+import tenantsReducer from "./screens/Console/Tenants/tenantsSlice";
+import dashboardReducer from "./screens/Console/Dashboard/dashboardSlice";
+import createTenantReducer from "./screens/Console/Tenants/AddTenant/createTenantSlice";
+import createUserReducer from "./screens/Console/Users/AddUsersSlice";
+import addPoolReducer from "./screens/Console/Tenants/TenantDetails/Pools/AddPool/addPoolSlice";
+import editPoolReducer from "./screens/Console/Tenants/TenantDetails/Pools/EditPool/editPoolSlice";
+import editTenantMonitoringReducer from "./screens/Console/Tenants/TenantDetails/tenantMonitoringSlice";
+import editTenantAuditLoggingReducer from "./screens/Console/Tenants/TenantDetails/tenantAuditLogSlice";
+import editTenantSecurityContextReducer from "./screens/Console/Tenants/tenantSecurityContextSlice";
+import directPVReducer from "./screens/Console/DirectPV/directPVSlice";
 
-const globalReducer = combineReducers({
+const rootReducer = combineReducers({
   system: systemReducer,
+  login: loginReducer,
   trace: traceReducer,
   logs: logReducer,
   watch: watchReducer,
   console: consoleReducer,
-  buckets: bucketsReducer,
+  addBucket: bucketsReducer,
+  bucketDetails: bucketDetailsReducer,
   objectBrowser: objectBrowserReducer,
   healthInfo: healthInfoReducer,
-  tenants: tenantsReducer,
-  directCSI: directCSIReducer,
   dashboard: dashboardReducer,
+  // Operator Reducers
+  tenants: tenantsReducer,
+  createTenant: createTenantReducer,
+  createUser: createUserReducer,
+  addPool: addPoolReducer,
+  editPool: editPoolReducer,
+  editTenantMonitoring: editTenantMonitoringReducer,
+  editTenantLogging: editTenantAuditLoggingReducer,
+  editTenantSecurityContext: editTenantSecurityContextReducer,
+  directPV: directPVReducer,
 });
 
-declare global {
-  interface Window {
-    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
-  }
+export const store = configureStore({
+  reducer: rootReducer,
+});
+
+if (process.env.NODE_ENV !== "production" && module.hot) {
+  module.hot.accept(() => {
+    store.replaceReducer(rootReducer);
+  });
 }
 
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+export type AppState = ReturnType<typeof store.getState>;
 
-export type AppState = ReturnType<typeof globalReducer>;
+export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch = () => useDispatch<AppDispatch>();
 
-export const store = createStore(
-  globalReducer,
-  composeEnhancers(applyMiddleware(thunk))
-);
-
-export default function configureStore() {
-  return store;
-}
+export default store;

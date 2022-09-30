@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
+
 import Grid from "@mui/material/Grid";
 import { Button } from "@mui/material";
 import { Theme } from "@mui/material/styles";
@@ -33,12 +33,14 @@ import {
   formFieldStyles,
   modalStyleUtils,
 } from "../../Common/FormComponents/common/styleLibrary";
-import { setModalErrorSnackMessage } from "../../../../actions";
+
 import { ErrorResponseHandler } from "../../../../common/types";
 import ModalWrapper from "../../Common/ModalWrapper/ModalWrapper";
 import InputBoxWrapper from "../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import AutocompleteWrapper from "../../Common/FormComponents/AutocompleteWrapper/AutocompleteWrapper";
 import { EventSubscriptionIcon } from "../../../../icons";
+import { setModalErrorSnackMessage } from "../../../../systemSlice";
+import { useAppDispatch } from "../../../../store";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -56,7 +58,6 @@ interface IAddEventProps {
   open: boolean;
   selectedBucket: string;
   closeModalAndRefresh: () => void;
-  setModalErrorSnackMessage: typeof setModalErrorSnackMessage;
 }
 
 const AddEvent = ({
@@ -64,8 +65,8 @@ const AddEvent = ({
   open,
   selectedBucket,
   closeModalAndRefresh,
-  setModalErrorSnackMessage,
 }: IAddEventProps) => {
+  const dispatch = useAppDispatch();
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [prefix, setPrefix] = useState<string>("");
   const [suffix, setSuffix] = useState<string>("");
@@ -95,7 +96,7 @@ const AddEvent = ({
       })
       .catch((err: ErrorResponseHandler) => {
         setAddLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
   };
 
@@ -113,9 +114,9 @@ const AddEvent = ({
       })
       .catch((err: ErrorResponseHandler) => {
         setAddLoading(false);
-        setModalErrorSnackMessage(err);
+        dispatch(setModalErrorSnackMessage(err));
       });
-  }, [setModalErrorSnackMessage]);
+  }, [dispatch]);
 
   useEffect(() => {
     fetchArnList();
@@ -271,8 +272,4 @@ const AddEvent = ({
   );
 };
 
-const connector = connect(null, {
-  setModalErrorSnackMessage,
-});
-
-export default withStyles(styles)(connector(AddEvent));
+export default withStyles(styles)(AddEvent);

@@ -241,7 +241,7 @@ const LogLine = (props: { log: LogMessage }) => {
               textTransform: "uppercase",
               verticalAlign: "top",
               textAlign: "right",
-              color: "#8399AB",
+              color: "#F0F0F0",
               fontWeight: "bold",
             }}
           >
