@@ -59,6 +59,7 @@ import StrategyForm from "./StrategyForm";
 import { LoginField } from "./LoginField";
 import DirectPVLogo from "../../icons/DirectPVLogo";
 import { useTranslation } from 'react-i18next';
+import LanguageToggle from "../Console/LanguageToggle";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -498,6 +499,7 @@ const Login = () => {
   const theme = useTheme();
   return (
     <div className={classes.root}>
+      <LanguageToggle />
       <CssBaseline />
       <MainError />
       <div className={classes.loginPage}>
