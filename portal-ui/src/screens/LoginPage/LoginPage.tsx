@@ -58,6 +58,8 @@ import { resetForm, setJwt } from "./loginSlice";
 import StrategyForm from "./StrategyForm";
 import { LoginField } from "./LoginField";
 import DirectPVLogo from "../../icons/DirectPVLogo";
+import { useTranslation } from 'react-i18next';
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -278,6 +280,7 @@ export const getTargetPath = () => {
   return targetPath;
 };
 
+
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -317,6 +320,8 @@ const Login = () => {
     e.preventDefault();
     dispatch(doLoginAsync());
   };
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (loadingFetchConfiguration) {
@@ -527,7 +532,7 @@ const Login = () => {
                 color: "#551C27",
               }}
             >
-              Secure Distributed Storage
+             {t('app_title')}
             </Box>
           </Grid>
           <Grid

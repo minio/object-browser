@@ -21,10 +21,33 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import MainRouter from "./MainRouter";
 import StyleHandler from "./StyleHandler";
+import i18next from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import LanguageDetector from 'i18next-browser-languagedetector'
+import HttpApi from 'i18next-http-backend'
+
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
+i18next
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .use(HttpApi)
+  .init({
+    supportedLngs: ['en', 'fr'],
+    fallbackLng: 'en',
+    debug: false,
+    // Options for language detector
+    detection: {
+      order: ['htmlTag', 'path', 'cookie'],
+      caches: ['cookie'],
+    },
+    backend: {
+      loadPath: '/assets/{{lng}}/translation.json',
+    },
+  })
 
 root.render(
   <React.StrictMode>

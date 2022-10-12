@@ -64,7 +64,7 @@ export const validRoutes = (
   const ldapIsEnabled = (features && features.includes("ldap-idp")) || false;
   let consoleMenus: IMenuItem[] = [
     {
-      name: "Buckets",
+      name: "Bucket",
       id: "buckets",
       component: NavLink,
       to: IAM_PAGES.BUCKETS,
