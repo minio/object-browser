@@ -40,6 +40,8 @@ import {
   TableRowPredefStyles,
 } from "../FormComponents/common/styleLibrary";
 import Loader from "../Loader/Loader";
+import { useTranslation } from 'react-i18next';
+
 
 //Interfaces for table Items
 
@@ -297,6 +299,8 @@ const calculateColumnRest = (
 
   return freeSpacing / colsItems.filter((el) => !el.width).length;
 };
+
+const { t } = useTranslation();
 
 // Function that renders Columns in table
 const generateColumnsMap = (
@@ -682,7 +686,7 @@ const TableWrapper = ({
                                   />
                                 </div>
                               ) : (
-                                <Fragment>Select</Fragment>
+                                <Fragment>{t("select")}</Fragment>
                               )}
                             </Fragment>
                           )}

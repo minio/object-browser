@@ -29,6 +29,8 @@ import Loader from "../../../Common/Loader/Loader";
 
 import { setErrorSnackMessage } from "../../../../../systemSlice";
 import { useAppDispatch } from "../../../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 const AddBucketTagModal = withSuspense(
   React.lazy(() => import("../AddBucketTagModal"))
@@ -91,6 +93,7 @@ const BucketTags = ({ bucketName }: BucketTagProps) => {
     fetchTags();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bucketName]);
+  const { t } = useTranslation();
 
   return (
     <Box>
@@ -151,7 +154,7 @@ const BucketTags = ({ bucketName }: BucketTagProps) => {
               icon={<AddIcon />}
               clickable
               size="small"
-              label="Add tag"
+              label= {t("add")+" tags"}
               color="primary"
               variant="outlined"
               onClick={() => {

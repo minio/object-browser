@@ -19,21 +19,23 @@ import { setName } from "./addBucketsSlice";
 import InputBoxWrapper from "../../../Common/FormComponents/InputBoxWrapper/InputBoxWrapper";
 import { useSelector } from "react-redux";
 import { AppState, useAppDispatch } from "../../../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 const AddBucketName = ({ hasErrors }: { hasErrors: boolean }) => {
   const dispatch = useAppDispatch();
-
+  const { t } = useTranslation();
   const bucketName = useSelector((state: AppState) => state.addBucket.name);
   return (
     <InputBoxWrapper
       id="bucket-name"
       name="bucket-name"
-      error={hasErrors ? "Invalid bucket Name" : ""}
+      error={hasErrors ? t("invalid_bucket_name") : ""}
       autoFocus={true}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(setName(event.target.value));
       }}
-      label="Bucket Name"
+      label={t("BucketName")}
       value={bucketName}
       required
     />

@@ -41,6 +41,8 @@ import { encodeURLString } from "../../../../common/utils";
 import { setErrorSnackMessage } from "../../../../systemSlice";
 import { selBucketDetailsLoading } from "./bucketDetailsSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 function a11yProps(index: any) {
   return {
@@ -152,9 +154,11 @@ const AccessDetails = () => {
     }
   }, [loadingPolicies, dispatch, bucketName, displayPoliciesList]);
 
+  const { t } = useTranslation();
+
   return (
     <Fragment>
-      <PanelTitle>Access Audit</PanelTitle>
+      <PanelTitle>{t("acess_audit")}</PanelTitle>
       <Tabs
         value={curTab}
         onChange={(e: React.ChangeEvent<{}>, newValue: number) => {
@@ -166,8 +170,8 @@ const AccessDetails = () => {
         variant="scrollable"
         scrollButtons="auto"
       >
-        {displayPoliciesList && <Tab label="Policies" {...a11yProps(0)} />}
-        {displayUsersList && <Tab label="Users" {...a11yProps(1)} />}
+        {displayPoliciesList && <Tab label={t("policies")} {...a11yProps(0)} />}
+        {displayUsersList && <Tab label={t("user")} {...a11yProps(1)} />}
       </Tabs>
       <Paper>
         <TabPanel index={0} value={curTab}>
@@ -179,7 +183,7 @@ const AccessDetails = () => {
             <TableWrapper
               noBackground={true}
               itemActions={PolicyActions}
-              columns={[{ label: "Name", elementKey: "name" }]}
+              columns={[{ label: t("name"), elementKey: "name" }]}
               isLoading={loadingPolicies}
               records={bucketPolicy}
               entityName="Policies"
@@ -202,7 +206,7 @@ const AccessDetails = () => {
             <TableWrapper
               noBackground={true}
               itemActions={userTableActions}
-              columns={[{ label: "User", elementKey: "accessKey" }]}
+              columns={[{ label: t("user"), elementKey: "accessKey" }]}
               isLoading={loadingUsers}
               records={bucketUsers}
               entityName="Users"

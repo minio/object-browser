@@ -27,6 +27,8 @@ import ConfirmDialog from "../../Common/ModalWrapper/ConfirmDialog";
 import { ConfirmDeleteIcon } from "../../../../icons";
 import { setErrorSnackMessage } from "../../../../systemSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 interface IDeleteAccessRule {
   modalOpen: boolean;
@@ -59,9 +61,11 @@ const DeleteAccessRule = ({
     });
   };
 
+  const { t } = useTranslation();
+
   return (
     <ConfirmDialog
-      title={`Delete Access Rule`}
+      title={t('delete_access_rule')}
       confirmText={"Delete"}
       isOpen={modalOpen}
       isLoading={deleteLoading}
@@ -70,7 +74,7 @@ const DeleteAccessRule = ({
       onClose={onClose}
       confirmationContent={
         <DialogContentText>
-          Are you sure you want to delete this access rule?
+          {t("delete_access_rule_message")}
         </DialogContentText>
       }
     />

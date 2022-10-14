@@ -58,6 +58,7 @@ import AddBucketName from "./AddBucketName";
 import { IAM_SCOPES } from "../../../../../common/SecureComponent/permissions";
 import { hasPermission } from "../../../../../common/SecureComponent";
 import BucketNamingRules from "./BucketNamingRules";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -107,6 +108,7 @@ const styles = (theme: Theme) =>
 interface IsetProps {
   classes: any;
 }
+const { t } = useTranslation();
 
 const AddBucket = ({ classes }: IsetProps) => {
   const dispatch = useAppDispatch();
@@ -217,7 +219,7 @@ const AddBucket = ({ classes }: IsetProps) => {
       <PageHeader label={<BackLink to={"/buckets"} label={"Buckets"} />} />
       <PageLayout>
         <FormLayout
-          title={"Create Bucket"}
+          title={t("create_bucket")}
           icon={<BucketsIcon />}
           helpbox={
             <HelpBox
@@ -225,23 +227,18 @@ const AddBucket = ({ classes }: IsetProps) => {
               title={"Buckets"}
               help={
                 <Fragment>
-                  Mantle SDS uses buckets to organize objects. A bucket is similar to
-                  a folder or directory in a filesystem, where each bucket can
-                  hold an arbitrary number of objects.
+                  {t("create_buckets_intro")}
                   <br />
                   <br />
-                  <b>Versioning</b> allows to keep multiple versions of the same
-                  object under the same key.
+                  <b>{t("versioning")}</b>{t("versioning_info")}
                   <br />
                   <br />
-                  <b>Object Locking</b> prevents objects from being deleted.
-                  Required to support retention and legal hold. Can only be
-                  enabled at bucket creation.{" "}
+                  <b>{t("object_blocking")}</b>{t("object_locking_info")}{" "}
                   {!lockingAllowed ? (
                     <Fragment>
                       <br />
                       <span>
-                        To enable this option{" "}
+                        {t("option_enabling")}{" "}
                         <i>s3:PutBucketObjectLockConfiguration</i> and{" "}
                         <i>s3:PutBucketVersioning</i> permissions must be set.
                       </span>
@@ -251,14 +248,12 @@ const AddBucket = ({ classes }: IsetProps) => {
                   )}
                   <br />
                   <br />
-                  <b>Quota</b> limits the amount of data in the bucket.
+                  <b>{t("quota")}</b> {t("quota_info")}
                   {lockingAllowed && (
                     <Fragment>
                       <br />
                       <br />
-                      <b>Retention</b> imposes rules to prevent object deletion
-                      for a period of time. Versioning must be enabled in order
-                      to set bucket retention policies.
+                      <b>{t("retention")}</b>{t("retention_info")}
                     </Fragment>
                   )}
                   <br />
@@ -284,21 +279,21 @@ const AddBucket = ({ classes }: IsetProps) => {
                 <BucketNamingRules errorList={validationResult} />
               </Grid>
               <Grid item xs={12}>
-                <SectionTitle>Features</SectionTitle>
+                <SectionTitle>{t("features")}</SectionTitle>
                 {!distributedSetup && (
                   <Fragment>
                     <div className={classes.error}>
-                      These features are unavailable in a single-disk setup.
+                      {t("features_unavailable")}
                       <br />
-                      Please deploy a server in{" "}
+                      {t("please_deploy_in")}{" "}
                       <a
                         href="https://docs.min.io/minio/baremetal/installation/deploy-minio-distributed.html?ref=con"
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Distributed Mode
+                        {t("distributed_mode")}
                       </a>{" "}
-                      to use these features.
+                      {t("to_use_these_features")}
                     </div>
                     <br />
                     <br />
@@ -324,7 +319,7 @@ const AddBucket = ({ classes }: IsetProps) => {
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     dispatch(setVersioning(event.target.checked));
                   }}
-                  label={"Versioning"}
+                  label={t("versioning")}
                   disabled={
                     !distributedSetup ||
                     lockingEnabled ||
@@ -347,7 +342,7 @@ const AddBucket = ({ classes }: IsetProps) => {
                       dispatch(setVersioning(true));
                     }
                   }}
-                  label={"Object Locking"}
+                  label={t("object_locking")}
                 />
               </Grid>
 

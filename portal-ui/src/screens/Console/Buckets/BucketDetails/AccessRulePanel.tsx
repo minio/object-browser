@@ -46,6 +46,8 @@ import { setErrorSnackMessage } from "../../../../systemSlice";
 import makeStyles from "@mui/styles/makeStyles";
 import { selBucketDetailsLoading } from "./bucketDetailsSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 const AddAccessRuleModal = withSuspense(
   React.lazy(() => import("./AddAccessRule"))
@@ -166,6 +168,8 @@ const AccessRule = () => {
     setLoadingAccessRules(true);
   };
 
+  const { t } = useTranslation();
+
   return (
     <Fragment>
       {addAccessRuleOpen && (
@@ -193,7 +197,7 @@ const AccessRule = () => {
         />
       )}
       <Grid item xs={12} className={classes.actionsTray}>
-        <PanelTitle>Access Rules</PanelTitle>
+        <PanelTitle>{t("access_rules")}</PanelTitle>
         <SecureComponent
           scopes={[
             IAM_SCOPES.S3_GET_BUCKET_POLICY,
@@ -204,11 +208,11 @@ const AccessRule = () => {
           errorProps={{ disabled: true }}
         >
           <RBIconButton
-            tooltip={"Add Access Rule"}
+            tooltip={t("add_access_rule")}
             onClick={() => {
               setAddAccessRuleOpen(true);
             }}
-            text={"Add Access Rule"}
+            text={t("add_access_rule")}
             icon={<AddIcon />}
             color="primary"
             variant={"contained"}
@@ -225,8 +229,8 @@ const AccessRule = () => {
             noBackground={true}
             itemActions={AccessRuleActions}
             columns={[
-              { label: "Prefix", elementKey: "prefix" },
-              { label: "Access", elementKey: "access" },
+              { label: t("prefix"), elementKey: "prefix" },
+              { label: t("access"), elementKey: "access" },
             ]}
             isLoading={loadingAccessRules}
             records={accessRules}

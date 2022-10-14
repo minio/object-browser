@@ -458,9 +458,9 @@ const Login = () => {
             <React.Fragment>
               <div>
                 <p style={{ color: "#000", textAlign: "center" }}>
-                  An error has occurred
+                    {t("error_has_occured")}
                   <br />
-                  The backend cannot be reached.
+                  {t("backend_not_reached")}
                 </p>
               </div>
               <div>
