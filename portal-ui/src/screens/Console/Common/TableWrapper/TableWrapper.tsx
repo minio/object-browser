@@ -300,8 +300,6 @@ const calculateColumnRest = (
   return freeSpacing / colsItems.filter((el) => !el.width).length;
 };
 
-const { t } = useTranslation();
-
 // Function that renders Columns in table
 const generateColumnsMap = (
   columns: IColumns[],
@@ -511,6 +509,7 @@ const TableWrapper = ({
     setColumnSelectorOpen(false);
     setAnchorEl(null);
   };
+  const { t } = useTranslation();
 
   const columnsSelection = (columns: IColumns[]) => {
     return (

@@ -51,6 +51,7 @@ import PanelTitle from "../Common/PanelTitle/PanelTitle";
 
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IAddServiceAccountProps {
   classes: any;
@@ -78,6 +79,7 @@ const styles = (theme: Theme) =>
 const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [addSending, setAddSending] = useState<boolean>(false);
   const [accessKey, setAccessKey] = useState<string>(getRandomString(16));
@@ -153,7 +155,7 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
       )}
       <Grid item xs={12}>
         <PageHeader
-          label={<BackLink to={IAM_PAGES.ACCOUNT} label={"Service Accounts"} />}
+          label={<BackLink to={IAM_PAGES.ACCOUNT} label={t("service_accounts")} />}
         />
         <PageLayout>
           <Box
@@ -170,7 +172,7 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
           >
             <Box>
               <SectionTitle icon={<ServiceAccountCredentialsIcon />}>
-                Create Service Account
+                {t("create_service_account")}
               </SectionTitle>
 
               <form
@@ -195,10 +197,10 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
                                 <div className={classes.stackedInputs}>
                                   <InputBoxWrapper
                                     value={accessKey}
-                                    label={"Access Key"}
+                                    label={t("access_key")}
                                     id={"accessKey"}
                                     name={"accessKey"}
-                                    placeholder={"Enter Access Key"}
+                                    placeholder={t("enter_access_key")}
                                     onChange={(e) => {
                                       setAccessKey(e.target.value);
                                     }}
@@ -209,11 +211,11 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
                                 <div className={classes.stackedInputs}>
                                   <InputBoxWrapper
                                     value={secretKey}
-                                    label={"Secret Key"}
+                                    label={t("secret_key")}
                                     id={"secretKey"}
                                     name={"secretKey"}
                                     type={showPassword ? "text" : "password"}
-                                    placeholder={"Enter Secret Key"}
+                                    placeholder={t("enter_secret_key")}
                                     onChange={(e) => {
                                       setSecretKey(e.target.value);
                                     }}
@@ -253,10 +255,8 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
                             ) => {
                               setIsRestrictedByPolicy(event.target.checked);
                             }}
-                            label={"Restrict beyond user policy"}
-                            tooltip={
-                              "You can specify an optional JSON-formatted IAM policy to further restrict Service Account access to a subset of the actions and resources explicitly allowed for the parent user. Additional access beyond that of the parent user cannot be implemented through these policies."
-                            }
+                            label={t("restrict_beyond_user_policy")}
+                            tooltip={t("restrict_beyond_user_policy_tooltip")}
                           />
                         </Grid>
                       </Grid>
@@ -269,8 +269,7 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
                       >
                         <div>
                           <PanelTitle>
-                            Current User Policy - edit the JSON to remove
-                            permissions for this service account
+                          {t("current_user_policy")}
                           </PanelTitle>
                         </div>
                         <Grid item xs={12} className={classes.formScrollable}>
@@ -292,11 +291,11 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
                       color="primary"
                       onClick={resetForm}
                     >
-                      Clear
+                      {t("clear")}
                     </Button>
 
                     <Button type="submit" variant="contained" color="primary">
-                      Create
+                      {t("create")}
                     </Button>
                   </Grid>
                 </Grid>

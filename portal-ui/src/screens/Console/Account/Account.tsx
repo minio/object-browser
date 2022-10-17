@@ -59,6 +59,7 @@ import { setErrorSnackMessage, setSnackBarMessage } from "../../../systemSlice";
 import makeStyles from "@mui/styles/makeStyles";
 import { selFeatures } from "../consoleSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const DeleteServiceAccount = withSuspense(
   React.lazy(() => import("./DeleteServiceAccount"))
@@ -81,6 +82,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const Account = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const classes = useStyles();
   const features = useSelector(selFeatures);
@@ -136,7 +138,7 @@ const Account = () => {
   const closeDeleteMultipleModalAndRefresh = (refresh: boolean) => {
     setDeleteMultipleOpen(false);
     if (refresh) {
-      dispatch(setSnackBarMessage(`Service accounts deleted successfully.`));
+      dispatch(setSnackBarMessage(t("delete_service_account_successful")));
       setSelectedSAs([]);
       setLoading(true);
     }
@@ -204,11 +206,11 @@ const Account = () => {
         open={changePasswordModalOpen}
         closeModal={() => setChangePasswordModalOpen(false)}
       />
-      <PageHeader label="Service Accounts" />
+      <PageHeader label={t("serve_accounts")} />
       <PageLayout>
         <Grid item={true} xs={12} className={classes.actionsTray}>
           <SearchBox
-            placeholder={"Search Service Accounts"}
+            placeholder={t("search_service_accounts")}
             onChange={setFilter}
             overrideClass={classes.searchField}
             value={filter}
@@ -221,11 +223,11 @@ const Account = () => {
           >
             {" "}
             <RBIconButton
-              tooltip={"Delete Selected"}
+              tooltip={t("delete_selected")}
               onClick={() => {
                 setDeleteMultipleOpen(true);
               }}
-              text={"Delete Selected"}
+              text={t("delete_selected")}
               icon={<DeleteIcon />}
               color="secondary"
               disabled={selectedSAs.length === 0}
@@ -239,7 +241,7 @@ const Account = () => {
             >
               <RBIconButton
                 onClick={() => setChangePasswordModalOpen(true)}
-                text={`Change Password`}
+                text={t("change_password")}
                 icon={<PasswordKeyIcon />}
                 color={"primary"}
                 variant={"outlined"}
@@ -250,7 +252,7 @@ const Account = () => {
               onClick={(e) => {
                 navigate(`${IAM_PAGES.ACCOUNT_ADD}`);
               }}
-              text={`Create service account`}
+              text={t('create_service_account')}
               icon={<AddIcon />}
               color={"primary"}
               variant={"contained"}
@@ -262,9 +264,9 @@ const Account = () => {
           <TableWrapper
             isLoading={loading}
             records={filteredRecords}
-            entityName={"Service Accounts"}
+            entityName={t("service_account")}
             idField={""}
-            columns={[{ label: "Service Account", elementKey: "" }]}
+            columns={[{ label: t("service_account"), elementKey: "" }]}
             itemActions={tableActions}
             selectedItems={selectedSAs}
             onSelect={(e) => selectSAs(e, setSelectedSAs, selectedSAs)}
@@ -273,17 +275,11 @@ const Account = () => {
         </Grid>
         <Grid item xs={12} marginTop={"15px"}>
           <HelpBox
-            title={"Learn more about SERVICE ACCOUNTS"}
+            title={t("service_accounts_learn_more")}
             iconComponent={<AccountIcon />}
             help={
               <Fragment>
-                Mantle SDS service accounts are child identities of an authenticated
-                Mantle SDS user, including externally managed identities. Each
-                service account inherits its privileges based on the policies
-                attached to it’s parent user or those groups in which the parent
-                user has membership. Service accounts also support an optional
-                inline policy which further restricts access to a subset of
-                actions and resources available to the parent user.
+                {t("service_accounts_info")}
                 <br />
               </Fragment>
             }

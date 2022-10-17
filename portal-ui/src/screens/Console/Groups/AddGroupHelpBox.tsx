@@ -16,6 +16,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import { GroupsIcon, HelpIconFilled, IAMPoliciesIcon } from "../../../icons";
+import { useTranslation } from 'react-i18next';
 
 const FeatureItem = ({
   icon,
@@ -44,6 +45,8 @@ const FeatureItem = ({
   );
 };
 const AddGroupHelpBox = () => {
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -74,21 +77,18 @@ const AddGroupHelpBox = () => {
         }}
       >
         <HelpIconFilled />
-        <div>Learn more about Groups</div>
+        <div>{t("learn_more_groups")}</div>
       </Box>
       <Box sx={{ fontSize: "14px", marginBottom: "15px" }}>
-        Adding groups lets you assign IAM policies to multiple users at once.
+        {t("adding_groups_IAM")}
         <Box sx={{ paddingTop: "20px", paddingBottom: "10px" }}>
-          Users inherit access permissions to data and resources through the
-          groups they belong to.
+        {t("users_inherit_access_permissions")}
         </Box>
         <Box sx={{ paddingTop: "10px", paddingBottom: "10px" }}>
-          A user can be a member of multiple groups.
+          {t("user_multiple_groups")}
         </Box>
         <Box sx={{ paddingTop: "10px", paddingBottom: "10px" }}>
-          Groups provide a simplified method for managing shared permissions
-          among users with common access patterns and workloads. Client’s cannot
-          authenticate to a Mantle SDS deployment using a group as an identity.
+          {t("groups_simplified_method_managing")}
         </Box>
       </Box>
 
@@ -100,18 +100,14 @@ const AddGroupHelpBox = () => {
       >
         <FeatureItem icon={<GroupsIcon />} description={`Add Users to Group`} />
         <Box sx={{ paddingTop: "10px", paddingBottom: "10px" }}>
-          Select from the list of displayed users to assign users to the new
-          group at creation. These users inherit the policies assigned to the
-          group.
+        {t("select_from_the_list_of_user_to_assign_groups")}
         </Box>
         <FeatureItem
           icon={<IAMPoliciesIcon />}
-          description={`Assign Custom IAM Policies for Group`}
+          description={t("assign_IAM_policies_for_groups")}
         />
         <Box sx={{ paddingTop: "10px", paddingBottom: "10px" }}>
-          You can add policies to the group by selecting it from the Groups view
-          after creation. The Policy view lets you manage the assigned policies
-          for the group.
+        {t("add_polices_to_group")}
         </Box>
       </Box>
     </Box>

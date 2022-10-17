@@ -35,6 +35,7 @@ import CodeMirrorWrapper from "../Common/FormComponents/CodeMirrorWrapper/CodeMi
 import { encodeURLString } from "../../../common/utils";
 import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -70,6 +71,7 @@ const ServiceAccountPolicy = ({
   closeModalAndRefresh,
 }: IServiceAccountPolicyProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(true);
   const [policyDefinition, setPolicyDefinition] = useState<string>("");
   useEffect(() => {
@@ -112,7 +114,7 @@ const ServiceAccountPolicy = ({
 
   return (
     <ModalWrapper
-      title="Service Account Policy"
+      title={t("service_account_policy")}
       modalOpen={open}
       onClose={() => {
         closeModalAndRefresh();
@@ -129,7 +131,7 @@ const ServiceAccountPolicy = ({
         <Grid container>
           <Grid item xs={12} className={classes.codeMirrorContainer}>
             <CodeMirrorWrapper
-              label={`Service Account Policy`}
+              label={t("service_account_policy")}
               value={policyDefinition}
               onBeforeChange={(editor, data, value) => {
                 setPolicyDefinition(value);
@@ -147,7 +149,7 @@ const ServiceAccountPolicy = ({
               }}
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               type="submit"
@@ -155,7 +157,7 @@ const ServiceAccountPolicy = ({
               color="primary"
               disabled={loading}
             >
-              Set
+              {t("set")}
             </Button>
           </Grid>
         </Grid>

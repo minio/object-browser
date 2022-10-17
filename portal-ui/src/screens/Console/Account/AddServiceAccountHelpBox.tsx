@@ -21,6 +21,8 @@ import {
   PasswordKeyIcon,
   ServiceAccountIcon,
 } from "../../../icons";
+import { useTranslation } from 'react-i18next';
+
 
 const FeatureItem = ({
   icon,
@@ -49,6 +51,7 @@ const FeatureItem = ({
   );
 };
 const AddServiceAccountHelpBox = () => {
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -80,52 +83,40 @@ const AddServiceAccountHelpBox = () => {
         }}
       >
         <HelpIconFilled />
-        <div>Learn more about Service Accounts</div>
+        <div>{t("service_accounts_help_intro")}</div>
       </Box>
       <Box sx={{ fontSize: "14px", marginBottom: "15px" }}>
         <Box sx={{ paddingBottom: "20px" }}>
           <FeatureItem
             icon={<ServiceAccountIcon />}
-            description={`Create Service Accounts`}
+            description={t("create_service_account")}
           />
           <Box sx={{ paddingTop: "20px" }}>
-            Service Accounts inherit the policies explicitly attached to the
-            parent user, and the policies attached to each group in which the
-            parent user has membership.
+          {t("service_accounts_info2")}
           </Box>
         </Box>
         <Box sx={{ paddingBottom: "20px" }}>
           <FeatureItem
             icon={<PasswordKeyIcon />}
-            description={`Assign Custom Credentials`}
+            description={t("assign_custom_credentials")}
           />
           <Box sx={{ paddingTop: "10px" }}>
-            Randomized access credentials are recommended, and provided by
-            default. You may use your own custom Access Key and Secret Key by
-            replacing the default values. After creation of any Service Account,
-            you will be given the opportunity to view and download the account
-            credentials.
+            {t("randomized_acces_credentials_are_recommended")}
           </Box>
           <Box sx={{ paddingTop: "10px" }}>
-            Service Accounts support programmatic access by applications. You
-            cannot use a Service Account to log into the Mantle SDS Console.
+          {t("service_accounts_programmatic_access")}
           </Box>
         </Box>
         <Box sx={{ paddingBottom: "20px" }}>
           <FeatureItem
             icon={<IAMPoliciesIcon />}
-            description={`Assign Access Policies`}
+            description={t("assign_access_policies")}
           />
-          <Box sx={{ paddingTop: "10px" }}>
-            You can specify an optional JSON-formatted IAM policy to further
-            restrict Service Account access to a subset of the actions and
-            resources explicitly allowed for the parent user. Additional access
-            beyond that of the parent user cannot be implemented through these
-            policies.
+            <Box sx={{ paddingTop: "10px" }}>
+              {t("specify_optional_json_IAM_policy")}
           </Box>
           <Box sx={{ paddingTop: "10px" }}>
-            You cannot modify the optional Service Account IAM policy after
-            saving.
+            {t('cannot_modify_option_json_IAM')}
           </Box>
         </Box>
       </Box>

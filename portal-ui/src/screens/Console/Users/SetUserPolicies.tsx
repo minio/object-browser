@@ -31,6 +31,7 @@ import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { AppState, useAppDispatch } from "../../../store";
 import { useSelector } from "react-redux";
 import { setSelectedPolicies } from "./AddUsersSlice";
+import { useTranslation } from 'react-i18next';
 
 interface ISetUserPoliciesProps {
   classes: any;
@@ -57,6 +58,7 @@ const SetUserPolicies = ({
   open,
 }: ISetUserPoliciesProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   //Local States
   const [loading, setLoading] = useState<boolean>(false);
   const [actualPolicy, setActualPolicy] = useState<string[]>([]);
@@ -109,7 +111,7 @@ const SetUserPolicies = ({
         closeModalAndRefresh();
       }}
       modalOpen={open}
-      title="Set Policies"
+      title={t("set_policies")}
     >
       <Grid container>
         <Grid item xs={12}>
@@ -123,7 +125,7 @@ const SetUserPolicies = ({
           className={classes.clearButton}
           onClick={resetSelection}
         >
-          Reset
+          {t("reset")}
         </button>
         <Button
           type="button"
@@ -132,7 +134,7 @@ const SetUserPolicies = ({
           disabled={loading}
           onClick={SetUserPoliciesAction}
         >
-          Save
+          {t("save")}
         </Button>
       </Grid>
       {loading && (

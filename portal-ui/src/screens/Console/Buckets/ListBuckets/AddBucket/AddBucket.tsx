@@ -108,9 +108,8 @@ const styles = (theme: Theme) =>
 interface IsetProps {
   classes: any;
 }
-const { t } = useTranslation();
-
 const AddBucket = ({ classes }: IsetProps) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 

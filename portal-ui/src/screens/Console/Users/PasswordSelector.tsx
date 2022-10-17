@@ -21,12 +21,15 @@ import { useSelector } from "react-redux";
 import { AppState, useAppDispatch } from "../../../store";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import { useTranslation } from 'react-i18next';
+
 
 interface IAddUserProps2 {
   classes: any;
 }
 
 const PasswordSelector = ({ classes }: IAddUserProps2) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const showPassword = useSelector(
     (state: AppState) => state.createUser.showPassword
@@ -43,7 +46,7 @@ const PasswordSelector = ({ classes }: IAddUserProps2) => {
       id="standard-multiline-static"
       name="standard-multiline-static"
       label="Password"
-      type={showPassword ? "text" : "password"}
+      type={showPassword ? "text" : t("password")}
       value={secretKey}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(setSecretKey(e.target.value));

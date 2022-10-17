@@ -38,6 +38,7 @@ import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { AppState, useAppDispatch } from "../../../store";
 import { setSelectedPolicies } from "../Users/AddUsersSlice";
 import { useSelector } from "react-redux";
+import { useTranslation } from 'react-i18next';
 
 interface ISelectPolicyProps {
   classes: any;
@@ -79,6 +80,7 @@ const PolicySelectors = ({
   classes,
   selectedPolicy = [],
 }: ISelectPolicyProps) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   // Local State
   const [records, setRecords] = useState<any[]>([]);
@@ -147,10 +149,10 @@ const PolicySelectors = ({
         {records.length > 0 ? (
           <React.Fragment>
             <Grid item xs={12} className={classes.filterBox}>
-              <span className={classes.fieldLabel}>Assign Policies</span>
+              <span className={classes.fieldLabel}>{t("assign_policies")}</span>
               <div className={classes.searchBox}>
                 <SearchBox
-                  placeholder="Start typing to search for a Policy"
+                  placeholder={t("policy_search_placeholder")}
                   onChange={(value) => {
                     setFilter(value);
                   }}
@@ -165,7 +167,7 @@ const PolicySelectors = ({
               style={{ paddingBottom: 16 }}
             >
               <TableWrapper
-                columns={[{ label: "Policy", elementKey: "name" }]}
+                columns={[{ label: t("policy"), elementKey: "name" }]}
                 onSelect={selectionChanged}
                 selectedItems={currentPolicies}
                 isLoading={loading}
@@ -177,7 +179,7 @@ const PolicySelectors = ({
             </Grid>
           </React.Fragment>
         ) : (
-          <div className={classes.noFound}>No Policies Available</div>
+          <div className={classes.noFound}>{t("no_policies_available")}</div>
         )}
       </Grid>
     </Grid>

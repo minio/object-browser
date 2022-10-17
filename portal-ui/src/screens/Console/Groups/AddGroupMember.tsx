@@ -19,6 +19,7 @@ import { AddMembersToGroupIcon } from "../../../icons";
 import { encodeURLString } from "../../../common/utils";
 import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 type UserPickerModalProps = {
   classes?: any;
@@ -54,6 +55,7 @@ const AddGroupMember = ({
   onClose,
 }: UserPickerModalProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [selectedUsers, setSelectedUsers] = useState(preSelectedUsers);
 
   function addMembersToGroup() {
@@ -82,7 +84,7 @@ const AddGroupMember = ({
       <Grid container>
         <Grid item xs={12}>
           <div className={classes.formFieldRow}>
-            <PredefinedList label={`Selected Group`} content={selectedGroup} />
+            <PredefinedList label={t("selected_group")} content={selectedGroup} />
           </div>
           <div className={classes.userSelector}>
             <UsersSelectors
@@ -102,7 +104,7 @@ const AddGroupMember = ({
             setSelectedUsers(preSelectedUsers);
           }}
         >
-          Reset
+          {t("reset")}
         </Button>
 
         <Button
@@ -113,7 +115,7 @@ const AddGroupMember = ({
             addMembersToGroup();
           }}
         >
-          Save
+          {t("save")}
         </Button>
       </Grid>
     </ModalWrapper>

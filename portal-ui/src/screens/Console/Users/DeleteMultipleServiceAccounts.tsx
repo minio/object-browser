@@ -22,6 +22,7 @@ import ConfirmDialog from "../../../screens/Console/Common/ModalWrapper/ConfirmD
 import { ConfirmDeleteIcon } from "../../../icons";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IDeleteMultiSAsProps {
   closeDeleteModalAndRefresh: (refresh: boolean) => void;
@@ -35,6 +36,7 @@ const DeleteMultipleSAs = ({
   selectedSAs,
 }: IDeleteMultiSAsProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const onDelSuccess = () => closeDeleteModalAndRefresh(true);
   const onDelError = (err: ErrorResponseHandler) =>
     dispatch(setErrorSnackMessage(err));
@@ -61,8 +63,8 @@ const DeleteMultipleSAs = ({
       onClose={onClose}
       confirmationContent={
         <DialogContentText>
-          Are you sure you want to delete the selected {selectedSAs.length}{" "}
-          service accounts?{" "}
+          {t("are_you_sure_delete_selected")} {selectedSAs.length}{" "}
+          {t("service_accounts")}?{" "}
         </DialogContentText>
       }
     />

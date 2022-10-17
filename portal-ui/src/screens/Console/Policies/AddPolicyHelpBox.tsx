@@ -16,6 +16,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import { HelpIconFilled, IAMPoliciesIcon } from "../../../icons";
+import { useTranslation } from 'react-i18next';
 
 const FeatureItem = ({
   icon,
@@ -45,6 +46,8 @@ const FeatureItem = ({
 };
 
 const AddPolicyHelpBox = () => {
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -73,29 +76,23 @@ const AddPolicyHelpBox = () => {
         }}
       >
         <HelpIconFilled />
-        <div>Learn more about Policies</div>
+        <div>{t("learn_more_policies")}</div>
       </Box>
       <Box sx={{ fontSize: "14px", marginBottom: "15px" }}>
         <Box sx={{ paddingBottom: "20px" }}>
           <FeatureItem
             icon={<IAMPoliciesIcon />}
-            description={`Create Policies`}
+            description={t('create_policies')}
           />
           <Box sx={{ paddingTop: "20px" }}>
-            MinIO uses Policy-Based Access Control (PBAC) to define the
-            authorized actions and resources to which an authenticated user has
-            access. Each policy describes one or more actions and conditions
-            that outline the permissions of a user or group of users.{" "}
+            {t("PBAC_info")}{" "}
           </Box>
         </Box>
         <Box sx={{ paddingBottom: "20px" }}>
-          MinIO PBAC is built for compatibility with AWS IAM policy syntax,
-          structure, and behavior.
+          {t("AWS_IAM_compatibility")}
         </Box>
         <Box sx={{ paddingBottom: "20px" }}>
-          Each user can access only those resources and operations which are
-          explicitly granted by the built-in role. MinIO denies access to any
-          other resource or action by default.
+          {t("acces_based_on_roles")}
         </Box>
       </Box>
     </Box>

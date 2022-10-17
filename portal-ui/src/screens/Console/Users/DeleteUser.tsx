@@ -29,6 +29,7 @@ import WarningMessage from "../Common/WarningMessage/WarningMessage";
 import TableWrapper from "../Common/TableWrapper/TableWrapper";
 import api from "../../../common/api";
 import Loader from "../Common/Loader/Loader";
+import { useTranslation } from 'react-i18next';
 
 interface IDeleteUserProps {
   closeDeleteModalAndRefresh: (refresh: boolean) => void;
@@ -44,6 +45,7 @@ const DeleteUser = ({
   setErrorSnackMessage,
 }: IDeleteUserProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const onDelSuccess = () => closeDeleteModalAndRefresh(true);
   const onDelError = (err: ErrorResponseHandler) => setErrorSnackMessage(err);
@@ -99,8 +101,8 @@ const DeleteUser = ({
     for (let user of selectedUsers) {
       if (user === userLoggedIn) {
         setErrorSnackMessage({
-          errorMessage: "Cannot delete currently logged in user",
-          detailedError: `Cannot delete currently logged in user ${userLoggedIn}`,
+          errorMessage: t("delete_logged_in_error"),
+          detailedError: t("delete_logged_in_error") + userLoggedIn,
         });
         closeDeleteModalAndRefresh(true);
       } else {
@@ -117,18 +119,18 @@ const DeleteUser = ({
   }
 
   const noSAtext =
-    "Are you sure you want to delete the following " +
+    t("are_you_sure_delete") +
     selectedUsers.length +
     " " +
-    "user" +
+    t("user") +
     (selectedUsers.length > 1 ? "s?" : "?");
 
   return loadingSA ? (
     <Loader />
   ) : (
     <ConfirmDialog
-      title={`Delete User${selectedUsers.length > 1 ? "s" : ""}`}
-      confirmText={"Delete"}
+      title={`${t("delete_user")}${selectedUsers.length > 1 ? "s" : ""}`}
+      confirmText={t("delete")}
       isOpen={deleteOpen}
       titleIcon={<ConfirmDeleteIcon />}
       isLoading={deleteLoading}
@@ -139,15 +141,15 @@ const DeleteUser = ({
           {hasSA ? (
             <Fragment>
               <WarningMessage
-                label="Click on a user to view the full listing of asociated Service Accounts. All Service Accounts associated with a user will be deleted along with the user. Are you sure you want to continue?"
-                title="Warning: One or more users selected has associated Service Accounts. "
+                label={t("delete_user_service_account_associated_deleted")}
+                title={t("warning_user_selected_has_service_account")}
               />
               <TableWrapper
                 itemActions={tableActions}
                 columns={[
-                  { label: "Username", elementKey: "userName" },
+                  { label: t("username"), elementKey: "userName" },
                   {
-                    label: "# Associated Service Accounts",
+                    label: t('associated_service_account'),
                     elementKey: "numSAs",
                   },
                 ]}

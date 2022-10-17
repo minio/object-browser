@@ -27,9 +27,10 @@ import ValidRule from "./ValidRule";
 import InvalidRule from "./InvalidRule";
 import NARule from "./NARule";
 
-const { t } = useTranslation();
 
 const BucketNamingRules = ({ errorList }: { errorList: boolean[] }) => {
+  const { t } = useTranslation();
+
   const lengthRuleText = t("bucket_name_length_rule");
   const characterRuleText = t("bucket_name_char_rule");
   const periodRuleText = t("bucket_name_period_rule");

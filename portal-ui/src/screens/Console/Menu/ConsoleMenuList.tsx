@@ -31,6 +31,7 @@ import {
 import MenuItem from "./MenuItem";
 
 import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
+import LanguageToggle from "../LanguageToggle";
 
 const ConsoleMenuList = ({
   menuItems,
@@ -120,6 +121,7 @@ const ConsoleMenuList = ({
           })}
         </React.Fragment>
       </List>
+      <LanguageToggle/>
       {/* List of Bottom anchored menus */}
       <List
         sx={{

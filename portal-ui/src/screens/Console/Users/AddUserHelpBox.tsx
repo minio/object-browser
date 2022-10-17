@@ -21,6 +21,8 @@ import {
   HelpIconFilled,
   UsersIcon,
 } from "../../../icons";
+import { useTranslation } from 'react-i18next';
+
 
 const FeatureItem = ({
   icon,
@@ -49,6 +51,8 @@ const FeatureItem = ({
   );
 };
 const AddUserHelpBox = () => {
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -79,18 +83,13 @@ const AddUserHelpBox = () => {
         }}
       >
         <HelpIconFilled />
-        <div>Learn more about the Users feature</div>
+        <div>{t("learn_more_users_feature")}</div>
       </Box>
       <Box sx={{ fontSize: "14px", marginBottom: "15px" }}>
-        A Mantle SDS user consists of a unique access key (username) and
-        corresponding secret key (password). Clients must authenticate their
-        identity by specifying both a valid access key (username) and the
-        corresponding secret key (password) of an existing Mantle SDS user.
+        {t("create_user_info1")}
         <br />
         <br />
-        Each user can have one or more assigned policies that explicitly list
-        the actions and resources to which that user has access. Users can also
-        inherit policies from the groups in which they have membership.
+        {t("create_user_info5")}
         <br />
       </Box>
 
@@ -100,12 +99,9 @@ const AddUserHelpBox = () => {
           flexFlow: "column",
         }}
       >
-        <FeatureItem icon={<UsersIcon />} description={`Create Users`} />
-        <FeatureItem icon={<GroupsIcon />} description={`Manage Groups`} />
-        <FeatureItem
-          icon={<ChangeAccessPolicyIcon />}
-          description={`Assign Policies`}
-        />
+        <FeatureItem icon={<UsersIcon />} description={t("create_users")} />
+        <FeatureItem icon={<GroupsIcon />} description={t("manage_group")} />
+        <FeatureItem icon={<ChangeAccessPolicyIcon />} description={t("assign_policies")} />
       </Box>
     </Box>
   );

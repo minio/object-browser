@@ -25,6 +25,7 @@ import Grid from "@mui/material/Grid";
 import CredentialItem from "./CredentialItem";
 import WarnIcon from "../../../../icons/WarnIcon";
 import { DownloadIcon, ServiceAccountCredentialsIcon } from "../../../../icons";
+import { useTranslation } from 'react-i18next';
 
 import RBIconButton from "../../Buckets/BucketDetails/SummaryItems/RBIconButton";
 
@@ -91,6 +92,8 @@ const CredentialsPrompt = ({
   closeModal,
   entity,
 }: ICredentialsPromptProps) => {
+  const { t } = useTranslation();
+
   if (!newServiceAccount) {
     return null;
   }
@@ -105,30 +108,30 @@ const CredentialsPrompt = ({
       }}
       title={
         <div className={classes.promptTitle}>
-          <div>New {entity} Created</div>
+          <div>{t("new")} {entity} {t("created")}</div>
         </div>
       }
       titleIcon={<ServiceAccountCredentialsIcon />}
     >
       <Grid container>
         <Grid item xs={12} className={classes.formScrollable}>
-          A new {entity} has been created with the following details:
+          {t("a_new")} {entity} {t("following_details")}:
           {!idp && consoleCreds && (
             <React.Fragment>
               <Grid item xs={12} className={classes.credentialsPanel}>
                 <div className={classes.credentialTitle}>
-                  Console Credentials
+                 {t("console_credentials")}
                 </div>
                 {Array.isArray(consoleCreds) &&
                   consoleCreds.map((credentialsPair, index) => {
                     return (
                       <>
                         <CredentialItem
-                          label="Access Key"
+                          label={t("acces_key")}
                           value={credentialsPair.accessKey}
                         />
                         <CredentialItem
-                          label="Secret Key"
+                          label={t("secret_key")}
                           value={credentialsPair.secretKey}
                         />
                       </>
@@ -137,11 +140,11 @@ const CredentialsPrompt = ({
                 {!Array.isArray(consoleCreds) && (
                   <>
                     <CredentialItem
-                      label="Access Key"
+                      label={t("acces_key")}
                       value={consoleCreds.accessKey}
                     />
                     <CredentialItem
-                      label="Secret Key"
+                      label={t("secret_key")}
                       value={consoleCreds.secretKey}
                     />
                   </>
@@ -152,25 +155,24 @@ const CredentialsPrompt = ({
           {(consoleCreds === null || consoleCreds === undefined) && (
             <>
               <CredentialItem
-                label="Access Key"
+                label={t("acces_key")}
                 value={newServiceAccount.accessKey || ""}
               />
               <CredentialItem
-                label="Secret Key"
+                label={t("secret_key")}
                 value={newServiceAccount.secretKey || ""}
               />
             </>
           )}
           {idp ? (
             <div className={classes.warningBlock}>
-              Please Login via the configured external identity provider.
+              {t("please_login_configured_identity_provider")}
             </div>
           ) : (
             <div className={classes.warningBlock}>
               <WarnIcon />
               <span>
-                Write these down, as this is the only time the secret will be
-                displayed.
+                {t("write_these_down_only_time_displayed")}
               </span>
             </div>
           )}
@@ -180,10 +182,8 @@ const CredentialsPrompt = ({
             <>
               <RBIconButton
                 id={"download-button"}
-                tooltip={
-                  "Download credentials in a JSON file formatted for import using mc alias import. This will only include the default login credentials."
-                }
-                text={"Download for import"}
+                tooltip={t("download_credentials_json_details")}
+                text={t("download_for_import")}
                 className={classes.buttonSpacer}
                 onClick={() => {
                   let consoleExtras = {};
@@ -234,10 +234,8 @@ const CredentialsPrompt = ({
               {Array.isArray(consoleCreds) && consoleCreds.length > 1 && (
                 <RBIconButton
                   id={"download-all-button"}
-                  tooltip={
-                    "Download all access credentials to a JSON file. NOTE: This file is not formatted for import using mc alias import. If you plan to import this alias from the file, please use the Download for Import button. "
-                  }
-                  text={"Download all access credentials"}
+                  tooltip={t("download_all_access_credentials_to_json")}
+                  text={t("download_all_access")}
                   className={classes.buttonSpacer}
                   onClick={() => {
                     let allCredentials = {};

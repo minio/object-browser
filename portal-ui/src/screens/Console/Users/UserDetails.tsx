@@ -62,6 +62,7 @@ import {
 import { hasPermission } from "../../../common/SecureComponent";
 import { useAppDispatch } from "../../../store";
 import { policyDetailsSort } from "../../../utils/sortFunctions";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -93,6 +94,7 @@ interface IGroupItem {
 
 const UserDetails = ({ classes }: IUserDetailsProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -212,7 +214,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
       <PageHeader
         label={
           <Fragment>
-            <BackLink label={"Users"} to={IAM_PAGES.USERS} />
+            <BackLink label={t("users")} to={IAM_PAGES.USERS} />
           </Fragment>
         }
         actions={<React.Fragment></React.Fragment>}
@@ -265,12 +267,12 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
             title={userName}
             actions={
               <Fragment>
-                <span className={classes.statusLabel}>User Status:</span>
+                <span className={classes.statusLabel}>{t("user_status")}</span>
                 <span className={classes.statusValue}>
-                  {enabled ? "Enabled" : "Disabled"}
+                  {enabled ? t("enabled") : t("disabled")}
                 </span>
                 <FormSwitchWrapper
-                  indicatorLabels={["Enabled", "Disabled"]}
+                  indicatorLabels={[t("enabled"), t("disabled")}
                   checked={enabled}
                   value={"group_enabled"}
                   id="group-status"
@@ -283,7 +285,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
                 />
 
                 <RBIconButton
-                  tooltip={"Delete User"}
+                  tooltip={t("delete_user")}
                   text={""}
                   onClick={deleteUser}
                   icon={<TrashIcon />}
@@ -292,7 +294,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
                 />
 
                 <RBIconButton
-                  tooltip={"Change Password"}
+                  tooltip={t("change_password")}
                   text={""}
                   onClick={changeUserPassword}
                   icon={<PasswordKeyIcon />}
@@ -308,15 +310,15 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
           <VerticalTabs>
             {{
               tabConfig: {
-                label: "Groups",
+                label: t("groups"),
               },
               content: (
                 <React.Fragment>
                   <div className={classes.actionsTray}>
-                    <PanelTitle>Groups</PanelTitle>
+                    <PanelTitle>{t("groups")}</PanelTitle>
                     <RBIconButton
-                      tooltip={"Add to Groups"}
-                      text={"Add to Groups"}
+                      tooltip={t('add_to_groups')}
+                      text={t('add_to_groups')}
                       onClick={() => {
                         setAddGroupOpen(true);
                       }}
@@ -328,7 +330,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
                   <div className={classes.tableBlock}>
                     <TableWrapper
                       itemActions={groupTableActions}
-                      columns={[{ label: "Name", elementKey: "group" }]}
+                      columns={[{ label: t("name"), elementKey: t("group") }]}
                       isLoading={loading}
                       records={currentGroups}
                       entityName="Groups"
@@ -340,7 +342,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
             }}
             {{
               tabConfig: {
-                label: "Service Accounts",
+                label: t("service_accouts"),
               },
               content: (
                 <UserServiceAccountsPanel
@@ -356,11 +358,11 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
               content: (
                 <Fragment>
                   <div className={classes.actionsTray}>
-                    <PanelTitle>Policies</PanelTitle>
+                    <PanelTitle>{t("policies")}</PanelTitle>
 
                     <RBIconButton
-                      tooltip={"Assign Policies"}
-                      text={"Assign Policies"}
+                      tooltip={t("assign_policies")}
+                      text={t("assign_policies")}
                       onClick={() => {
                         setPolicyOpen(true);
                       }}
@@ -383,7 +385,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
                           },
                         },
                       ]}
-                      columns={[{ label: "Name", elementKey: "policy" }]}
+                      columns={[{ label: t("name"), elementKey: "policy" }]}
                       isLoading={loading}
                       records={currentPolicies}
                       entityName="Policies"

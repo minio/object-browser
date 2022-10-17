@@ -61,6 +61,7 @@ import { encodeURLString } from "../../../common/utils";
 
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const DeleteGroup = withSuspense(React.lazy(() => import("./DeleteGroup")));
 const SetPolicy = withSuspense(
@@ -89,6 +90,7 @@ const styles = (theme: Theme) =>
 const Groups = ({ classes }: IGroupsProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [loading, isLoading] = useState<boolean>(false);
@@ -209,7 +211,7 @@ const Groups = ({ classes }: IGroupsProps) => {
           }}
         />
       )}
-      <PageHeader label={"Groups"} />
+      <PageHeader label={t("groups")} />
 
       <PageLayout>
         <Grid item xs={12} className={classes.actionsTray}>
@@ -219,7 +221,7 @@ const Groups = ({ classes }: IGroupsProps) => {
             errorProps={{ disabled: true }}
           >
             <SearchBox
-              placeholder={"Search Groups"}
+              placeholder={t("search_groups")}
               onChange={setFilter}
               overrideClass={classes.searchField}
               value={filter}
@@ -237,11 +239,11 @@ const Groups = ({ classes }: IGroupsProps) => {
               errorProps={{ disabled: true }}
             >
               <RBIconButton
-                tooltip={"Select Policy"}
+                tooltip={t("select_policy")}
                 onClick={() => {
                   setPolicyOpen(true);
                 }}
-                text={"Assign Policy"}
+                text={"assign_policy"}
                 icon={<IAMPoliciesIcon />}
                 color="primary"
                 disabled={checkedGroups.length < 1}
@@ -255,11 +257,11 @@ const Groups = ({ classes }: IGroupsProps) => {
               errorProps={{ disabled: true }}
             >
               <RBIconButton
-                tooltip={"Delete Selected"}
+                tooltip={t("delete_selected")}
                 onClick={() => {
                   setDeleteOpen(true);
                 }}
-                text={"Delete Selected"}
+                text={t("delete_selected")}
                 icon={<DeleteIcon />}
                 color="secondary"
                 disabled={checkedGroups.length === 0}
@@ -276,8 +278,8 @@ const Groups = ({ classes }: IGroupsProps) => {
               errorProps={{ disabled: true }}
             >
               <RBIconButton
-                tooltip={"Create Group"}
-                text={"Create Group"}
+                tooltip={t("create_group")}
+                text={t("create_group")}
                 variant="contained"
                 color="primary"
                 icon={<AddIcon />}
@@ -301,7 +303,7 @@ const Groups = ({ classes }: IGroupsProps) => {
                   >
                     <TableWrapper
                       itemActions={tableActions}
-                      columns={[{ label: "Name", elementKey: "" }]}
+                      columns={[{ label: t("name"), elementKey: "" }]}
                       isLoading={loading}
                       selectedItems={checkedGroups}
                       onSelect={deleteGroup ? selectionChanged : undefined}
@@ -313,7 +315,7 @@ const Groups = ({ classes }: IGroupsProps) => {
                 </Grid>
                 <Grid item xs={12} marginTop={"25px"}>
                   <HelpBox
-                    title={"Groups"}
+                    title={t("groups")}
                     iconComponent={<GroupsIcon />}
                     help={
                       <Fragment>
@@ -337,14 +339,11 @@ const Groups = ({ classes }: IGroupsProps) => {
               >
                 <Grid item xs={8}>
                   <HelpBox
-                    title={"Groups"}
+                    title={t("groups")}
                     iconComponent={<UsersIcon />}
                     help={
                       <Fragment>
-                        A group can have one attached IAM policy, where all
-                        users with membership in that group inherit that policy.
-                        Groups support more simplified management of user
-                        permissions on the Mantle SDS Tenant.
+                        {t("group_IAM_info")}
                         <SecureComponent
                           resource={CONSOLE_UI_RESOURCE}
                           scopes={[
@@ -355,13 +354,13 @@ const Groups = ({ classes }: IGroupsProps) => {
                         >
                           <br />
                           <br />
-                          To get started,{" "}
+                          {t("get_started")}{" "}
                           <AButton
                             onClick={() => {
                               navigate(`${IAM_PAGES.GROUPS_ADD}`);
                             }}
                           >
-                            Create a Group
+                            {t("create_a_group")}
                           </AButton>
                           .
                         </SecureComponent>
