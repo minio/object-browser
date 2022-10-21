@@ -29,7 +29,8 @@ export type KVFieldType =
   | "sentence"
   | "csv"
   | "comment"
-  | "switch";
+  | "switch"
+  | "dropdown";
 
 export interface KVField {
   name: string;

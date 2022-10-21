@@ -128,6 +128,7 @@ import {
 } from "../../../BucketDetails/bucketDetailsSlice";
 import RenameLongFileName from "../../../../ObjectBrowser/RenameLongFilename";
 import { selFeatures } from "../../../../consoleSlice";
+import { useTranslation } from 'react-i18next';
 
 const HistoryIcon = React.lazy(
   () => import("../../../../../../icons/HistoryIcon")
@@ -280,6 +281,7 @@ const ListObjects = () => {
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const rewindEnabled = useSelector(
     (state: AppState) => state.objectBrowser.rewind.rewindEnabled
@@ -1362,12 +1364,12 @@ const ListObjects = () => {
               <Fragment>
                 <Grid item xs={12} className={classes.bucketDetails}>
                   <span className={classes.detailsSpacer}>
-                    Created:&nbsp;&nbsp;&nbsp;
+                    {t("created")}:&nbsp;&nbsp;&nbsp;
                     <strong>{bucketInfo?.creation_date || ""}</strong>
                   </span>
                   <span className={classes.detailsSpacer}>
-                    Access:&nbsp;&nbsp;&nbsp;
-                    <strong>{bucketInfo?.access || ""}</strong>
+                  {t("access")}:&nbsp;&nbsp;&nbsp;
+                    <strong>{bucketInfo? t(bucketInfo.access.toLocaleLowerCase()).toUpperCase(): ""}</strong>
                   </span>
                   {bucketInfo && (
                     <Fragment>
@@ -1381,7 +1383,7 @@ const ListObjects = () => {
                         {bucketInfo.size && bucketInfo.objects ? " - " : ""}
                         {bucketInfo.objects && (
                           <Fragment>
-                            {bucketInfo.objects}&nbsp;Object
+                            {bucketInfo.objects}&nbsp;{t("objects")}
                             {bucketInfo.objects && bucketInfo.objects !== 1
                               ? "s"
                               : ""}
@@ -1399,7 +1401,7 @@ const ListObjects = () => {
                   <RBIconButton
                     id={"rewind-objects-list"}
                     tooltip={"Rewind Bucket"}
-                    text={"Rewind"}
+                    text={t("rewind")}
                     icon={
                       <Badge
                         badgeContent=" "
@@ -1432,7 +1434,7 @@ const ListObjects = () => {
                   <RBIconButton
                     id={"refresh-objects-list"}
                     tooltip={"Reload List"}
-                    text={"Refresh"}
+                    text={t("refresh")}
                     icon={<RefreshIcon />}
                     color="primary"
                     variant={"outlined"}
@@ -1522,7 +1524,7 @@ const ListObjects = () => {
                               name={"deleted_objects"}
                               id={"showDeletedObjects"}
                               value={"deleted_on"}
-                              label={"Show deleted objects"}
+                              label={t("show_deleted_obj")}
                               onChange={setDeletedAction}
                               checked={showDeleted}
                               overrideLabelClasses={classes.labelStyle}
@@ -1550,8 +1552,8 @@ const ListObjects = () => {
                     } ${detailsOpen ? "actionsPanelOpen" : ""}`}
                     selectedItems={selectedObjects}
                     onSelect={selectListObjects}
-                    customEmptyMessage={`This location is empty${
-                      !rewindEnabled ? ", please try uploading a new file" : ""
+                    customEmptyMessage={`${t("this_location_empty")}: ${
+                      !rewindEnabled ? `, ${t("please_try_uploading_a_new_file")}` : ""
                     }`}
                     sortConfig={{
                       currentSort: currentSortField,
@@ -1561,7 +1563,7 @@ const ListObjects = () => {
                     onSelectAll={selectAllItems}
                     rowStyle={({ index }) => {
                       if (payload[index]?.delete_flag) {
-                        return "deleted";
+                        return t("deleted");
                       }
 
                       return "";
@@ -1586,7 +1588,7 @@ const ListObjects = () => {
                 {selectedObjects.length > 0 && (
                   <ActionsListSection
                     items={multiActionButtons}
-                    title={"Selected Objects:"}
+                    title={`${t("selected_objects")}:`}
                   />
                 )}
                 {selectedInternalPaths !== null && (

@@ -629,7 +629,7 @@ const TableWrapper = ({
                         <Fragment>
                           {customEmptyMessage !== ""
                             ? customEmptyMessage
-                            : `There are no ${entityName} yet.`}
+                            : `${t("there_are_no")} ${entityName} ${t("yet")}.`}
                         </Fragment>
                       )}
                       overscanRowCount={10}

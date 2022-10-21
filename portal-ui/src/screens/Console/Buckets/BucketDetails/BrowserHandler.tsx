@@ -44,6 +44,7 @@ import {
 import SearchBox from "../../Common/SearchBox";
 import { selFeatures } from "../../consoleSlice";
 import AutoColorIcon from "../../Common/Components/AutoColorIcon";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -53,6 +54,7 @@ const styles = (theme: Theme) =>
 const BrowserHandler = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const params = useParams();
   const location = useLocation();
 
@@ -95,7 +97,7 @@ const BrowserHandler = () => {
           errorProps={{ disabled: true }}
         >
           <SearchBox
-            placeholder={"Start typing to filter objects in the bucket"}
+            placeholder={t("start_typing_to_filter_obj")}
             onChange={(value) => {
               dispatch(setSearchObjects(value));
             }}
@@ -105,7 +107,7 @@ const BrowserHandler = () => {
       ) : (
         <Fragment>
           <SearchBox
-            placeholder={`Start typing to filter versions of ${versionedFile}`}
+            placeholder={`${"start_typing_to_filter_version_of"} ${versionedFile}`}
             onChange={(value) => {
               dispatch(setSearchVersions(value));
             }}
@@ -127,10 +129,10 @@ const BrowserHandler = () => {
               resource={bucketName}
               errorProps={{ disabled: true }}
             >
-              <Tooltip title={"Configure Bucket"}>
+              <Tooltip title={t("configure_bucket")}>
                 <IconButton
                   color="primary"
-                  aria-label="Configure Bucket"
+                  aria-label={t("configure_bucket")}
                   component="span"
                   onClick={openBucketConfiguration}
                   size="large"

@@ -36,6 +36,7 @@ import CodeMirrorWrapper from "../../Common/FormComponents/CodeMirrorWrapper/Cod
 import { setModalErrorSnackMessage } from "../../../../systemSlice";
 import { useAppDispatch } from "../../../../store";
 import { emptyPolicy } from "../../Policies/utils";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -75,6 +76,7 @@ const SetAccessPolicy = ({
   closeModalAndRefresh,
 }: ISetAccessPolicyProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [accessPolicy, setAccessPolicy] = useState<string>("");
   const [policyDefinition, setPolicyDefinition] = useState<string>(emptyPolicy);
@@ -110,7 +112,7 @@ const SetAccessPolicy = ({
 
   return (
     <ModalWrapper
-      title="Change Access Policy"
+      title={t("change_access_policy")}
       modalOpen={open}
       onClose={() => {
         closeModalAndRefresh();
@@ -129,16 +131,16 @@ const SetAccessPolicy = ({
             <Grid item xs={12} className={classes.formFieldRow}>
               <SelectWrapper
                 value={accessPolicy}
-                label="Access Policy"
+                label={t("access_policy")}
                 id="select-access-policy"
                 name="select-access-policy"
                 onChange={(e: SelectChangeEvent<string>) => {
                   setAccessPolicy(e.target.value as string);
                 }}
                 options={[
-                  { value: "PRIVATE", label: "Private" },
-                  { value: "PUBLIC", label: "Public" },
-                  { value: "CUSTOM", label: "Custom" },
+                  { value: "PRIVATE", label: t("private") },
+                  { value: "PUBLIC", label: t("public") },
+                  { value: "CUSTOM", label: t("custom") },
                 ]}
               />
             </Grid>
@@ -165,7 +167,7 @@ const SetAccessPolicy = ({
               }}
               disabled={addLoading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               type="submit"
@@ -175,7 +177,7 @@ const SetAccessPolicy = ({
                 addLoading || (accessPolicy === "CUSTOM" && !policyDefinition)
               }
             >
-              Set
+              {t("set")}
             </Button>
           </Grid>
         </Grid>

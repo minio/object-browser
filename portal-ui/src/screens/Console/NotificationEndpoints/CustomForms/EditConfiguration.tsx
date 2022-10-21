@@ -79,7 +79,6 @@ const EditConfiguration = ({
   const { pathname = "" } = useLocation();
 
   let selConfigTab = pathname.substring(pathname.lastIndexOf("/") + 1);
-  selConfigTab = selConfigTab === "settings" ? "compression" : selConfigTab;
 
   //Local States
   const [valuesObj, setValueObj] = useState<IElementValue[]>([]);
@@ -89,7 +88,7 @@ const EditConfiguration = ({
   const [configSubsysList, setConfigSubsysList] = useState<any>([]);
   const [resetConfigurationOpen, setResetConfigurationOpen] =
     useState<boolean>(false);
-
+  const isLanguage = selConfigTab === "language"
   useEffect(() => {
     setLoadingConfig(true);
   }, [selConfigTab]);
@@ -98,7 +97,7 @@ const EditConfiguration = ({
     if (loadingConfig) {
       const configId = get(selectedConfiguration, "configuration_id", false);
 
-      if (configId) {
+      if (configId && !isLanguage) {
         api
           .invoke("GET", `/api/v1/configs/${configId}`)
           .then((res) => {
@@ -119,7 +118,7 @@ const EditConfiguration = ({
   }, [loadingConfig, selectedConfiguration, dispatch]);
 
   useEffect(() => {
-    if (saving) {
+    if (saving && !isLanguage) {
       const payload = {
         key_values: removeEmptyFields(valuesObj),
       };
@@ -210,7 +209,8 @@ const EditConfiguration = ({
                 />
               )}
             </Grid>
-            <Grid
+            {!isLanguage?
+             <Grid
               item
               xs={12}
               sx={{
@@ -247,7 +247,7 @@ const EditConfiguration = ({
               >
                 {t("save")}
               </Button>
-            </Grid>
+            </Grid>: null}
           </form>
         </Box>
       )}

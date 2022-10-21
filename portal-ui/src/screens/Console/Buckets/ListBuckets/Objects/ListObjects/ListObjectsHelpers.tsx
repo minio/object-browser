@@ -19,6 +19,7 @@ import * as reactMoment from "react-moment";
 import { BucketObjectItem } from "./types";
 import { niceBytes } from "../../../../../../common/utils";
 import { displayFileIconName } from "./utils";
+import  i18next  from 'i18next';
 
 // Functions
 
@@ -44,20 +45,20 @@ export const displayDeleteFlag = (state: boolean) => {
 
 export const listModeColumns = [
   {
-    label: "Name",
+    label: i18next.t("name"),
     elementKey: "name",
     renderFunction: displayFileIconName,
     enableSort: true,
   },
   {
-    label: "Last Modified",
+    label: i18next.t("last_modified"),
     elementKey: "last_modified",
     renderFunction: displayParsedDate,
     renderFullObject: true,
     enableSort: true,
   },
   {
-    label: "Size",
+    label: i18next.t("size"),
     elementKey: "size",
     renderFunction: displayNiceBytes,
     renderFullObject: true,
@@ -69,20 +70,20 @@ export const listModeColumns = [
 
 export const rewindModeColumns = [
   {
-    label: "Name",
+    label: i18next.t("name"),
     elementKey: "name",
     renderFunction: displayFileIconName,
     enableSort: true,
   },
   {
-    label: "Object Date",
+    label: i18next.t("object_data"),
     elementKey: "last_modified",
     renderFunction: displayParsedDate,
     renderFullObject: true,
     enableSort: true,
   },
   {
-    label: "Size",
+    label: i18next.t("size"),
     elementKey: "size",
     renderFunction: displayNiceBytes,
     renderFullObject: true,
@@ -91,7 +92,7 @@ export const rewindModeColumns = [
     enableSort: true,
   },
   {
-    label: "Deleted",
+    label: i18next.t("deleted"),
     elementKey: "delete_flag",
     renderFunction: displayDeleteFlag,
     width: 60,

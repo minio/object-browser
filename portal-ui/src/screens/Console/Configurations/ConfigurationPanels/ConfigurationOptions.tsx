@@ -66,7 +66,7 @@ const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
   const { t } = useTranslation();
 
   let selConfigTab = pathname.substring(pathname.lastIndexOf("/") + 1);
-  selConfigTab = selConfigTab === "settings" ? "compression" : selConfigTab;
+  selConfigTab = selConfigTab === "configurations" ? "language" : selConfigTab;
 
   return (
     <Fragment>
@@ -93,7 +93,7 @@ const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
                   ))}
                   <Route
                     path={"/"}
-                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/compression`} />}
+                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/language`} />}
                   />
                 </Routes>
               }

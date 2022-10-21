@@ -29,7 +29,7 @@ import { Theme, useTheme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import { spacingUtils } from "../Console/Common/FormComponents/common/styleLibrary";
 import { doLoginAsync } from "./loginThunks";
-import { PasswordKeyIcon } from "../../icons";
+import { useTranslation } from 'react-i18next';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -65,6 +65,7 @@ const StrategyForm = () => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const accessKey = useSelector((state: AppState) => state.login.accessKey);
   const secretKey = useSelector((state: AppState) => state.login.secretKey);
@@ -148,7 +149,7 @@ const StrategyForm = () => {
               ((accessKey === "" || secretKey === "")) || loginSending
             }
           >
-            Login
+            {t("login")}
           </Button>
         </Grid>
         <Grid item xs={12} className={classes.linearPredef}>

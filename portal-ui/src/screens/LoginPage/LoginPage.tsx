@@ -59,7 +59,6 @@ import StrategyForm from "./StrategyForm";
 import { LoginField } from "./LoginField";
 import DirectPVLogo from "../../icons/DirectPVLogo";
 import { useTranslation } from 'react-i18next';
-import LanguageToggle from "../Console/LanguageToggle";
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -285,6 +284,7 @@ export const getTargetPath = () => {
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const classes = useStyles();
 
   const jwt = useSelector((state: AppState) => state.login.jwt);
@@ -321,8 +321,6 @@ const Login = () => {
     e.preventDefault();
     dispatch(doLoginAsync());
   };
-
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (loadingFetchConfiguration) {
@@ -438,7 +436,7 @@ const Login = () => {
                 className={classes.submit}
                 disabled={jwt === "" || loginSending}
               >
-                Login
+                {t("login")}
               </Button>
             </Grid>
             <Grid item xs={12} className={classes.linearPredef}>
@@ -499,7 +497,6 @@ const Login = () => {
   const theme = useTheme();
   return (
     <div className={classes.root}>
-      <LanguageToggle />
       <CssBaseline />
       <MainError />
       <div className={classes.loginPage}>

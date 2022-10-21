@@ -41,7 +41,7 @@ i18next
     debug: false,
     // Options for language detector
     detection: {
-      order: ['htmlTag', 'path', 'cookie'],
+      order: ['cookie', 'htmlTag'],
       caches: ['cookie'],
     },
     backend: {

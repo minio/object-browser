@@ -87,7 +87,7 @@ const tabStripStyle = {
 const VerticalTabs = ({
   children,
   classes,
-  selectedTab = "0",
+  selectedTab = "language",
   routes,
   isRouteTabs,
 }: VerticalTabsProps) => {
@@ -109,7 +109,6 @@ const VerticalTabs = ({
     headerList.push(child.tabConfig);
     contentList.push(child.content);
   });
-
   return (
     <TabContext value={`${value}`}>
       <Box className={classes.tabsContainer}>

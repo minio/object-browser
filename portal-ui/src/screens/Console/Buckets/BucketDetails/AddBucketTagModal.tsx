@@ -32,6 +32,7 @@ import api from "../../../../common/api";
 import { AddNewTagIcon } from "../../../../icons";
 import { setModalErrorSnackMessage } from "../../../../systemSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IBucketTagModal {
   modalOpen: boolean;
@@ -58,6 +59,7 @@ const AddBucketTagModal = ({
   classes,
 }: IBucketTagModal) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [newKey, setNewKey] = useState<string>("");
   const [newLabel, setNewLabel] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -91,7 +93,7 @@ const AddBucketTagModal = ({
   return (
     <ModalWrapper
       modalOpen={modalOpen}
-      title={`Add New Tag `}
+      title={t("add_new_tag")}
       onClose={() => {
         onCloseAndUpdate(false);
       }}
@@ -104,10 +106,10 @@ const AddBucketTagModal = ({
         <Grid item xs={12} className={classes.formFieldRow}>
           <InputBoxWrapper
             value={newKey}
-            label={"New Tag Key"}
+            label={t("new_tag_key")}
             id={"newTagKey"}
             name={"newTagKey"}
-            placeholder={"Enter New Tag Key"}
+            placeholder={t("enter_new_tag_key")}
             onChange={(e: any) => {
               setNewKey(e.target.value);
             }}
@@ -116,10 +118,10 @@ const AddBucketTagModal = ({
         <Grid item xs={12} className={classes.formFieldRow}>
           <InputBoxWrapper
             value={newLabel}
-            label={"New Tag Label"}
+            label={t("new_tag_label")}
             id={"newTagLabel"}
             name={"newTagLabel"}
-            placeholder={"Enter New Tag Label"}
+            placeholder={t("enter_new_tag_lable")}
             onChange={(e: any) => {
               setNewLabel(e.target.value);
             }}

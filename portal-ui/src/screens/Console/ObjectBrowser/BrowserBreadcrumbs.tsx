@@ -34,6 +34,7 @@ import { setSnackBarMessage } from "../../../systemSlice";
 import { AppState, useAppDispatch } from "../../../store";
 import { setVersionsModeEnabled } from "./objectBrowserSlice";
 import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
+import { useTranslation } from 'react-i18next';
 
 const CreatePathModal = withSuspense(
   React.lazy(
@@ -68,6 +69,7 @@ const BrowserBreadcrumbs = ({
 }: IObjectBrowser) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const rewindEnabled = useSelector(
     (state: AppState) => state.objectBrowser.rewind.rewindEnabled
@@ -250,7 +252,7 @@ const BrowserBreadcrumbs = ({
               }}
               variant={"outlined"}
             >
-              Create new path
+              {t("create_new_path")}
             </Button>
           </Tooltip>
         )}

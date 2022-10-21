@@ -357,8 +357,8 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                   <EditablePropertyItem
                     iamScopes={[IAM_SCOPES.S3_PUT_BUCKET_POLICY]}
                     resourceName={bucketName}
-                    property={t("acces_policy")+":"}
-                    value={accessPolicy.toLowerCase()}
+                    property={t("access_policy")+":"}
+                    value={t(accessPolicy.toLowerCase())}
                     onEdit={() => {
                       setAccessPolicyScreenOpen(true);
                     }}

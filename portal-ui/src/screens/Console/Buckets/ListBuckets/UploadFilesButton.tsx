@@ -25,6 +25,7 @@ import { UploadFolderIcon, UploadIcon } from "../../../../icons";
 import RBIconButton from "../BucketDetails/SummaryItems/RBIconButton";
 import { IAM_SCOPES } from "../../../../common/SecureComponent/permissions";
 import { hasPermission } from "../../../../common/SecureComponent";
+import { useTranslation } from 'react-i18next';
 
 interface IUploadFilesButton {
   uploadPath: string;
@@ -54,6 +55,7 @@ const UploadFilesButton = ({
   uploadFolderFunction,
   classes,
 }: IUploadFilesButton) => {
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const openUploadMenu = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -79,12 +81,12 @@ const UploadFilesButton = ({
     <Fragment>
       <RBIconButton
         id={"upload-main"}
-        tooltip={"Upload Files"}
+        tooltip={t("upload_file")}
         aria-controls={`upload-main-menu`}
         aria-haspopup="true"
         aria-expanded={openUploadMenu ? "true" : undefined}
         onClick={handleClick}
-        text={"Upload"}
+        text={t("upload")}
         icon={<UploadIcon />}
         color="primary"
         variant={"contained"}
@@ -116,7 +118,7 @@ const UploadFilesButton = ({
           <ListItemIcon className={classes.listUploadIcons}>
             <UploadIcon />
           </ListItemIcon>
-          <ListItemText>Upload File</ListItemText>
+          <ListItemText>{t("upload_file")}</ListItemText>
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -127,7 +129,7 @@ const UploadFilesButton = ({
           <ListItemIcon className={classes.listUploadIcons}>
             <UploadFolderIcon />
           </ListItemIcon>
-          <ListItemText>Upload Folder</ListItemText>
+          <ListItemText>{t("upload_folder")}</ListItemText>
         </MenuItem>
       </Menu>
     </Fragment>

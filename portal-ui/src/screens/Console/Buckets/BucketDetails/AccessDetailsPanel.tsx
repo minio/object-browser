@@ -158,7 +158,7 @@ const AccessDetails = () => {
 
   return (
     <Fragment>
-      <PanelTitle>{t("acess_audit")}</PanelTitle>
+      <PanelTitle>{t("access_audit")}</PanelTitle>
       <Tabs
         value={curTab}
         onChange={(e: React.ChangeEvent<{}>, newValue: number) => {

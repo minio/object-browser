@@ -55,7 +55,8 @@ import {
 import SettingsIcon from "../../icons/SettingsIcon";
 import React from "react";
 import LicenseBadge from "./Menu/LicenseBadge";
-import { useTranslation } from 'react-i18next';
+import i18next from "i18next";
+
 
 export const validRoutes = (
   features: string[] | null | undefined,
@@ -63,7 +64,6 @@ export const validRoutes = (
   directPVMode: boolean
 ) => {
   const ldapIsEnabled = (features && features.includes("ldap-idp")) || false;
-  const { t } = useTranslation();
 
   let consoleMenus: IMenuItem[] = [
     {
@@ -76,7 +76,7 @@ export const validRoutes = (
       children: [],
     },
     {
-      name: t("identity"),
+      name: i18next.t("identity"),
       id: "identity",
       icon: IdentityMenuIcon,
       children: [
@@ -87,7 +87,7 @@ export const validRoutes = (
           customPermissionFnc: () =>
             hasPermission(CONSOLE_UI_RESOURCE, [IAM_SCOPES.ADMIN_LIST_USERS]) ||
             hasPermission(S3_ALL_RESOURCES, [IAM_SCOPES.ADMIN_CREATE_USER]),
-          name: t("users"),
+          name: i18next.t("users"),
           icon: UsersMenuIcon,
           fsHidden: ldapIsEnabled,
         },
@@ -95,7 +95,7 @@ export const validRoutes = (
           component: NavLink,
           id: "groups",
           to: IAM_PAGES.GROUPS,
-          name: t("groups"),
+          name: i18next.t("groups"),
           icon: GroupsMenuIcon,
           fsHidden: ldapIsEnabled,
         },
@@ -103,14 +103,14 @@ export const validRoutes = (
           component: NavLink,
           id: "serviceaccounts",
           to: IAM_PAGES.ACCOUNT,
-          name: t("service_accounts"),
+          name: i18next.t("service_accounts"),
           icon: AccountsMenuIcon,
           forceDisplay: true,
         },
       ],
     },
     {
-      name: t("access"),
+      name: i18next.t("access"),
       component: NavLink,
       id: "access",
       to: IAM_PAGES.POLICIES,
@@ -133,14 +133,14 @@ export const validRoutes = (
     {
       component: NavLink,
       to: IAM_PAGES.TIERS,
-      name: t("billing"),
+      name: i18next.t("billing"),
       icon: MoneyIcon,
       id: "billing",
     },
     {
       component: NavLink,
       to: IAM_PAGES.SETTINGS,
-      name: t("configurations"),
+      name: i18next.t("configurations"),
       id: "configurations",
       icon: SettingsIcon,
     },

@@ -15,6 +15,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useState } from "react";
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
@@ -28,6 +33,8 @@ import InputBoxWrapper from "../Common/FormComponents/InputBoxWrapper/InputBoxWr
 import CSVMultiSelector from "../Common/FormComponents/CSVMultiSelector/CSVMultiSelector";
 import CommentBoxWrapper from "../Common/FormComponents/CommentBoxWrapper/CommentBoxWrapper";
 import FormSwitchWrapper from "../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
+import { useTranslation } from 'react-i18next';
+import i18next from 'i18next'
 
 interface IConfGenericProps {
   onChange: (newValue: IElementValue[]) => void;
@@ -71,6 +78,8 @@ const ConfTargetGeneric = ({
   defaultVals,
   classes,
 }: IConfGenericProps) => {
+  const { t } = useTranslation();
+
   const [valueHolder, setValueHolder] = useState<IElementValue[]>([]);
   const fieldsElements = !fields ? [] : fields;
   const defValList = !defaultVals ? [] : defaultVals;
@@ -99,6 +108,11 @@ const ConfTargetGeneric = ({
     valuesDup[index] = { key, value };
 
     setValueHolder(valuesDup);
+  };
+
+  const updateLanguage = (event: SelectChangeEvent) => {
+    i18next.changeLanguage(event.target.value)
+    window.location.reload();
   };
 
   const fieldDefinition = (field: KVField, item: number) => {
@@ -147,6 +161,20 @@ const ConfTargetGeneric = ({
             }
             placeholder={field.placeholder}
           />
+        );
+        case "dropdown":
+        return (
+          <FormControl fullWidth>
+            <InputLabel>{t("language")}</InputLabel>
+            <Select
+              value={i18next.language}
+              label="language"
+              onChange={updateLanguage}
+            >
+              <MenuItem value="en">{t("english")}</MenuItem>
+              <MenuItem value="fr">{t("french")}</MenuItem>
+            </Select>
+          </FormControl>
         );
       default:
         return (
