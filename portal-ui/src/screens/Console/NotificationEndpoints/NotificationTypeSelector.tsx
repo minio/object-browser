@@ -29,6 +29,7 @@ import BackLink from "../../../common/BackLink";
 import PageLayout from "../Common/Layout/PageLayout";
 import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
 import ContentBox from "../Common/ContentBox";
+import { useTranslation } from 'react-i18next';
 
 interface INotificationTypeSelector {
   classes: any;
@@ -44,6 +45,7 @@ const styles = (theme: Theme) =>
 
 const NotificationTypeSelector = ({ classes }: INotificationTypeSelector) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <Fragment>
       <PageHeader
@@ -51,7 +53,7 @@ const NotificationTypeSelector = ({ classes }: INotificationTypeSelector) => {
           <Fragment>
             <BackLink
               to={IAM_PAGES.NOTIFICATIONS_ENDPOINTS}
-              label="Notification Targets"
+              label={t("notification_targets")}
             />
           </Fragment>
         }
@@ -60,7 +62,7 @@ const NotificationTypeSelector = ({ classes }: INotificationTypeSelector) => {
       <PageLayout>
         <ContentBox>
           <div style={{ fontSize: 16, fontWeight: 600, paddingBottom: 15 }}>
-            Select Target Type
+            {t("select_target_type")}            
           </div>
           <div className={classes.iconContainer}>
             {withLogos.map((item) => {

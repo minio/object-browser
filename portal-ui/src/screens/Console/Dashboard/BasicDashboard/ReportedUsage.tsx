@@ -17,6 +17,7 @@
 import { Box, Tooltip } from "@mui/material";
 import React from "react";
 import { Cell, Pie, PieChart } from "recharts";
+import { useTranslation } from 'react-i18next';
 
 const ReportedUsage = ({
   usageValue,
@@ -27,6 +28,8 @@ const ReportedUsage = ({
   total: number | string;
   unit: string;
 }) => {
+  const { t } = useTranslation();
+
   const plotValues = [
     { value: total, color: "#D6D6D6", label: "Free Space" },
     {
@@ -74,7 +77,7 @@ const ReportedUsage = ({
     >
       <Box>
         <div className="usage-label">
-          <span>Reported Usage</span>
+          <span>{t("reported_usage")}</span>
         </div>
 
         <Tooltip title={`${usageValue} Bytes`}>

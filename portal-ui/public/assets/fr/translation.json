@@ -59,8 +59,8 @@
   "validity": "Validité",
   "add": "Ajouter",
   "policies": "Politiques",
-  "user": "Utilisatieur",
-  "users": "Utilisatieurs",
+  "user": "Utilisateur",
+  "users": "Utilisateurs",
   "name": "Nom",
   "readonly": "lectureseul",
   "writeonly": "écritureseule  ",
@@ -84,7 +84,8 @@
   "create_user_info3": "Les utilisateurs héritent des autorisations d'accès aux données et aux ressources via les groupes auxquels ils appartiennent.",
   "create_user_info4": "Mantle SDS utilise le contrôle d'accès basé sur des politiques (PBAC) pour définir les actions autorisées et les ressources auxquelles un utilisateur authentifié a accès. Chaque stratégie décrit une ou plusieurs actions et conditions qui décrivent les autorisations d'un utilisateur ou d'un groupe d'utilisateurs.",
   "create_user_info5": "Chaque utilisateur ne peut accéder qu'aux ressources et opérations explicitement accordées par le rôle intégré. Mantle SDS refuse l'accès à toute autre ressource ou action par défaut.",
-  "select": "Sélectionner"
+  "select": "Choisir",
+  "password_not_long_enough": ""
 
 
 }

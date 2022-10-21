@@ -27,8 +27,10 @@ import {
   MenuCollapsedIcon,
   MenuExpandedIcon,
 } from "../../../../icons/SidebarMenus";
+import { useTranslation } from 'react-i18next';
 
 const ServersList = ({ data }: { data: ServerInfo[] }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = React.useState<string>(
     data.length > 1 ? "" : data[0].endpoint + "-0"
   );
@@ -44,7 +46,7 @@ const ServersList = ({ data }: { data: ServerInfo[] }) => {
           marginBottom: "10px",
         }}
       >
-        Servers ({data.length})
+        {t("servers")} ({data.length})
       </Box>
       <List
         sx={{ width: "100%", flex: 1, padding: "0" }}
@@ -126,7 +128,7 @@ const ServersList = ({ data }: { data: ServerInfo[] }) => {
                     component="div"
                     sx={{ paddingLeft: "30px" }}
                   >
-                    Drives ({serverInfo.drives.length})
+                    {t("drives")} ({serverInfo.drives.length})
                   </ListSubheader>
 
                   <Collapse

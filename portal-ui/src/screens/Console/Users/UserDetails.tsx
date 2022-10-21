@@ -272,7 +272,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
                   {enabled ? t("enabled") : t("disabled")}
                 </span>
                 <FormSwitchWrapper
-                  indicatorLabels={[t("enabled"), t("disabled")}
+                  indicatorLabels={[t("enabled"), t("disabled")]}
                   checked={enabled}
                   value={"group_enabled"}
                   id="group-status"

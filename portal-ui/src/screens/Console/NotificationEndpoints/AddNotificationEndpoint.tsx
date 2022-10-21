@@ -50,6 +50,7 @@ import {
 } from "../../../systemSlice";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const ConfMySql = withSuspense(
   React.lazy(() => import("./CustomForms/ConfMySql"))
@@ -117,6 +118,7 @@ const AddNotificationEndpoint = ({
 }: IAddNotificationEndpointProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const params = useParams();
 
   //Local States
@@ -215,7 +217,7 @@ const AddNotificationEndpoint = ({
                     <div className={classes.lambdaNotifTitle}>
                       <b>
                         {targetElement ? targetElement.targetTitle : ""}
-                        Notification Endpoint
+                        {t("notification_endpoint")}
                       </b>
                     </div>
                   </div>
@@ -232,7 +234,7 @@ const AddNotificationEndpoint = ({
                     color="primary"
                     disabled={saving}
                   >
-                    Save Notification Target
+                    {t("save_notification_target")}
                   </Button>
                 </Grid>
               </div>

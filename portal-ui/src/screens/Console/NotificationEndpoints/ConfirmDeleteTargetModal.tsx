@@ -2,6 +2,7 @@ import React from "react";
 import ConfirmDialog from "../Common/ModalWrapper/ConfirmDialog";
 import { ConfirmModalIcon } from "../../../icons";
 import { DialogContentText } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 const ConfirmDeleteTargetModal = ({
   onConfirm,
@@ -14,10 +15,12 @@ const ConfirmDeleteTargetModal = ({
   serviceName: string;
   status: string;
 }) => {
+  const { t } = useTranslation();
+
   return (
     <ConfirmDialog
-      title={`Delete Endpoint`}
-      confirmText={"Delete"}
+      title={t("delete_endpoint")}
+      confirmText={t("delete")}
       isOpen={true}
       titleIcon={<ConfirmModalIcon />}
       isLoading={false}
@@ -26,9 +29,9 @@ const ConfirmDeleteTargetModal = ({
       confirmationContent={
         <React.Fragment>
           <DialogContentText>
-            Are you sure you want to delete the notification endpoint ?
+           {t("are_you_sure_delete_notif")}
             <br />
-            <b>{serviceName}</b> which is <b>{status}</b>
+            <b>{serviceName}</b> {t("which_is")} <b>{status}</b>
           </DialogContentText>
         </React.Fragment>
       }

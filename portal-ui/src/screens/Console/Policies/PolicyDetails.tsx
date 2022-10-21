@@ -434,7 +434,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
           }}
           {{
             tabConfig: {
-              label: {t("groups")},
+              label: t("groups"),
               disabled: !displayGroups || ldapIsEnabled,
             },
             content: (

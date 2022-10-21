@@ -39,6 +39,7 @@ import RBIconButton from "../../Buckets/BucketDetails/SummaryItems/RBIconButton"
 import { Link } from "react-router-dom";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
 import TimeStatItem from "../TimeStatItem";
+import { useTranslation } from 'react-i18next';
 
 const BoxItem = ({ children }: { children: any }) => {
   return (
@@ -91,6 +92,8 @@ const prettyUsage = (usage: string | undefined) => {
 };
 
 const BasicDashboard = ({ usage }: IDashboardProps) => {
+  const { t } = useTranslation();
+
   const usageValue = usage && usage.usage ? usage.usage.toString() : "0";
   const usageToRepresent = prettyUsage(usageValue);
 
@@ -137,15 +140,12 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
           {usage?.prometheusNotReady && (
             <HelpBox
               iconComponent={<PrometheusErrorIcon />}
-              title={"We can't retrieve advanced metrics at this time"}
+              title={t('cant_retrieve_metrics')}
               help={
                 <Fragment>
-                  Mantle SDS Dashboard will display basic metrics as we couldn't
-                  connect to Prometheus successfully.
+                  {t("console_display_basic_metrics")}
                   <br /> <br />
-                  Please try again in a few minutes. If the problem persists,
-                  you can review your configuration and confirm that Prometheus
-                  server is up and running.
+                  {t("try_again_few_minutes")}
                 </Fragment>
               }
             />
@@ -162,11 +162,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                       fontSize: "14px",
                     }}
                   >
-                    Mantle SDS Dashboard will display basic metrics as we couldn’t
-                    connect to Prometheus successfully. Please try again in a
-                    few minutes. If the problem persists, you can review your
-                    configuration and confirm that Prometheus server is up and
-                    running.
+                    {t("dashboard_display_basic_couldnt_connect_prometheus")}
                   </Box>
                 </Box>
               }
@@ -212,9 +208,9 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                     }}
                   >
                     <RBIconButton
-                      tooltip={"Browse"}
+                      tooltip={t("browse")}
                       onClick={() => {}}
-                      text={"Browse"}
+                      text={t("browse")}
                       icon={<ArrowRightIcon />}
                       color={"primary"}
                       variant={"outlined"}
@@ -235,7 +231,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
               <StatusCountCard
                 onlineCount={onlineServers.length}
                 offlineCount={offlineServers.length}
-                label={"Servers"}
+                label={t("servers")}
                 icon={<ServersIcon />}
               />
             </BoxItem>
@@ -243,7 +239,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
               <StatusCountCard
                 offlineCount={offlineDrives.length}
                 onlineCount={onlineDrives.length}
-                label={"Drives"}
+                label={t("drives")}
                 icon={<DrivesIcon />}
               />
             </BoxItem>
@@ -284,9 +280,9 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                           },
                         }}
                       >
-                        Time since last
+                        {t("time_since_last")}
                       </Box>{" "}
-                      Heal Activity
+                      {t("heal_activity")}
                     </Box>
                   }
                   value={lastHeal}
@@ -303,16 +299,16 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                           },
                         }}
                       >
-                        Time since last
+                        {t("time_since_last")}
                       </Box>{" "}
-                      Scan Activity
+                      {t("scan_activity")}
                     </Box>
                   }
                   value={lastScan}
                 />
                 <TimeStatItem
                   icon={<UptimeIcon />}
-                  label={"Uptime"}
+                  label={t("uptime")}
                   value={upTime}
                 />
               </Box>

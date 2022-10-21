@@ -18,6 +18,7 @@ import CompressIcon from "@mui/icons-material/Compress";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LoginIcon from "@mui/icons-material/Login";
 import { IElement, IElementValue } from "./types";
+import { useTranslation } from 'react-i18next';
 
 export const configurationElements: IElement[] = [
   {
@@ -36,27 +37,27 @@ export const configurationElements: IElement[] = [
     configuration_label: "Identity LDAP",
   },
 ];
+const { t } = useTranslation();
 
 export const fieldsConfigurations: any = {
+
   compression: [
     {
       name: "extensions",
       required: false,
-      label: "Extensions",
-      tooltip:
-        'Extensions to compress e.g. ".txt",".log" or ".csv", you can write one per field',
+      label: t("extenstion"),
+      tooltip: t("extensions_tooltip"),
       type: "csv",
-      placeholder: "Enter an Extension",
+      placeholder: t("enter_extention"),
       withBorder: true,
     },
     {
       name: "mime_types",
       required: false,
-      label: "Mime Types",
-      tooltip:
-        'Mime types e.g. "text/*","application/json" or "application/xml", you can write one per field',
+      label: t("mime_types"),
+      tooltip: t("mime_types_tooltip"),
       type: "csv",
-      placeholder: "Enter a Mime Type",
+      placeholder: t("enter_mime_type"),
       withBorder: true,
     },
   ],
@@ -64,8 +65,8 @@ export const fieldsConfigurations: any = {
     {
       name: "config_url",
       required: false,
-      label: "Config URL",
-      tooltip: "Config URL for identity provider configuration",
+      label: t("config_url"),
+      tooltip: t("config_url_tooltip"),
       type: "string",
       placeholder:
         "https://identity-provider-url/.well-known/openid-configuration",
@@ -73,143 +74,139 @@ export const fieldsConfigurations: any = {
     {
       name: "client_id",
       required: false,
-      label: "Client ID",
+      label: t("client_id"),
       type: "string",
-      placeholder: "Enter Client ID",
+      placeholder: t("enter_client_id"),
     },
     {
       name: "client_secret",
       required: false,
-      label: "Secret ID",
+      label: t("secret_id"),
       type: "string",
-      placeholder: "Enter Secret ID",
+      placeholder: t("enter_secret_id"),
     },
     {
       name: "claim_name",
       required: false,
-      label: "Claim Name",
-      tooltip: "Claim from which MinIO will read the policy or role to use",
+      label: t("claim_name"),
+      tooltip: t("claim_name_tooltip"),
       type: "string",
-      placeholder: "Enter Claim Name",
+      placeholder: t("enter_claim_name"),
     },
     {
       name: "claim_prefix",
       required: false,
-      label: "Claim Prefix",
-      tooltip: "Claim Prefix",
+      label: t("claim_prefix"),
+      tooltip: t("claim_prefix"),
       type: "string",
-      placeholder: "Enter Claim Prefix",
+      placeholder: t("enter_claim_prefix"),
     },
     {
       name: "claim_userinfo",
       required: false,
-      label: "Claim UserInfo",
+      label: t("claim_userinfo"),
       type: "on|off",
     },
     {
       name: "redirect_uri",
       required: false,
-      label: "Redirect URI",
+      label: t("redirect_uri"),
       type: "string",
       placeholder: "https://console-endpoint-url/oauth_callback",
     },
     {
       name: "scopes",
       required: false,
-      label: "Scopes",
+      label: t("scopes"),
       type: "string",
-      placeholder: "openid,profile,email",
+      placeholder: t("openid_profil_email"),
     },
   ],
   identity_ldap: [
     {
       name: "server_addr",
       required: true,
-      label: "Server Addr",
-      tooltip: 'AD/LDAP server address e.g. "myldapserver.com:636"',
+      label: t("server_addr"),
+      tooltip: t("AD_LDAP_server_address"),
       type: "string",
       placeholder: "myldapserver.com:636",
     },
     {
       name: "tls_skip_verify",
       required: false,
-      label: "TLS Skip Verify",
-      tooltip:
-        'Trust server TLS without verification, defaults to "off" (verify)',
+      label: t("TLS_slip_verify"),
+      tooltip:t("TLS_slip_verify_tooltip"),
       type: "on|off",
     },
     {
       name: "server_insecure",
       required: false,
-      label: "Server Insecure",
-      tooltip:
-        'Allow plain text connection to AD/LDAP server, defaults to "off"',
+      label: t("server_insecure"),
+      tooltip:t("server_insecure_tooltip"),
       type: "on|off",
     },
     {
       name: "server_starttls",
       required: false,
-      label: "Start TLS connection to AD/LDAP server",
-      tooltip: "Use StartTLS connection to AD/LDAP server",
+      label: t("start_TLS_connection"),
+      tooltip: t("start_TLS_connection_tooltip"),
       type: "on|off",
     },
     {
       name: "lookup_bind_dn",
       required: true,
-      label: "Lookup Bind DN",
-      tooltip:
-        "DN for LDAP read-only service account used to perform DN and group lookups",
+      label: t("lookup_bind_DN"),
+      tooltip:t("lookup_bind_DN_tooltip"),
       type: "string",
       placeholder: "cn=admin,dc=min,dc=io",
     },
     {
       name: "lookup_bind_password",
       required: false,
-      label: "Lookup Bind Password",
-      tooltip:
-        "Password for LDAP read-only service account used to perform DN and group lookups",
+      label: t("lookup_bind_password"),
+      tooltip:t("lookup_bind_password_tooltip"),
       type: "string",
-      placeholder: "admin",
+      placeholder: t("admin"),
     },
     {
       name: "user_dn_search_base_dn",
       required: false,
-      label: "User DN Search Base DN",
-      tooltip: "Base LDAP DN to search for user DN",
+      label: t("user_DN_search_base_DN"),
+      tooltip: t("user_DN_search_base_DN_tooltip"),
       type: "csv",
       placeholder: "dc=myldapserver",
     },
     {
       name: "user_dn_search_filter",
       required: false,
-      label: "User DN Search Filter",
-      tooltip: "Search filter to lookup user DN",
+      label: t("user_DN_filter"),
+      tooltip: t("user_DN_filter_tooltip"),
       type: "string",
       placeholder: "(sAMAcountName=%s)",
     },
     {
       name: "group_search_filter",
       required: false,
-      label: "Group Search Filter",
-      tooltip: "Search filter for groups",
+      label: t("group_search_filter"),
+      tooltip:t("group_search_filter_tooltip"),
       type: "string",
       placeholder: "(&(objectclass=groupOfNames)(member=%d))",
     },
     {
       name: "group_search_base_dn",
       required: false,
-      label: "Group Search Base DN",
-      tooltip: "List of group search base DNs",
+      label: t("group_search_base_DN"),
+      tooltip: t("group_search_base_DN_tooltip"),
       type: "csv",
       placeholder: "dc=minioad,dc=local",
     },
     {
       name: "comment",
       required: false,
-      label: "Comment",
-      tooltip: "Optionally add a comment to this setting",
+      label: t("comment"),
+      tooltip:t("comment_tooltip"),
       type: "comment",
-      placeholder: "Enter custom notes if any",
+      placeholder: t("enter_custom_notes"),
     },
   ],
 };

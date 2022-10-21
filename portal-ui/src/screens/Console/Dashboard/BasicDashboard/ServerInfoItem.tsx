@@ -28,6 +28,7 @@ import {
   getNetworkStatusColor,
   serverStatusColor,
 } from "./Utils";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -121,6 +122,7 @@ const ServerStatItem = ({
 };
 
 const ServerInfoItem = ({ server }: ICardProps) => {
+  const { t } = useTranslation();
   const networkKeys = Object.keys(get(server, "network", {}));
   const networkTotal = networkKeys.length;
   const totalDrives = server.drives ? server.drives.length : 0;
@@ -203,20 +205,20 @@ const ServerInfoItem = ({ server }: ICardProps) => {
         >
           <ServerStatItem
             statusColor={getDriveStatusColor(activeDisks, totalDrives)}
-            label={"Drives"}
+            label={t("drives")}
             hasStatus={true}
             value={`${activeDisks}/${totalDrives}`}
           />
           <ServerStatItem
             statusColor={getNetworkStatusColor(activeNetwork, networkTotal)}
-            label={"Network"}
+            label={t("network")}
             hasStatus={true}
             value={`${activeNetwork}/${networkTotal}`}
           />
 
           <ServerStatItem
             statusColor={"green"}
-            label={"Up time"}
+            label={t("uptime")}
             value={server?.uptime ? niceDays(server.uptime) : "N/A"}
           />
         </Box>
@@ -240,7 +242,7 @@ const ServerInfoItem = ({ server }: ICardProps) => {
                 },
               }}
             >
-              <span className="label">Version:</span>
+              <span className="label">{t("version")}:</span>
               {server.version ? server.version : "N/A"}
             </Box>
           }

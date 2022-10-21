@@ -28,6 +28,7 @@ import ConfirmDialog from "../../Common/ModalWrapper/ConfirmDialog";
 import { ConfirmDeleteIcon } from "../../../../icons";
 import { setErrorSnackMessage } from "../../../../systemSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -54,6 +55,7 @@ const ResetConfigurationModal = ({
   resetOpen,
 }: IResetConfiguration) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [resetLoading, setResetLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -77,8 +79,8 @@ const ResetConfigurationModal = ({
 
   return (
     <ConfirmDialog
-      title={`Restore Defaults`}
-      confirmText={"Yes, Reset Configuration"}
+      title={t("restore_defaults")}
+      confirmText={t("yes_reset_conf")}
       isOpen={resetOpen}
       titleIcon={<ConfirmDeleteIcon />}
       isLoading={resetLoading}
@@ -90,11 +92,10 @@ const ResetConfigurationModal = ({
         <React.Fragment>
           {resetLoading && <LinearProgress />}
           <DialogContentText>
-            Are you sure you want to restore these configurations to default
-            values?
+            {t("are_you_sure_reset_conf")}
             <br />
             <b className={classes.wrapText}>
-              Please note that this may cause your system to not be accessible
+              {t("note_system_may_not_accessible")}
             </b>
           </DialogContentText>
         </React.Fragment>

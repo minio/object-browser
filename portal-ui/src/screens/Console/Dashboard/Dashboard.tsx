@@ -32,6 +32,7 @@ import { ErrorResponseHandler } from "../../../common/types";
 import BasicDashboard from "./BasicDashboard/BasicDashboard";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IDashboardSimple {
   classes: any;
@@ -44,6 +45,7 @@ const styles = (theme: Theme) =>
 
 const Dashboard = ({ classes }: IDashboardSimple) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(true);
   const [basicResult, setBasicResult] = useState<Usage | null>(null);
 
@@ -70,7 +72,7 @@ const Dashboard = ({ classes }: IDashboardSimple) => {
 
   return (
     <Fragment>
-      <PageHeader label="Metrics" />
+      <PageHeader label={t("metrics")} />
       {loading ? (
         <Grid container>
           <Grid item xs={12} className={classes.container}>

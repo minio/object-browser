@@ -48,6 +48,7 @@ import {
 import { useAppDispatch } from "../../../../store";
 import Loader from "../../Common/Loader/Loader";
 import EndpointDisplay from "./EndpointDisplay";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -73,6 +74,8 @@ const EditConfiguration = ({
 }: IAddNotificationEndpointProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const { pathname = "" } = useLocation();
 
   let selConfigTab = pathname.substring(pathname.lastIndexOf("/") + 1);
@@ -130,7 +133,7 @@ const EditConfiguration = ({
           setSaving(false);
           dispatch(setServerNeedsRestart(res.restart));
           if (!res.restart) {
-            dispatch(setSnackBarMessage("Configuration saved successfully"));
+            dispatch(setSnackBarMessage(t("configuration_saved_successfully")));
           }
         })
         .catch((err: ErrorResponseHandler) => {
@@ -233,7 +236,7 @@ const EditConfiguration = ({
                   setResetConfigurationOpen(true);
                 }}
               >
-                Restore Defaults
+                {t("restore_defaults")}
               </Button>
               &nbsp; &nbsp;
               <Button
@@ -242,7 +245,7 @@ const EditConfiguration = ({
                 color="primary"
                 disabled={saving}
               >
-                Save
+                {t("save")}
               </Button>
             </Grid>
           </form>

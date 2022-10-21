@@ -55,6 +55,7 @@ import {
 } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
 import ConfirmDeleteTargetModal from "./ConfirmDeleteTargetModal";
+import { useTranslation } from 'react-i18next';
 
 interface IListNotificationEndpoints {
   classes: any;
@@ -87,6 +88,7 @@ const styles = (theme: Theme) =>
 const ListNotificationEndpoints = ({ classes }: IListNotificationEndpoints) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   //Local States
   const [records, setRecords] = useState<TransformedEndpointItem[]>([]);
   const [filter, setFilter] = useState<string>("");
@@ -185,15 +187,15 @@ const ListNotificationEndpoints = ({ classes }: IListNotificationEndpoints) => {
       <PageLayout>
         <Grid item xs={12} className={classes.actionsTray}>
           <SearchBox
-            placeholder="Search target"
+            placeholder={t("search_target")}
             onChange={setFilter}
             overrideClass={classes.searchField}
             value={filter}
           />
           <div className={classes.rightActionItems}>
             <RBIconButton
-              tooltip={"Refresh List"}
-              text={"Refresh"}
+              tooltip={t("refresh_list")}
+              text={t("refresh")}
               variant="outlined"
               color="primary"
               icon={<RefreshIcon />}
@@ -203,8 +205,8 @@ const ListNotificationEndpoints = ({ classes }: IListNotificationEndpoints) => {
             />
 
             <RBIconButton
-              tooltip={"Add Notification Target"}
-              text={" Add Notification Target"}
+              tooltip={t("add_notif_target")}
+              text={t("add_notif_target")}
               variant="contained"
               color="primary"
               icon={<AddIcon />}
@@ -224,12 +226,12 @@ const ListNotificationEndpoints = ({ classes }: IListNotificationEndpoints) => {
                     itemActions={tableActions}
                     columns={[
                       {
-                        label: "Status",
+                        label: t("status"),
                         elementKey: "status",
                         renderFunction: statusDisplay,
                         width: 150,
                       },
-                      { label: "Service", elementKey: "service_name" },
+                      { label: t("service"), elementKey: "service_name" },
                     ]}
                     isLoading={isLoading}
                     records={filteredRecords}
@@ -244,11 +246,7 @@ const ListNotificationEndpoints = ({ classes }: IListNotificationEndpoints) => {
                     iconComponent={<LambdaIcon />}
                     help={
                       <Fragment>
-                        Mantle SDS bucket notifications allow administrators to send
-                        notifications to supported external services on certain
-                        object or bucket events. Mantle SDS supports bucket and
-                        object-level S3 events similar to the Amazon S3 Event
-                        Notifications.
+                        {t("notif_info")}
                       </Fragment>
                     }
                   />
@@ -268,20 +266,16 @@ const ListNotificationEndpoints = ({ classes }: IListNotificationEndpoints) => {
                     iconComponent={<LambdaIcon />}
                     help={
                       <Fragment>
-                        Mantle SDS bucket notifications allow administrators to send
-                        notifications to supported external services on certain
-                        object or bucket events. Mantle SDS supports bucket and
-                        object-level S3 events similar to the Amazon S3 Event
-                        Notifications.
+                        {t("notif_info")}
                         <br />
                         <br />
-                        To get started,{" "}
+                        {t("get_started")}{" "}
                         <AButton
                           onClick={() => {
                             navigate(IAM_PAGES.NOTIFICATIONS_ENDPOINTS_ADD);
                           }}
                         >
-                          Add a Notification Target
+                          {t("add_notif_target")}
                         </AButton>
                         .
                       </Fragment>

@@ -30,6 +30,7 @@ import {
 import CommentBoxWrapper from "../../Common/FormComponents/CommentBoxWrapper/CommentBoxWrapper";
 import FormSwitchWrapper from "../../Common/FormComponents/FormSwitchWrapper/FormSwitchWrapper";
 import PredefinedList from "../../Common/FormComponents/PredefinedList/PredefinedList";
+import { useTranslation } from 'react-i18next';
 
 interface IConfPostgresProps {
   onChange: (newValue: IElementValue[]) => void;
@@ -74,6 +75,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
   // queue_dir           (path)               staging dir for undelivered messages e.g. '/home/events'
   // queue_limit         (number)             maximum limit for undelivered messages, defaults to '10000'
   // comment             (sentence)           optionally add a comment to this setting
+  const { t } = useTranslation();
 
   const KvSeparator = "=";
   const parseConnectionString = (
@@ -223,7 +225,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
             <InputBoxWrapper
               id="connection-string"
               name="connection_string"
-              label="Connection String"
+              label={t("connection_string")}
               value={connectionString}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setConnectionString(e.target.value);
@@ -240,7 +242,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
                   id="host"
                   name="host"
                   label=""
-                  placeholder="Enter Host"
+                  placeholder={t("enter_host")}
                   value={host}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setHostname(e.target.value);
@@ -252,7 +254,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
                   id="db-name"
                   name="db-name"
                   label=""
-                  placeholder="Enter DB Name"
+                  placeholder={t("enter_bd_name")}
                   value={dbName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setDbName(e.target.value);
@@ -264,7 +266,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
                   id="port"
                   name="port"
                   label=""
-                  placeholder="Enter Port"
+                  placeholder={t("enter_port")}
                   value={port}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setPort(e.target.value);
@@ -283,11 +285,11 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
                     }
                   }}
                   options={[
-                    { label: "Enter SSL Mode", value: " " },
-                    { label: "Require", value: "require" },
-                    { label: "Disable", value: "disable" },
-                    { label: "Verify CA", value: "verify-ca" },
-                    { label: "Verify Full", value: "verify-full" },
+                    { label: t("enter_SSL_mode"), value: " " },
+                    { label: t("require"), value: "require" },
+                    { label: t("disable"), value: "disable" },
+                    { label: t("verify_CA"), value: "verify-ca" },
+                    { label: t("verify_full"), value: "verify-full" },
                   ]}
                 />
               </Grid>
@@ -296,7 +298,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
                   id="user"
                   name="user"
                   label=""
-                  placeholder="Enter User"
+                  placeholder={t("enter_user")}
                   value={user}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setUser(e.target.value);
@@ -309,7 +311,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
                   name="password"
                   label=""
                   type="password"
-                  placeholder="Enter Password"
+                  placeholder={t('enter_password')}
                   value={password}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setPassword(e.target.value);
@@ -319,7 +321,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
             </Grid>
           </Grid>
           <PredefinedList
-            label={"Connection String"}
+            label={t("connection_string")}
             content={connectionString}
           />
           <Grid item xs={12}>
@@ -331,10 +333,10 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
         <InputBoxWrapper
           id="table"
           name="table"
-          label="Table"
-          placeholder={"Enter Table Name"}
+          label={t("table")}
+          placeholder={t("enter_table_name")}
           value={table}
-          tooltip="DB table name to store/update events, table is auto-created"
+          tooltip={t("db_table_name_to_restore")}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setTable(e.target.value);
           }}
@@ -345,14 +347,14 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
           currentSelection={format}
           id="format"
           name="format"
-          label="Format"
+          label={t("format")}
           onChange={(e) => {
             setFormat(e.target.value);
           }}
-          tooltip="'namespace' reflects current bucket/object list and 'access' reflects a journal of object operations, defaults to 'namespace'"
+          tooltip={t("namespace_reflects_current_bucket_object")}
           selectorOptions={[
-            { label: "Namespace", value: "namespace" },
-            { label: "Access", value: "access" },
+            { label: t('namespace'), value: "namespace" },
+            { label: t("access"), value: "access" },
           ]}
         />
       </Grid>
@@ -360,10 +362,10 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
         <InputBoxWrapper
           id="queue-dir"
           name="queue_dir"
-          label="Queue Dir"
-          placeholder="Enter Queue Directory"
+          label={t("queue_dir")}
+          placeholder={t("enter_a_queue_dir")}
           value={queueDir}
-          tooltip="staging dir for undelivered messages e.g. '/home/events'"
+          tooltip={t("staging_dir_for_undelivered_message")}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setQueueDir(e.target.value);
           }}
@@ -373,11 +375,11 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
         <InputBoxWrapper
           id="queue-limit"
           name="queue_limit"
-          label="Queue Limit"
-          placeholder="Enter Queue Limit"
+          label={t("queue_limit")}
+          placeholder={t("enter_queue_limit")}
           type="number"
           value={queueLimit}
-          tooltip="maximum limit for undelivered messages, defaults to '10000'"
+          tooltip={t("maximum_limit_for_undelivered_message")}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setQueueLimit(e.target.value);
           }}
@@ -387,8 +389,8 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
         <CommentBoxWrapper
           id="comment"
           name="comment"
-          label="Comment"
-          placeholder="Enter custom notes if any"
+          label={t("comment")}
+          placeholder={t("enter_custom_notes")}
           value={comment}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setComment(e.target.value);

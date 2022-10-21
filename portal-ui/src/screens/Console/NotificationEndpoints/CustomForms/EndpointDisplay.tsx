@@ -19,6 +19,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
+import { useTranslation } from 'react-i18next';
 
 import {
   fieldBasic,
@@ -52,6 +53,7 @@ const EndpointDisplay = ({
   className = "",
 }: IEndpointDisplayProps) => {
   const [configRecords, setConfigRecords] = useState<any>([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     let records: any[] = [];
@@ -73,12 +75,12 @@ const EndpointDisplay = ({
 
   return (
     <Fragment>
-      <h3>Currently Configured Endpoints</h3>
+      <h3>{t("currently_configured_endpoints")}</h3>
 
       <TableWrapper
         columns={[
-          { label: "Name", elementKey: "name" },
-          { label: "Endpoint", elementKey: "endpoint" },
+          { label: t("name"), elementKey: "name" },
+          { label: t("endpoint"), elementKey: "endpoint" },
         ]}
         idField="config-id"
         isLoading={false}

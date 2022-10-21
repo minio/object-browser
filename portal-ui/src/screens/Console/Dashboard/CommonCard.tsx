@@ -22,6 +22,7 @@ import withStyles from "@mui/styles/withStyles";
 import makeStyles from "@mui/styles/makeStyles";
 import React, { Fragment } from "react";
 import { widgetCommon } from "../Common/FormComponents/common/styleLibrary";
+import { useTranslation } from 'react-i18next';
 
 export interface ISubInterface {
   message: string;
@@ -110,6 +111,7 @@ const CommonCard = ({
   extraMargin = false,
   classes,
 }: ICommonCard) => {
+  const { t } = useTranslation();
   const subStyles = cardSubStyles();
   const SubHeader = () => {
     return (
@@ -146,7 +148,7 @@ const CommonCard = ({
           {moreLink && (
             <Fragment>
               <span className={classes.viewAll}>
-                <Link to={moreLink}>View All</Link>
+                <Link to={moreLink}>{t("view_all")}</Link>
               </span>
             </Fragment>
           )}
