@@ -243,7 +243,7 @@ const Groups = ({ classes }: IGroupsProps) => {
                 onClick={() => {
                   setPolicyOpen(true);
                 }}
-                text={"assign_policy"}
+                text={t("assign_policy")}
                 icon={<IAMPoliciesIcon />}
                 color="primary"
                 disabled={checkedGroups.length < 1}

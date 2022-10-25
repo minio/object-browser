@@ -234,7 +234,7 @@ const AccessRule = () => {
             ]}
             isLoading={loadingAccessRules}
             records={accessRules}
-            entityName="Access Rules"
+            entityName={t("access_rules")}
             idField="prefix"
           />
         </SecureComponent>

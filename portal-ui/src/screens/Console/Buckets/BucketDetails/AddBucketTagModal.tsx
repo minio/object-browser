@@ -134,7 +134,7 @@ const AddBucketTagModal = ({
             color="primary"
             onClick={resetForm}
           >
-            Clear
+            {t("clear")}
           </Button>
           <Button
             type="submit"
@@ -145,7 +145,7 @@ const AddBucketTagModal = ({
             }
             onClick={addTagProcess}
           >
-            Save
+            {t("save")}
           </Button>
         </Grid>
       </Grid>

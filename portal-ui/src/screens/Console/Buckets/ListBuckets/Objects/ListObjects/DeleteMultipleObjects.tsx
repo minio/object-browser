@@ -25,6 +25,7 @@ import FormSwitchWrapper from "../../../../Common/FormComponents/FormSwitchWrapp
 
 import { setErrorSnackMessage } from "../../../../../../systemSlice";
 import { useAppDispatch } from "../../../../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IDeleteObjectProps {
   closeDeleteModalAndRefresh: (refresh: boolean) => void;
@@ -44,6 +45,8 @@ const DeleteObject = ({
   versioning,
 }: IDeleteObjectProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
   const onDelSuccess = () => closeDeleteModalAndRefresh(true);
   const onDelError = (err: ErrorResponseHandler) =>
     dispatch(setErrorSnackMessage(err));
@@ -84,8 +87,8 @@ const DeleteObject = ({
 
   return (
     <ConfirmDialog
-      title={`Delete Objects`}
-      confirmText={"Delete"}
+      title={t("delete_objects")}
+      confirmText={t("delete")}
       isOpen={deleteOpen}
       titleIcon={<ConfirmDeleteIcon />}
       isLoading={deleteLoading}
@@ -93,8 +96,8 @@ const DeleteObject = ({
       onClose={onClose}
       confirmationContent={
         <DialogContentText>
-          Are you sure you want to delete the selected {selectedObjects.length}{" "}
-          objects?{" "}
+          {t("are_you_sure_delete_selected")} {selectedObjects.length}{" "}
+          {t("objects")}?{" "}
           {versioning && (
             <FormSwitchWrapper
               label={"Delete All Versions"}

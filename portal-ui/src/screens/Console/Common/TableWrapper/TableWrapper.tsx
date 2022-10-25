@@ -41,6 +41,7 @@ import {
 } from "../FormComponents/common/styleLibrary";
 import Loader from "../Loader/Loader";
 import { useTranslation } from 'react-i18next';
+import i18next from "i18next";
 
 
 //Interfaces for table Items
@@ -439,7 +440,7 @@ const calculateOptionsSize = (containerWidth: number, totalOptions: number) => {
 
   return sizeOptions;
 };
-
+const message = i18next.t("loading")+"..."
 // Main function to render the Table Wrapper
 const TableWrapper = ({
   itemActions,
@@ -447,7 +448,7 @@ const TableWrapper = ({
   onSelect,
   records,
   isLoading,
-  loadingMessage = <Typography component="h3">Loading...</Typography>,
+  loadingMessage = <Typography component="h3">{message}</Typography>,
   entityName,
   selectedItems,
   idField,
@@ -469,6 +470,7 @@ const TableWrapper = ({
   parentClassName = "",
 }: TableWrapperProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [columnSelectorOpen, setColumnSelectorOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
@@ -509,7 +511,6 @@ const TableWrapper = ({
     setColumnSelectorOpen(false);
     setAnchorEl(null);
   };
-  const { t } = useTranslation();
 
   const columnsSelection = (columns: IColumns[]) => {
     return (
@@ -784,7 +785,7 @@ const TableWrapper = ({
               <div id={"empty-results"}>
                 {customEmptyMessage !== ""
                   ? customEmptyMessage
-                  : `There are no ${entityName} yet.`}
+                  : `${t("there_are_no")} ${entityName}.`}
               </div>
             )}
           </Fragment>

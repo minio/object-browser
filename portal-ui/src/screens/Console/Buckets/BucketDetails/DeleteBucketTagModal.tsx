@@ -27,6 +27,7 @@ import ConfirmDialog from "../../Common/ModalWrapper/ConfirmDialog";
 import { ConfirmDeleteIcon } from "../../../../icons";
 import { setErrorSnackMessage } from "../../../../systemSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IDeleteBucketTagModal {
   deleteOpen: boolean;
@@ -51,6 +52,7 @@ const DeleteBucketTagModal = ({
   classes,
 }: IDeleteBucketTagModal) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [tagKey, tagLabel] = selectedTag;
 
   const onDelSuccess = () => onCloseAndUpdate(true);
@@ -75,8 +77,8 @@ const DeleteBucketTagModal = ({
 
   return (
     <ConfirmDialog
-      title={`Delete Tag`}
-      confirmText={"Delete"}
+      title={t("delete_tag")}
+      confirmText={t("delete")}
       isOpen={deleteOpen}
       titleIcon={<ConfirmDeleteIcon />}
       isLoading={deleteLoading}
@@ -84,7 +86,7 @@ const DeleteBucketTagModal = ({
       onClose={onClose}
       confirmationContent={
         <DialogContentText>
-          Are you sure you want to delete the tag{" "}
+          {t("are_you_sure_delete_tag")}{" "}
           <b className={classes.wrapText}>
             {tagKey} : {tagLabel}
           </b>{" "}

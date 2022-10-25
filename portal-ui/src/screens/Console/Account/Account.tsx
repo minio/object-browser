@@ -206,7 +206,7 @@ const Account = () => {
         open={changePasswordModalOpen}
         closeModal={() => setChangePasswordModalOpen(false)}
       />
-      <PageHeader label={t("serve_accounts")} />
+      <PageHeader label={t("service_accounts")} />
       <PageLayout>
         <Grid item={true} xs={12} className={classes.actionsTray}>
           <SearchBox

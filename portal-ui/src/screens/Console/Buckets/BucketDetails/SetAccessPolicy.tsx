@@ -77,6 +77,7 @@ const SetAccessPolicy = ({
 }: ISetAccessPolicyProps) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [accessPolicy, setAccessPolicy] = useState<string>("");
   const [policyDefinition, setPolicyDefinition] = useState<string>(emptyPolicy);
@@ -147,7 +148,7 @@ const SetAccessPolicy = ({
             {accessPolicy === "CUSTOM" && (
               <Grid item xs={12} className={classes.codeMirrorContainer}>
                 <CodeMirrorWrapper
-                  label={`Write Policy`}
+                  label={t("write_policy")}
                   value={policyDefinition}
                   onBeforeChange={(editor, data, value) => {
                     setPolicyDefinition(value);

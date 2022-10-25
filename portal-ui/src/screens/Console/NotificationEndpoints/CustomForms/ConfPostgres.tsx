@@ -363,7 +363,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
           id="queue-dir"
           name="queue_dir"
           label={t("queue_dir")}
-          placeholder={t("enter_a_queue_dir")}
+          placeholder={t("enter_queue_dir")}
           value={queueDir}
           tooltip={t("staging_dir_for_undelivered_message")}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

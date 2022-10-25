@@ -1264,36 +1264,36 @@ const ListObjects = () => {
   const multiActionButtons = [
     {
       action: downloadSelected,
-      label: "Download",
+      label: t("download"),
       disabled: selectedObjects.length === 0,
       icon: <DownloadIcon />,
-      tooltip: "Download Selected",
+      tooltip: t("download_selected"),
     },
     {
       action: openShare,
-      label: "Share",
+      label: t("share"),
       disabled: selectedObjects.length !== 1 || !canShareFile,
       icon: <ShareIcon />,
-      tooltip: "Share Selected File",
+      tooltip: t("share_selected_file"),
     },
     {
       action: openPreview,
-      label: "Preview",
+      label: t("preview"),
       disabled: selectedObjects.length !== 1 || !canPreviewFile,
       icon: <PreviewIcon />,
-      tooltip: "Preview Selected File",
+      tooltip: t("preview_selected_file"),
     },
     {
       action: () => {
         setDeleteMultipleOpen(true);
       },
-      label: "Delete",
+      label: t("delete"),
       icon: <DeleteIcon />,
       disabled:
         !hasPermission(bucketName, [IAM_SCOPES.S3_DELETE_OBJECT]) ||
         selectedObjects.length === 0 ||
         !displayDeleteObject,
-      tooltip: "Delete Selected Files",
+      tooltip: t("delete_selected_file"),
     },
   ];
 
@@ -1400,7 +1400,7 @@ const ListObjects = () => {
                 <div className={classes.actionsSection}>
                   <RBIconButton
                     id={"rewind-objects-list"}
-                    tooltip={"Rewind Bucket"}
+                    tooltip={t("rewind_bucket")}
                     text={t("rewind")}
                     icon={
                       <Badge
@@ -1552,7 +1552,7 @@ const ListObjects = () => {
                     } ${detailsOpen ? "actionsPanelOpen" : ""}`}
                     selectedItems={selectedObjects}
                     onSelect={selectListObjects}
-                    customEmptyMessage={`${t("this_location_empty")}: ${
+                    customEmptyMessage={`${t("this_location_empty")} ${
                       !rewindEnabled ? `, ${t("please_try_uploading_a_new_file")}` : ""
                     }`}
                     sortConfig={{

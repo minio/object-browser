@@ -232,7 +232,7 @@ const AddBucket = ({ classes }: IsetProps) => {
                   <b>{t("versioning")}</b>{t("versioning_info")}
                   <br />
                   <br />
-                  <b>{t("object_blocking")}</b>{t("object_locking_info")}{" "}
+                  <b>{t("object_locking")}</b>{t("object_locking_info")}{" "}
                   {!lockingAllowed ? (
                     <Fragment>
                       <br />
@@ -442,8 +442,8 @@ const AddBucket = ({ classes }: IsetProps) => {
                           }}
                           unitSelected={retentionUnit}
                           unitsList={[
-                            { value: "days", label: "Days" },
-                            { value: "years", label: "Years" },
+                            { value: "days", label: t("days") },
+                            { value: "years", label: t("years") },
                           ]}
                           disabled={false}
                         />
@@ -460,7 +460,7 @@ const AddBucket = ({ classes }: IsetProps) => {
                 className={classes.clearButton}
                 onClick={resForm}
               >
-                Clear
+                {t("clear")}
               </Button>
               <Button
                 type="submit"
@@ -468,7 +468,7 @@ const AddBucket = ({ classes }: IsetProps) => {
                 color="primary"
                 disabled={addLoading || invalidFields.length > 0 || hasErrors}
               >
-                Create Bucket
+                {t("create_bucket")}
               </Button>
             </Grid>
             {addLoading && (

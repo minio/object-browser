@@ -98,7 +98,7 @@ const AddGroupHelpBox = () => {
           flexFlow: "column",
         }}
       >
-        <FeatureItem icon={<GroupsIcon />} description={`Add Users to Group`} />
+        <FeatureItem icon={<GroupsIcon />} description={t("add_users_to_gorup")} />
         <Box sx={{ paddingTop: "10px", paddingBottom: "10px" }}>
         {t("select_from_the_list_of_user_to_assign_groups")}
         </Box>

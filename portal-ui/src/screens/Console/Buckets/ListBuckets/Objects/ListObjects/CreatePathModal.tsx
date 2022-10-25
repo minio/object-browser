@@ -33,6 +33,7 @@ import { BucketObjectItem } from "./types";
 import { CreateNewPathIcon } from "../../../../../../icons";
 import { AppState, useAppDispatch } from "../../../../../../store";
 import { setModalErrorSnackMessage } from "../../../../../../systemSlice";
+import { useTranslation } from 'react-i18next';
 
 interface ICreatePath {
   classes: any;
@@ -61,6 +62,7 @@ const CreatePathModal = ({
 }: ICreatePath) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [pathUrl, setPathUrl] = useState("");
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
@@ -93,7 +95,7 @@ const CreatePathModal = ({
     if (existingFiles.findIndex(sharesName) !== -1) {
       dispatch(
         setModalErrorSnackMessage({
-          errorMessage: "Folder cannot have the same name as an existing file",
+          errorMessage: t("folder_cannot_have_same_name_file"),
           detailedError: "",
         })
       );
@@ -134,13 +136,13 @@ const CreatePathModal = ({
     <React.Fragment>
       <ModalWrapper
         modalOpen={modalOpen}
-        title="Choose or create a new path"
+        title={t("choose_or_create_path")}
         onClose={onClose}
         titleIcon={<CreateNewPathIcon />}
       >
         <Grid container>
           <Grid item xs={12} className={classes.formFieldRow}>
-            <strong>Current Path:</strong> <br />
+            <strong>{t("current_path")}:</strong> <br />
             <div
               style={{
                 textOverflow: "ellipsis",
@@ -157,10 +159,10 @@ const CreatePathModal = ({
           <Grid item xs={12} className={classes.formFieldRow}>
             <InputBoxWrapper
               value={pathUrl}
-              label={"New Folder Path"}
+              label={t("new_folder_path")}
               id={"folderPath"}
               name={"folderPath"}
-              placeholder={"Enter the new Folder Path"}
+              placeholder={t("enter_new_folder_path")}
               onChange={inputChange}
               onKeyPress={keyPressed}
               required
@@ -173,7 +175,7 @@ const CreatePathModal = ({
               variant="outlined"
               onClick={resetForm}
             >
-              Clear
+              {t("clear")}
             </Button>
             <Button
               type="submit"
@@ -182,7 +184,7 @@ const CreatePathModal = ({
               disabled={!isFormValid}
               onClick={createProcess}
             >
-              Create
+              {t("create")}
             </Button>
           </Grid>
         </Grid>

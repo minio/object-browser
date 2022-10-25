@@ -99,7 +99,7 @@ const AddUserHelpBox = () => {
           flexFlow: "column",
         }}
       >
-        <FeatureItem icon={<UsersIcon />} description={t("create_users")} />
+        <FeatureItem icon={<UsersIcon />} description={t("create_user")} />
         <FeatureItem icon={<GroupsIcon />} description={t("manage_group")} />
         <FeatureItem icon={<ChangeAccessPolicyIcon />} description={t("assign_policies")} />
       </Box>

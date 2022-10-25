@@ -96,6 +96,7 @@ interface IBucketSummaryProps {
 
 const BucketSummary = ({ classes }: IBucketSummaryProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const params = useParams();
 
   const loadingBucket = useSelector(selBucketDetailsLoading);
@@ -302,7 +303,6 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
       loadAllBucketData();
     }
   };
-  const { t } = useTranslation();
 
   // @ts-ignore
   return (
@@ -379,7 +379,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                         }
                         label={
                           <label className={classes.textMuted}>
-                            {hasObjectLocking ? "Enabled" : "Disabled"}
+                            {hasObjectLocking ? t("enabled") : t("disabled")}
                           </label>
                         }
                       />

@@ -154,7 +154,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
           {!usage?.prometheusNotReady && (
             <HelpBox
               iconComponent={<PrometheusErrorIcon />}
-              title={"We can’t retrieve advanced metrics at this time."}
+              title={t("we_cant_retrieve_advanced_metrics")}
               help={
                 <Box>
                   <Box

@@ -45,8 +45,8 @@ const PasswordSelector = ({ classes }: IAddUserProps2) => {
       }}
       id="standard-multiline-static"
       name="standard-multiline-static"
-      label="Password"
-      type={showPassword ? "text" : t("password")}
+      label={t("password")}
+      type={showPassword ? "text" : "password"}
       value={secretKey}
       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(setSecretKey(e.target.value));

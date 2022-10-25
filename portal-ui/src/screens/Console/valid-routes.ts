@@ -55,7 +55,7 @@ import {
 import SettingsIcon from "../../icons/SettingsIcon";
 import React from "react";
 import LicenseBadge from "./Menu/LicenseBadge";
-import i18next from "i18next";
+import i18next, { t } from "i18next";
 
 
 export const validRoutes = (
@@ -117,7 +117,7 @@ export const validRoutes = (
       icon: AccessMenuIcon,
     },
     {
-      name: "Monitoring",
+      name: i18next.t("monitoring"),
       id: "monitorMetrics",
       to: IAM_PAGES.DASHBOARD,
       icon: MetricsMenuIcon,

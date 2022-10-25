@@ -39,7 +39,7 @@ const UserSelector = ({ classes }: IAddUserProps2) => {
         }}
         id="accesskey-input"
         name="accesskey-input"
-        label={t("userName")}
+        label={t("username")}
         value={userName}
         autoFocus={true}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

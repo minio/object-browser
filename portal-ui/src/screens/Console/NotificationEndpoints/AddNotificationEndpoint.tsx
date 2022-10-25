@@ -234,7 +234,7 @@ const AddNotificationEndpoint = ({
                     color="primary"
                     disabled={saving}
                   >
-                    {t("save_notification_target")}
+                    {t("save")}
                   </Button>
                 </Grid>
               </div>

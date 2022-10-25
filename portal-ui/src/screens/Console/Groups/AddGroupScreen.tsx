@@ -40,6 +40,7 @@ import api from "../../../../src/common/api";
 import FormLayout from "../Common/FormLayout";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IAddGroupProps {
   classes: any;
@@ -67,6 +68,7 @@ const styles = (theme: Theme) =>
 const AddGroupScreen = ({ classes }: IAddGroupProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [groupName, setGroupName] = useState<string>("");
   const [saving, isSaving] = useState<boolean>(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
@@ -114,11 +116,11 @@ const AddGroupScreen = ({ classes }: IAddGroupProps) => {
     <Fragment>
       <Grid item xs={12}>
         <PageHeader
-          label={<BackLink to={IAM_PAGES.GROUPS} label={"Groups"} />}
+          label={<BackLink to={IAM_PAGES.GROUPS} label={t("groups")} />}
         />
         <PageLayout>
           <FormLayout
-            title={"Create Group"}
+            title={t("create_group")}
             icon={<CreateGroupIcon />}
             helpbox={<AddGroupHelpBox />}
           >
@@ -128,7 +130,7 @@ const AddGroupScreen = ({ classes }: IAddGroupProps) => {
                   <InputBoxWrapper
                     id="group-name"
                     name="group-name"
-                    label="Group Name"
+                    label={t("group_name")}
                     autoFocus={true}
                     value={groupName}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +154,7 @@ const AddGroupScreen = ({ classes }: IAddGroupProps) => {
                   className={classes.spacerRight}
                   onClick={resetForm}
                 >
-                  Clear
+                  {t("clear")}
                 </Button>
 
                 <Button
@@ -161,7 +163,7 @@ const AddGroupScreen = ({ classes }: IAddGroupProps) => {
                   color="primary"
                   disabled={saving || !validGroup}
                 >
-                  Save
+                  {t("save")}
                 </Button>
               </Grid>
               {saving && (
