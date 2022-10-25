@@ -16,7 +16,6 @@
 
 import * as React from "react";
 import { SVGProps } from "react";
-import { useTranslation } from 'react-i18next';
 
 const DiagnosticsMenuIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
