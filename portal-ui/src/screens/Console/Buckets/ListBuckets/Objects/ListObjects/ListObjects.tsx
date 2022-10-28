@@ -1433,7 +1433,7 @@ const ListObjects = () => {
                   />
                   <RBIconButton
                     id={"refresh-objects-list"}
-                    tooltip={"Reload List"}
+                    tooltip={t("reload_list")}
                     text={t("refresh")}
                     icon={<RefreshIcon />}
                     color="primary"

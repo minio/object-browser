@@ -35,7 +35,7 @@ const AddBucketName = ({ hasErrors }: { hasErrors: boolean }) => {
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(setName(event.target.value));
       }}
-      label={t("BucketName")}
+      label={t("bucket_name")}
       value={bucketName}
       required
     />

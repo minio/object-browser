@@ -489,6 +489,7 @@
   "we_cant_retrieve_advanced_metrics": "We can’t retrieve advanced metrics at this time.",
   "add_users_to_gorup": "Add Users to Group",
   "group_name": "Group Name",
-  "logout": "Logout"
-
+  "logout": "Logout",
+  "copy_to_clipboard": "Copy to Clipboard",
+  "manually_configure_string": "Manually Configure String"
 }

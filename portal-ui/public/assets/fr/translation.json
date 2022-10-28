@@ -2,7 +2,7 @@
   "app_title": "Stockage Distribué Sécurisé",
   "error_has_occured": "Une erreur est survenue",
   "backend_not_reached": "le backend n'a pas pu être atteint.",
-  "create_buckets_intro": "Mantle SDS utilise des buckets pour organiser les objets. Un bucket est similaire à un dossier ou à un répertoire dans un système de fichiers, où chaque buckets peut contenir un nombre arbitraire d'objets.",
+  "create_buckets_intro": "Mantle SDS utilise des buckets pour organiser les objets. Un bucket est similaire à un dossier ou à un répertoire dans un système de fichiers, où chaque buckets peuvent contenir un nombre arbitraire d'objets.",
   "versioning": "Versionnage",
   "versioning_info": " permet de conserver plusieurs versions du même objet sous la même clé.",
   "object_locking": "Blocage d'objet",
@@ -29,8 +29,8 @@
   "search_buckets": "Rechercher des buckets",
   "unselect_buckets": "Désélectionner les buckets",
   "select_multiple_buckets": "Sélectionner plusieurs buckets",
-  "unselect_all_buckets": "Désélectionner tout buckets",
-  "select_all_buckets": "Sélectionner tout buckets",
+  "unselect_all_buckets": "Désélectionner tout les buckets",
+  "select_all_buckets": "Sélectionner tout les buckets",
   "refresh": "Actualiser",
   "no_result": "Aucun résultat",
   "no_buckets_match": "Aucun bucket ne correspond à la condition",
@@ -489,7 +489,7 @@
   "we_cant_retrieve_advanced_metrics": "Nous ne pouvons pas récupérer les statistiques avancées pour le moment.",
   "add_users_to_gorup": "Ajouter des utilisateurs au groupe",
   "group_name": "Nom du groupe",
-  "logout": "Déconnexion"
-
-
+  "logout": "Déconnexion",
+  "copy_to_clipboard": "Copier dans le presse-papier",
+  "manually_configure_string": "Configurer manuellement la chaîne de characters"
 }

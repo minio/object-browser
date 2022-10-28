@@ -209,7 +209,7 @@ const AccessDetails = () => {
               columns={[{ label: t("user"), elementKey: "accessKey" }]}
               isLoading={loadingUsers}
               records={bucketUsers}
-              entityName="Users"
+              entityName={t("users")}
               idField="accessKey"
             />
           </SecureComponent>

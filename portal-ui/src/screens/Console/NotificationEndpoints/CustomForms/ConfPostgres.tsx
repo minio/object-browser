@@ -209,7 +209,7 @@ const ConfPostgres = ({ onChange, classes }: IConfPostgresProps) => {
     <Grid container>
       <Grid item xs={12}>
         <FormSwitchWrapper
-          label={"Manually Configure String"}
+          label={t("manually_configure_string")}
           checked={useConnectionString}
           id="manualString"
           name="manualString"
