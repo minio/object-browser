@@ -91,7 +91,7 @@ const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
                   ))}
                   <Route
                     path={"/"}
-                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/compression`} />}
+                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/identity_openid`} />}
                   />
                 </Routes>
               }

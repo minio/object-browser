@@ -46,7 +46,6 @@ import { AppState, useAppDispatch } from "../../../../../../store";
 import {
   DeleteIcon,
   DownloadIcon,
-  LegalHoldIcon,
   MetadataIcon,
   ObjectInfoIcon,
   PreviewIcon,
@@ -60,7 +59,6 @@ import api from "../../../../../../common/api";
 import ShareFile from "../ObjectDetails/ShareFile";
 import SetRetention from "../ObjectDetails/SetRetention";
 import DeleteObject from "../ListObjects/DeleteObject";
-import SetLegalHoldModal from "../ObjectDetails/SetLegalHoldModal";
 import {
   hasPermission,
   SecureComponent,
@@ -133,7 +131,6 @@ const styles = () =>
 const emptyFile: IFileInfo = {
   is_latest: true,
   last_modified: "",
-  legal_hold_status: "",
   name: "",
   retention_mode: "",
   retention_until_date: "",
@@ -175,7 +172,6 @@ const ObjectDetailPanel = ({
   const [shareFileModalOpen, setShareFileModalOpen] = useState<boolean>(false);
   const [retentionModalOpen, setRetentionModalOpen] = useState<boolean>(false);
   const [tagModalOpen, setTagModalOpen] = useState<boolean>(false);
-  const [legalholdOpen, setLegalholdOpen] = useState<boolean>(false);
   const [inspectModalOpen, setInspectModalOpen] = useState<boolean>(false);
   const [actualInfo, setActualInfo] = useState<IFileInfo | null>(null);
   const [allInfoElements, setAllInfoElements] = useState<IFileInfo[]>([]);
@@ -372,13 +368,6 @@ const ObjectDetailPanel = ({
     }
   };
 
-  const closeLegalholdModal = (reload: boolean) => {
-    setLegalholdOpen(false);
-    if (reload) {
-      dispatch(setLoadingObjectInfo(true));
-    }
-  };
-
   const loaderForContainer = (
     <div style={{ textAlign: "center", marginTop: 35 }}>
       <Loader />
@@ -438,20 +427,6 @@ const ObjectDetailPanel = ({
         !hasPermission(objectResources, [IAM_SCOPES.S3_GET_OBJECT]),
       icon: <PreviewIcon />,
       tooltip: "Preview this File",
-    },
-    {
-      action: () => {
-        setLegalholdOpen(true);
-      },
-      label: "Legal Hold",
-      disabled:
-        !locking ||
-        !distributedSetup ||
-        !!actualInfo.is_delete_marker ||
-        !hasPermission(bucketName, [IAM_SCOPES.S3_PUT_OBJECT_LEGAL_HOLD]) ||
-        selectedVersion !== "",
-      icon: <LegalHoldIcon />,
-      tooltip: "Change Legal Hold rules for this File",
     },
     {
       action: openRetentionModal,
@@ -550,15 +525,6 @@ const ObjectDetailPanel = ({
           closeDeleteModalAndRefresh={closeDeleteModal}
           versioning={distributedSetup && versioning}
           selectedVersion={selectedVersion}
-        />
-      )}
-      {legalholdOpen && actualInfo && (
-        <SetLegalHoldModal
-          open={legalholdOpen}
-          closeModalAndRefresh={closeLegalholdModal}
-          objectName={actualInfo.name}
-          bucketName={bucketName}
-          actualInfo={actualInfo}
         />
       )}
       {previewOpen && actualInfo && (
@@ -707,18 +673,6 @@ const ObjectDetailPanel = ({
                     </span>
                   );
                 })}
-          </Box>
-          <Box className={classes.detailContainer}>
-            <SecureComponent
-              scopes={[IAM_SCOPES.S3_GET_OBJECT_LEGAL_HOLD]}
-              resource={bucketName}
-            >
-              <Fragment>
-                <strong>Legal Hold:</strong>
-                <br />
-                {actualInfo.legal_hold_status ? "On" : "Off"}
-              </Fragment>
-            </SecureComponent>
           </Box>
           <Box className={classes.detailContainer}>
             <SecureComponent

@@ -20,11 +20,11 @@ import LoginIcon from "@mui/icons-material/Login";
 import { IElement, IElementValue } from "./types";
 
 export const configurationElements: IElement[] = [
-  {
-    icon: <CompressIcon />,
-    configuration_id: "compression",
-    configuration_label: "Compression",
-  },
+  // {
+  //   icon: <CompressIcon />,
+  //   configuration_id: "compression",
+  //   configuration_label: "Compression",
+  // },
   {
     icon: <LockOpenIcon />,
     configuration_id: "identity_openid",
