@@ -171,8 +171,8 @@ const ConfTargetGeneric = ({
               label="language"
               onChange={updateLanguage}
             >
-              <MenuItem value="en">{t("english")}</MenuItem>
-              <MenuItem value="fr">{t("french")}</MenuItem>
+              <MenuItem value="en">English</MenuItem>
+              <MenuItem value="fr">Français</MenuItem>
             </Select>
           </FormControl>
         );
