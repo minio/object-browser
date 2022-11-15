@@ -1352,13 +1352,6 @@ const ListObjects = () => {
                   {bucketInfo && (
                     <Fragment>
                       <span className={classes.detailsSpacer}>
-                        {bucketInfo.size && (
-                          <Fragment>{niceBytesInt(bucketInfo.size)}</Fragment>
-                        )}
-                        {bucketInfo.size && quota && (
-                          <Fragment> / {niceBytesInt(quota.quota)}</Fragment>
-                        )}
-                        {bucketInfo.size && bucketInfo.objects ? " - " : ""}
                         {bucketInfo.objects && (
                           <Fragment>
                             {bucketInfo.objects}&nbsp;Object
