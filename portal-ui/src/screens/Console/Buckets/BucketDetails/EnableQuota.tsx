@@ -105,17 +105,6 @@ const EnableQuota = ({
       amount: parseInt(getBytes(quotaSize, quotaUnit, true)),
       quota_type: "hard",
     };
-
-    api
-      .invoke("PUT", `/api/v1/buckets/${selectedBucket}/quota`, req)
-      .then(() => {
-        setLoading(false);
-        closeModalAndRefresh();
-      })
-      .catch((err: ErrorResponseHandler) => {
-        setLoading(false);
-        dispatch(setModalErrorSnackMessage(err));
-      });
   };
 
   return (
