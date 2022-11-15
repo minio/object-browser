@@ -14,19 +14,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Fragment } from "react";
 import { Box } from "@mui/material";
 import {
   ArrowRightIcon,
   BucketsIcon,
   DrivesIcon,
   HealIcon,
-  PrometheusErrorIcon,
   ServersIcon,
   TotalObjectsIcon,
   UptimeIcon,
 } from "../../../../icons";
-import HelpBox from "../../../../common/HelpBox";
 import { calculateBytes, representationNumber } from "../../../../common/utils";
 import { IDriveInfo, Usage } from "../types";
 import StatusCountCard from "./StatusCountCard";
@@ -133,47 +130,6 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
           marginRight: "40px",
         }}
       >
-        <Box>
-          {usage?.prometheusNotReady && (
-            <HelpBox
-              iconComponent={<PrometheusErrorIcon />}
-              title={"We can't retrieve advanced metrics at this time"}
-              help={
-                <Fragment>
-                  Mantle SDS Dashboard will display basic metrics as we couldn't
-                  connect to Prometheus successfully.
-                  <br /> <br />
-                  Please try again in a few minutes. If the problem persists,
-                  you can review your configuration and confirm that Prometheus
-                  server is up and running.
-                </Fragment>
-              }
-            />
-          )}
-
-          {!usage?.prometheusNotReady && (
-            <HelpBox
-              iconComponent={<PrometheusErrorIcon />}
-              title={"We can’t retrieve advanced metrics at this time."}
-              help={
-                <Box>
-                  <Box
-                    sx={{
-                      fontSize: "14px",
-                    }}
-                  >
-                    Mantle SDS Dashboard will display basic metrics as we couldn’t
-                    connect to Prometheus successfully. Please try again in a
-                    few minutes. If the problem persists, you can review your
-                    configuration and confirm that Prometheus server is up and
-                    running.
-                  </Box>
-                </Box>
-              }
-            />
-          )}
-        </Box>
-
         <Box
           sx={{
             display: "grid",
