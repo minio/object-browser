@@ -87,7 +87,7 @@ interface IShareFileProps {
   dataObject: IFileInfo;
   closeModalAndRefresh: () => void;
 }
-
+const initialDate = new Date();
 const ShareFile = ({
   classes,
   open,
@@ -104,7 +104,6 @@ const ShareFile = ({
   const [dateValid, setDateValid] = useState<boolean>(true);
   const [versionID, setVersionID] = useState<string>("null");
 
-  const initialDate = new Date();
 
   const dateChanged = (newDate: string, isValid: boolean) => {
     setDateValid(isValid);
@@ -164,7 +163,7 @@ const ShareFile = ({
       setShareURL("");
 
       const slDate = new Date(`${selectedDate}`);
-      const currDate = new Date();
+      const currDate = initialDate;
 
       const diffDate = Math.ceil(
         (slDate.getTime() - currDate.getTime()) / 1000
@@ -267,7 +266,7 @@ const ShareFile = ({
                       >
                         <CopyIcon />
                       </BoxIconButton>
-                    </CopyToClipboard>
+                    </CopyToClipboard>    
                   }
                 />
               </Grid>

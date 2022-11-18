@@ -741,18 +741,19 @@ export const tooltipCommon = {
 
 export const snackBarCommon = {
   snackBar: {
-    backgroundColor: "#081F44",
+    backgroundColor: "#551C27",
     fontWeight: 400,
     fontFamily: "Lato, sans-serif",
     fontSize: 14,
-    padding: "0px 20px 0px 20px;",
+    padding: "20px 20px 20px 20px;",
+    margin: "50px 0px 0px 0px",
     boxShadow: "none" as const,
     "&.MuiPaper-root.MuiSnackbarContent-root": {
-      borderRadius: "0px 0px 5px 5px",
+      borderRadius: "5px 5px 5px 5px",
     },
     "& div": {
       textAlign: "center" as const,
-      padding: "6px 30px",
+      padding: "6px 6px",
       width: "100%",
       overflowX: "hidden",
       textOverflow: "ellipsis",
@@ -778,6 +779,7 @@ export const snackBarCommon = {
     position: "absolute" as const,
   },
   snackBarModal: {
+    zIndex: 0,
     top: 0,
     position: "absolute" as const,
     minWidth: "348px",
@@ -1257,7 +1259,7 @@ export const fileInputStyles = {
 export const deleteDialogStyles = {
   root: {
     "& .MuiPaper-root": {
-      padding: "1rem 2rem 2rem 1rem",
+      padding: "0.5rem 1rem 0.5rem 1rem",
     },
   },
   title: {
