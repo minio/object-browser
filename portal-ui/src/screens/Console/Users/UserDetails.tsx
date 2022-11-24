@@ -130,7 +130,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
     }
     setLoading(true);
     api
-      .invoke("GET", `/api/v1/user/${encodeURLString(userName)}`)
+      .invoke("GET", `/api/v1/user?name=${userName}`)
       .then((res) => {
         setAddLoading(false);
         const memberOf = res.memberOf || [];
@@ -171,7 +171,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
     }
     setAddLoading(true);
     api
-      .invoke("PUT", `/api/v1/user/${encodeURLString(userName)}`, {
+      .invoke("PUT", `/api/v1/user?name=${userName}`, {
         status: isEnabled ? "enabled" : "disabled",
         groups: selectedGroups,
       })

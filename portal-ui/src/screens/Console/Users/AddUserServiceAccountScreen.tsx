@@ -96,9 +96,7 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
       api
         .invoke(
           "POST",
-          `/api/v1/user/${encodeURLString(
-            userName
-          )}/service-account-credentials`,
+          `/api/v1/user/${userName}/service-account-credentials`,
           {
             policy: policyJSON,
             accessKey: accessKey,
@@ -131,7 +129,7 @@ const AddServiceAccount = ({ classes }: IAddServiceAccountProps) => {
   useEffect(() => {
     if (isRestrictedByPolicy) {
       api
-        .invoke("GET", `/api/v1/user/${encodeURLString(userName)}/policies`)
+        .invoke("GET", `/api/v1/user/${userName}/policies`)
 
         .then((res) => {
           setPolicyJSON(JSON.stringify(JSON.parse(res.policy), null, 4));
