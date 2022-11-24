@@ -21,13 +21,9 @@ import { useNavigate } from "react-router-dom";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { ErrorResponseHandler } from "../../../common/types";
 import { ConfirmDeleteIcon } from "../../../icons";
-import { encodeURLString } from "../../../common/utils";
 import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
 import useApi from "../Common/Hooks/useApi";
 import ConfirmDialog from "../Common/ModalWrapper/ConfirmDialog";
-import WarningMessage from "../Common/WarningMessage/WarningMessage";
-import TableWrapper from "../Common/TableWrapper/TableWrapper";
-import api from "../../../common/api";
 import Loader from "../Common/Loader/Loader";
 
 interface IDeleteUserProps {
@@ -51,27 +47,11 @@ const DeleteUser = ({
 
   const [deleteLoading, invokeDeleteApi] = useApi(onDelSuccess, onDelError);
   const [loadingSA, setLoadingSA] = useState<boolean>(true);
-  const [hasSA, setHasSA] = useState<boolean>(false);
-  const [userSAList, setUserSAList] = useState<userSACount[]>([]);
 
   const userLoggedIn = localStorage.getItem("userLoggedIn") || "";
 
   useEffect(() => {
-    if (selectedUsers) {
-      api
-        .invoke("POST", `/api/v1/users/service-accounts`, selectedUsers)
-        .then((res) => {
-          setUserSAList(res.userServiceAccountList);
-          if (res.hasSA) {
-            setHasSA(true);
-          }
-          setLoadingSA(false);
-        })
-        .catch((err: ErrorResponseHandler) => {
-          setErrorSnackMessage(err);
-          setLoadingSA(false);
-        });
-    }
+    setLoadingSA(false);
   }, [selectedUsers, setErrorSnackMessage]);
 
   if (!selectedUsers) {
@@ -82,18 +62,6 @@ const DeleteUser = ({
       <b>{user}</b>
     </div>
   ));
-  const viewAction = (selectionElement: any): void => {
-    navigate(
-      `${IAM_PAGES.USERS}/${encodeURLString(selectionElement.userName)}`
-    );
-    onClose();
-  };
-  const tableActions = [
-    {
-      type: "view",
-      onClick: viewAction,
-    },
-  ];
 
   const onConfirmDelete = () => {
     for (let user of selectedUsers) {
@@ -104,19 +72,14 @@ const DeleteUser = ({
         });
         closeDeleteModalAndRefresh(true);
       } else {
-        invokeDeleteApi("DELETE", `/api/v1/user/name=${user}`);
+        invokeDeleteApi("DELETE", `/api/v1/user?name=${user}`);
         closeDeleteModalAndRefresh(true);
         navigate(`${IAM_PAGES.USERS}`);
       }
     }
   };
 
-  interface userSACount {
-    userName: string;
-    numSAs: number;
-  }
-
-  const noSAtext =
+  const text =
     "Are you sure you want to delete the following " +
     selectedUsers.length +
     " " +
@@ -136,34 +99,10 @@ const DeleteUser = ({
       onClose={onClose}
       confirmationContent={
         <DialogContentText>
-          {hasSA ? (
             <Fragment>
-              <WarningMessage
-                label="Click on a user to view the full listing of asociated Service Accounts. All Service Accounts associated with a user will be deleted along with the user. Are you sure you want to continue?"
-                title="Warning: One or more users selected has associated Service Accounts. "
-              />
-              <TableWrapper
-                itemActions={tableActions}
-                columns={[
-                  { label: "Username", elementKey: "userName" },
-                  {
-                    label: "# Associated Service Accounts",
-                    elementKey: "numSAs",
-                  },
-                ]}
-                isLoading={loadingSA}
-                records={userSAList}
-                entityName="User Service Accounts"
-                idField="userName"
-                customPaperHeight="250"
-              />
-            </Fragment>
-          ) : (
-            <Fragment>
-              {noSAtext}
+              {text}
               {renderUsers}
             </Fragment>
-          )}
         </DialogContentText>
       }
     />

@@ -1481,6 +1481,29 @@ paths:
       tags:
         - AdminAPI
 
+  /users/service-accounts:
+    post:
+      summary: Check number of service accounts for each user specified
+      operationId: CheckUserServiceAccounts
+      parameters:
+        - name: selectedUsers
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: A successful response.
+          schema:
+            $ref: "#/definitions/userServiceAccountSummary"
+        default:
+          description: Generic error response.
+          schema:
+            $ref: "#/definitions/error"
+      tags:
+        - User
   /user:
     get:
       summary: Get User Info
