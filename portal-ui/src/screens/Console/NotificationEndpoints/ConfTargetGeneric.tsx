@@ -165,7 +165,7 @@ const ConfTargetGeneric = ({
         case "dropdown":
         return (
           <FormControl fullWidth>
-            <InputLabel>{t("language")}</InputLabel>
+            <InputLabel>{t("languages")}</InputLabel>
             <Select
               value={i18next.language}
               label="language"

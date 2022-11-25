@@ -24,6 +24,7 @@ import { searchField } from "../Common/FormComponents/common/styleLibrary";
 import withStyles from "@mui/styles/withStyles";
 import { DisabledIcon, EnabledIcon } from "../../../icons";
 import { STATUS_COLORS } from "../Dashboard/BasicDashboard/Utils";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -63,6 +64,7 @@ const PolicyView = ({
   classes?: any;
 }) => {
   const [filter, setFilter] = useState<string>("");
+  const { t } = useTranslation();
 
   return (
     <Grid container>
@@ -79,9 +81,9 @@ const PolicyView = ({
             gap: "15px",
           }}
         >
-          <Box>Statements</Box>
+          <Box>{t("statements")}</Box>
           <SearchBox
-            placeholder={"Search"}
+            placeholder={t("search")}
             onChange={setFilter}
             overrideClass={classes.searchField}
             value={filter}
@@ -127,7 +129,7 @@ const PolicyView = ({
               }}
             >
               <Box sx={rowGridStyle}>
-                <Box className="label">Effect:</Box>
+                <Box className="label">{t("effect")}:</Box>
                 <Box
                   sx={{
                     display: "flex",
@@ -142,7 +144,7 @@ const PolicyView = ({
                   }}
                 >
                   {isAllow ? <EnabledIcon /> : <DisabledIcon />}
-                  {effect}
+                  {t(effect)}
                 </Box>
               </Box>
 
@@ -157,7 +159,7 @@ const PolicyView = ({
                 }}
               >
                 <Box sx={rowGridStyle}>
-                  <Box className="label">Actions:</Box>
+                  <Box className="label">{t("actions")}:</Box>
                   <Box>
                     {stmt.Action &&
                       stmt.Action.map((act, actIndex) => (
@@ -168,7 +170,7 @@ const PolicyView = ({
                   </Box>
                 </Box>
                 <Box sx={rowGridStyle}>
-                  <Box className="label">Resources:</Box>
+                  <Box className="label">{t("resources")}: </Box>
                   <Box>
                     {stmt.Resource &&
                       stmt.Resource.map((res, resIndex) => (

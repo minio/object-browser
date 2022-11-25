@@ -184,7 +184,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
             </BoxItem>
             <BoxItem>
               <CounterCard
-                label={"Objects"}
+                label={t("objects")}
                 icon={<TotalObjectsIcon />}
                 counterValue={usage ? representationNumber(usage.objects) : 0}
               />

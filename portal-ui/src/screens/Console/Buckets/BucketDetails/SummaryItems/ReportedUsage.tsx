@@ -18,8 +18,10 @@ import React from "react";
 import { Box } from "@mui/material";
 import { niceBytes } from "../../../../../common/utils";
 import { ReportedUsageFullIcon } from "../../../../../icons";
-
+import { useTranslation } from 'react-i18next';
 const ReportedUsage = ({ bucketSize }: { bucketSize: string }) => {
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -49,7 +51,7 @@ const ReportedUsage = ({ bucketSize }: { bucketSize: string }) => {
             fontWeight: 600,
           }}
         >
-          Reported Usage:
+          {t("reported_usage")}:
         </label>
         <label>{niceBytes(bucketSize)}</label>
       </Box>

@@ -26,7 +26,7 @@ export const configurationElements: IElement[] = [
   {
     icon: <LanguageIcon />,
     configuration_id: "language",
-    configuration_label: i18next.t("language"),
+    configuration_label: i18next.t("languages"),
   },
   /*{
     icon: <CompressIcon />,
