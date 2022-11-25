@@ -79,9 +79,7 @@ const ServiceAccountPolicy = ({
       api
         .invoke(
           "GET",
-          `/api/v1/service-accounts/${encodeURLString(
-            selectedAccessKey
-          )}/policy`
+          `/api/v1/service-accounts/${selectedAccessKey}/policy`
         )
         .then((res) => {
           setLoading(false);
@@ -99,7 +97,7 @@ const ServiceAccountPolicy = ({
     api
       .invoke(
         "PUT",
-        `/api/v1/service-accounts/${encodeURLString(selectedAccessKey)}/policy`,
+        `/api/v1/service-accounts/${selectedAccessKey}/policy`,
         {
           policy: newPolicy,
         }

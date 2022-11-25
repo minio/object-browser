@@ -127,7 +127,7 @@ const ModalWrapper = ({
       }}
       className={classes.root}
     >
-      <DialogTitle className={classes.title}>
+      <DialogTitle className={classes.title} style={{zIndex: 1}}>
         <div className={classes.titleText}>
           {titleIcon} {title}
         </div>

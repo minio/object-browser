@@ -14,19 +14,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Fragment } from "react";
 import { Box } from "@mui/material";
 import {
   ArrowRightIcon,
   BucketsIcon,
   DrivesIcon,
   HealIcon,
-  PrometheusErrorIcon,
   ServersIcon,
   TotalObjectsIcon,
   UptimeIcon,
 } from "../../../../icons";
-import HelpBox from "../../../../common/HelpBox";
 import { calculateBytes, representationNumber } from "../../../../common/utils";
 import { IDriveInfo, Usage } from "../types";
 import StatusCountCard from "./StatusCountCard";
@@ -136,40 +133,6 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
           marginRight: "40px",
         }}
       >
-        <Box>
-          {usage?.prometheusNotReady && (
-            <HelpBox
-              iconComponent={<PrometheusErrorIcon />}
-              title={t('cant_retrieve_metrics')}
-              help={
-                <Fragment>
-                  {t("console_display_basic_metrics")}
-                  <br /> <br />
-                  {t("try_again_few_minutes")}
-                </Fragment>
-              }
-            />
-          )}
-
-          {!usage?.prometheusNotReady && (
-            <HelpBox
-              iconComponent={<PrometheusErrorIcon />}
-              title={t("we_cant_retrieve_advanced_metrics")}
-              help={
-                <Box>
-                  <Box
-                    sx={{
-                      fontSize: "14px",
-                    }}
-                  >
-                    {t("dashboard_display_basic_couldnt_connect_prometheus")}
-                  </Box>
-                </Box>
-              }
-            />
-          )}
-        </Box>
-
         <Box
           sx={{
             display: "grid",

@@ -71,7 +71,7 @@ const ChangeUserGroups = ({
     }
 
     api
-      .invoke("GET", `/api/v1/user/${encodeURLString(selectedUser)}`)
+      .invoke("GET", `/api/v1/user?name=${selectedUser}`)
       .then((res) => {
         setAddLoading(false);
         setAccessKey(res.accessKey);
@@ -103,7 +103,7 @@ const ChangeUserGroups = ({
     setAddLoading(true);
     if (selectedUser !== null) {
       api
-        .invoke("PUT", `/api/v1/user/${encodeURLString(selectedUser)}`, {
+        .invoke("PUT", `/api/v1/user?name=${selectedUser}`, {
           status: enabled ? "enabled" : "disabled",
           groups: selectedGroups,
         })

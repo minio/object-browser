@@ -59,12 +59,12 @@ const BucketNamingRules = ({ errorList }: { errorList: boolean[] }) => {
     <Fragment>
       <Grid item xs={12}>
         {showNamingRules ? (
-          <span style={{ color: "#0288D1", textDecoration: "underline" }}>
+          <span>
             {" "}
             {t("hide_bucket_naming_rule")}{" "}
           </span>
         ) : (
-          <span style={{ color: "#0288D1", textDecoration: "underline" }}>
+          <span>
             {t("view_bucket_naming_rule")}
           </span>
         )}

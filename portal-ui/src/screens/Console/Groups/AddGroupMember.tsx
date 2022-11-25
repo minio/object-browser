@@ -60,7 +60,7 @@ const AddGroupMember = ({
 
   function addMembersToGroup() {
     return api
-      .invoke("PUT", `/api/v1/group/${encodeURLString(selectedGroup)}`, {
+      .invoke("PUT", `/api/v1/group?name=${selectedGroup}`, {
         group: selectedGroup,
         members: selectedUsers,
         status: groupStatus,

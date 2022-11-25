@@ -387,26 +387,6 @@ const ListObjects = () => {
   }, [selectedObjects]);
 
   useEffect(() => {
-    if (!quota) {
-      api
-        .invoke("GET", `/api/v1/buckets/${bucketName}/quota`)
-        .then((res: BucketQuota) => {
-          let quotaVals = null;
-
-          if (res.quota) {
-            quotaVals = res;
-          }
-
-          setQuota(quotaVals);
-        })
-        .catch((err) => {
-          console.error("Error Getting Quota Status: ", err.detailedError);
-          setQuota(null);
-        });
-    }
-  }, [quota, bucketName]);
-
-  useEffect(() => {
     if (selectedObjects.length > 0) {
       dispatch(setObjectDetailsView(true));
       return;
@@ -1374,13 +1354,6 @@ const ListObjects = () => {
                   {bucketInfo && (
                     <Fragment>
                       <span className={classes.detailsSpacer}>
-                        {bucketInfo.size && (
-                          <Fragment>{niceBytesInt(bucketInfo.size)}</Fragment>
-                        )}
-                        {bucketInfo.size && quota && (
-                          <Fragment> / {niceBytesInt(quota.quota)}</Fragment>
-                        )}
-                        {bucketInfo.size && bucketInfo.objects ? " - " : ""}
                         {bucketInfo.objects && (
                           <Fragment>
                             {bucketInfo.objects}&nbsp;{t("objects")}

@@ -28,11 +28,11 @@ export const configurationElements: IElement[] = [
     configuration_id: "language",
     configuration_label: i18next.t("language"),
   },
-  {
+  /*{
     icon: <CompressIcon />,
     configuration_id: "compression",
     configuration_label: i18next.t("compression"),
-  },
+  },*/
   {
     icon: <LockOpenIcon />,
     configuration_id: "identity_openid",

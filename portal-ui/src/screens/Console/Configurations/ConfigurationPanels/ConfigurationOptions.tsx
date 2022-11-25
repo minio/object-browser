@@ -113,17 +113,6 @@ const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
             </VerticalTabs>
           </div>
         </Grid>
-        <Grid item xs={12} sx={{ paddingTop: "15px" }}>
-          <HelpBox
-            title={t("learn_more_config")}
-            iconComponent={<SettingsIcon />}
-            help={
-              <Fragment>
-                {t("config_info")}
-              </Fragment>
-            }
-          />
-        </Grid>
       </PageLayout>
     </Fragment>
   );

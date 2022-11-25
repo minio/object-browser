@@ -130,6 +130,7 @@ export const validRoutes = (
       icon: LambdaIcon,
       id: "lambda",
     },
+<<<<<<< HEAD
     {
       component: NavLink,
       to: IAM_PAGES.TIERS,
@@ -137,6 +138,15 @@ export const validRoutes = (
       icon: MoneyIcon,
       id: "billing",
     },
+=======
+    // {
+    //   component: NavLink,
+    //   to: IAM_PAGES.TIERS,
+    //   name: "Billing",
+    //   icon: MoneyIcon,
+    //   id: "billing",
+    // },
+>>>>>>> main
     {
       component: NavLink,
       to: IAM_PAGES.SETTINGS,
