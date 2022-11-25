@@ -181,7 +181,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
           api
             .invoke(
               "GET",
-              `/api/v1/policies/${encodeURLString(policyName)}/users`
+              `/api/v1/policies/${policyName}/users`
             )
             .then((result: any) => {
               setUserList(result);
@@ -203,7 +203,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
           api
             .invoke(
               "GET",
-              `/api/v1/policies/${encodeURLString(policyName)}/groups`
+              `/api/v1/policies/${policyName}/groups`
             )
             .then((result: any) => {
               setGroupList(result);
@@ -222,7 +222,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
       if (loadingPolicy) {
         if (displayPolicy) {
           api
-            .invoke("GET", `/api/v1/policy/${encodeURLString(policyName)}`)
+            .invoke("GET", `/api/v1/policy?name=${policyName}`)
             .then((result: any) => {
               if (result) {
                 setPolicy(result);

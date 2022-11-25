@@ -146,7 +146,7 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
   function fetchGroupInfo() {
     if (getGroupDetails) {
       api
-        .invoke("GET", `/api/v1/group/${encodeURLString(groupName)}`)
+        .invoke("GET", `/api/v1/group?name=${groupName}`)
         .then((res: any) => {
           setGroupDetails(res);
         })
@@ -159,7 +159,7 @@ const GroupsDetails = ({ classes }: IGroupDetailsProps) => {
 
   function toggleGroupStatus(nextStatus: boolean) {
     return api
-      .invoke("PUT", `/api/v1/group/${encodeURLString(groupName)}`, {
+      .invoke("PUT", `/api/v1/group?name=${groupName}`, {
         group: groupName,
         members: members,
         status: nextStatus ? "enabled" : "disabled",

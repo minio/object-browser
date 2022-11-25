@@ -110,7 +110,7 @@ const SetPolicy = ({
   const fetchGroupInformation = () => {
     if (selectedGroups?.length === 1) {
       api
-        .invoke("GET", `/api/v1/group/${encodeURLString(selectedGroups[0])}`)
+        .invoke("GET", `/api/v1/group?name=${selectedGroups[0]}`)
         .then((res: any) => {
           const groupPolicy: String = get(res, "policy", "");
           setActualPolicy(groupPolicy.split(","));

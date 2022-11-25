@@ -51,7 +51,7 @@ const DeletePolicy = ({
   const onConfirmDelete = () => {
     invokeDeleteApi(
       "DELETE",
-      `/api/v1/policy/${encodeURLString(selectedPolicy)}`
+      `/api/v1/policy?name=${selectedPolicy}`
     );
   };
 
