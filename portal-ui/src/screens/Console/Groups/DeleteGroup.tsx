@@ -52,7 +52,7 @@ const DeleteGroup = ({
   }
   const onDeleteGroups = () => {
     for (let group of selectedGroups) {
-      invokeDeleteApi("DELETE", `/api/v1/group/${encodeURLString(group)}`);
+      invokeDeleteApi("DELETE", `/api/v1/group?name=${group}`);
     }
   };
 

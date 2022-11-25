@@ -57,7 +57,7 @@ const DeleteUserModal = ({
   const onConfirmDelete = () => {
     invokeDeleteApi(
       "DELETE",
-      `/api/v1/user/${encodeURLString(userName)}`,
+      `/api/v1/user?name=${userName}`,
       null
     );
   };
