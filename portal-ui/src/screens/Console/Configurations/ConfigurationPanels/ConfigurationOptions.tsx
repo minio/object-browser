@@ -91,7 +91,7 @@ const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
                   ))}
                   <Route
                     path={"/"}
-                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/compression`} />}
+                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/identity_openid`} />}
                   />
                 </Routes>
               }
@@ -110,18 +110,6 @@ const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
               })}
             </VerticalTabs>
           </div>
-        </Grid>
-        <Grid item xs={12} sx={{ paddingTop: "15px" }}>
-          <HelpBox
-            title={"Learn more about Configurations"}
-            iconComponent={<SettingsIcon />}
-            help={
-              <Fragment>
-                Mantle SDS supports a variety of configurations ranging from
-                encryption, compression, region, notifications, etc.
-              </Fragment>
-            }
-          />
         </Grid>
       </PageLayout>
     </Fragment>

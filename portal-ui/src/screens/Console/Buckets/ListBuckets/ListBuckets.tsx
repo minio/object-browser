@@ -240,39 +240,6 @@ const ListBuckets = ({ classes }: IListBucketsProps) => {
             alignItems={"center"}
             justifyContent={"flex-end"}
           >
-            {!obOnly && (
-              <Fragment>
-                <RBIconButton
-                  tooltip={
-                    bulkSelect ? "Unselect Buckets" : "Select Multiple Buckets"
-                  }
-                  onClick={() => {
-                    setBulkSelect(!bulkSelect);
-                    setSelectedBuckets([]);
-                  }}
-                  text={""}
-                  icon={<SelectMultipleIcon />}
-                  color={"primary"}
-                  variant={bulkSelect ? "contained" : "outlined"}
-                />
-
-                {bulkSelect && (
-                  <RBIconButton
-                    tooltip={
-                      selectedBuckets.length === filteredRecords.length
-                        ? "Unselect All Buckets"
-                        : "Select All Buckets"
-                    }
-                    onClick={selectAllBuckets}
-                    text={""}
-                    icon={<SelectAllIcon />}
-                    color={"primary"}
-                    variant={"outlined"}
-                  />
-                )}
-              </Fragment>
-            )}
-
             <RBIconButton
               tooltip={"Refresh"}
               onClick={() => {

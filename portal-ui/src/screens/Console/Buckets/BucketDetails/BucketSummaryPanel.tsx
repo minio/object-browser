@@ -50,7 +50,6 @@ import LabelWithIcon from "./SummaryItems/LabelWithIcon";
 import { DisabledIcon, EnabledIcon } from "../../../../icons";
 import EditablePropertyItem from "./SummaryItems/EditablePropertyItem";
 import ReportedUsage from "./SummaryItems/ReportedUsage";
-import BucketQuotaSize from "./SummaryItems/BucketQuotaSize";
 import SectionTitle from "../../Common/SectionTitle";
 import { selDistSet, setErrorSnackMessage } from "../../../../systemSlice";
 import {
@@ -72,8 +71,6 @@ const EnableVersioningModal = withSuspense(
 const BucketTags = withSuspense(
   React.lazy(() => import("./SummaryItems/BucketTags"))
 );
-
-const EnableQuota = withSuspense(React.lazy(() => import("./EnableQuota")));
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -108,19 +105,14 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
   const [loadingSize, setLoadingSize] = useState<boolean>(true);
   const [bucketLoading, setBucketLoading] = useState<boolean>(true);
   const [loadingVersioning, setLoadingVersioning] = useState<boolean>(true);
-  const [loadingQuota, setLoadingQuota] = useState<boolean>(true);
   const [loadingRetention, setLoadingRetention] = useState<boolean>(true);
   const [isVersioned, setIsVersioned] = useState<boolean>(false);
-  const [quotaEnabled, setQuotaEnabled] = useState<boolean>(false);
-  const [quota, setQuota] = useState<BucketQuota | null>(null);
   const [retentionEnabled, setRetentionEnabled] = useState<boolean>(false);
   const [retentionConfig, setRetentionConfig] =
     useState<IRetentionConfig | null>(null);
   const [retentionConfigOpen, setRetentionConfigOpen] =
     useState<boolean>(false);
 
-  const [enableQuotaScreenOpen, setEnableQuotaScreenOpen] =
-    useState<boolean>(false);
   const [enableVersioningOpen, setEnableVersioningOpen] =
     useState<boolean>(false);
 
@@ -136,10 +128,6 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
 
   const displayGetBucketObjectLockConfiguration = hasPermission(bucketName, [
     IAM_SCOPES.S3_GET_BUCKET_OBJECT_LOCK_CONFIGURATION,
-  ]);
-
-  const displayGetBucketQuota = hasPermission(bucketName, [
-    IAM_SCOPES.ADMIN_GET_BUCKET_QUOTA,
   ]);
 
   useEffect(() => {
@@ -165,38 +153,6 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
     }
   }, [loadingVersioning, dispatch, bucketName, distributedSetup]);
 
-  useEffect(() => {
-    if (loadingQuota && distributedSetup) {
-      if (displayGetBucketQuota) {
-        api
-          .invoke("GET", `/api/v1/buckets/${bucketName}/quota`)
-          .then((res: BucketQuota) => {
-            setQuota(res);
-            if (res.quota) {
-              setQuotaEnabled(true);
-            } else {
-              setQuotaEnabled(false);
-            }
-            setLoadingQuota(false);
-          })
-          .catch((err: ErrorResponseHandler) => {
-            dispatch(setErrorSnackMessage(err));
-            setQuotaEnabled(false);
-            setLoadingQuota(false);
-          });
-      } else {
-        setQuotaEnabled(false);
-        setLoadingQuota(false);
-      }
-    }
-  }, [
-    loadingQuota,
-    setLoadingVersioning,
-    dispatch,
-    bucketName,
-    distributedSetup,
-    displayGetBucketQuota,
-  ]);
 
   useEffect(() => {
     if (loadingVersioning && distributedSetup) {
@@ -275,14 +231,6 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
   const setBucketVersioning = () => {
     setEnableVersioningOpen(true);
   };
-  const setBucketQuota = () => {
-    setEnableQuotaScreenOpen(true);
-  };
-
-  const closeEnableBucketQuota = () => {
-    setEnableQuotaScreenOpen(false);
-    setLoadingQuota(true);
-  };
 
   const closeSetAccessPolicy = () => {
     setAccessPolicyScreenOpen(false);
@@ -303,15 +251,6 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
   // @ts-ignore
   return (
     <Fragment>
-      {enableQuotaScreenOpen && (
-        <EnableQuota
-          open={enableQuotaScreenOpen}
-          selectedBucket={bucketName}
-          enabled={quotaEnabled}
-          cfg={quota}
-          closeModalAndRefresh={closeEnableBucketQuota}
-        />
-      )}
       {accessPolicyScreenOpen && (
         <SetAccessPolicy
           bucketName={bucketName}
@@ -388,14 +327,6 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                     value={<BucketTags bucketName={bucketName} />}
                   />
                 </Box>
-                <EditablePropertyItem
-                  iamScopes={[IAM_SCOPES.ADMIN_SET_BUCKET_QUOTA]}
-                  resourceName={bucketName}
-                  property={"Quota:"}
-                  value={quotaEnabled ? "Enabled" : "Disabled"}
-                  onEdit={setBucketQuota}
-                  isLoading={loadingQuota}
-                />
               </Box>
 
               <Box
@@ -406,9 +337,6 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                 }}
               >
                 <ReportedUsage bucketSize={bucketSize} />
-                {quotaEnabled && quota ? (
-                  <BucketQuotaSize quota={quota} />
-                ) : null}
               </Box>
             </Box>
           </Grid>

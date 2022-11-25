@@ -127,13 +127,13 @@ export const validRoutes = (
       icon: LambdaIcon,
       id: "lambda",
     },
-    {
-      component: NavLink,
-      to: IAM_PAGES.TIERS,
-      name: "Billing",
-      icon: MoneyIcon,
-      id: "billing",
-    },
+    // {
+    //   component: NavLink,
+    //   to: IAM_PAGES.TIERS,
+    //   name: "Billing",
+    //   icon: MoneyIcon,
+    //   id: "billing",
+    // },
     {
       component: NavLink,
       to: IAM_PAGES.SETTINGS,
