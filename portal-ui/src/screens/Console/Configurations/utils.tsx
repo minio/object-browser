@@ -17,46 +17,61 @@ import React from "react";
 import CompressIcon from "@mui/icons-material/Compress";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import LoginIcon from "@mui/icons-material/Login";
+import LanguageIcon from '@mui/icons-material/Language';
 import { IElement, IElementValue } from "./types";
+import i18next from "i18next";
+
 
 export const configurationElements: IElement[] = [
-  // {
-  //   icon: <CompressIcon />,
-  //   configuration_id: "compression",
-  //   configuration_label: "Compression",
-  // },
+  {
+    icon: <LanguageIcon />,
+    configuration_id: "language",
+    configuration_label: i18next.t("languages"),
+  },
+  /*{
+    icon: <CompressIcon />,
+    configuration_id: "compression",
+    configuration_label: i18next.t("compression"),
+  },*/
   {
     icon: <LockOpenIcon />,
     configuration_id: "identity_openid",
-    configuration_label: "Identity Openid",
+    configuration_label: i18next.t("identity_openid"),
   },
   {
     icon: <LoginIcon />,
     configuration_id: "identity_ldap",
-    configuration_label: "Identity LDAP",
-  },
+    configuration_label: i18next.t("identity_ldap"),
+  }
 ];
 
 export const fieldsConfigurations: any = {
+
+  language: [
+    {
+      name: "language",
+      required: false,
+      label: i18next.t("language"),
+      type: "dropdown", 
+    } 
+  ],
   compression: [
     {
       name: "extensions",
       required: false,
-      label: "Extensions",
-      tooltip:
-        'Extensions to compress e.g. ".txt",".log" or ".csv", you can write one per field',
+      label: i18next.t("extenstion"),
+      tooltip:i18next.t("extensions_tooltip"),
       type: "csv",
-      placeholder: "Enter an Extension",
+      placeholder:i18next.t("enter_extention"),
       withBorder: true,
     },
     {
       name: "mime_types",
       required: false,
-      label: "Mime Types",
-      tooltip:
-        'Mime types e.g. "text/*","application/json" or "application/xml", you can write one per field',
+      label:i18next.t("mime_types"),
+      tooltip:i18next.t("mime_types_tooltip"),
       type: "csv",
-      placeholder: "Enter a Mime Type",
+      placeholder:i18next.t("enter_mime_type"),
       withBorder: true,
     },
   ],
@@ -64,8 +79,8 @@ export const fieldsConfigurations: any = {
     {
       name: "config_url",
       required: false,
-      label: "Config URL",
-      tooltip: "Config URL for identity provider configuration",
+      label: i18next.t("config_url"),
+      tooltip: i18next.t("config_url_tooltip"),
       type: "string",
       placeholder:
         "https://identity-provider-url/.well-known/openid-configuration",
@@ -73,143 +88,139 @@ export const fieldsConfigurations: any = {
     {
       name: "client_id",
       required: false,
-      label: "Client ID",
+      label: i18next.t("client_id"),
       type: "string",
-      placeholder: "Enter Client ID",
+      placeholder: i18next.t("enter_client_id"),
     },
     {
       name: "client_secret",
       required: false,
-      label: "Secret ID",
+      label: i18next.t("secret_id"),
       type: "string",
-      placeholder: "Enter Secret ID",
+      placeholder: i18next.t("enter_secret_id"),
     },
     {
       name: "claim_name",
       required: false,
-      label: "Claim Name",
-      tooltip: "Claim from which MinIO will read the policy or role to use",
+      label: i18next.t("claim_name"),
+      tooltip: i18next.t("claim_name_tooltip"),
       type: "string",
-      placeholder: "Enter Claim Name",
+      placeholder: i18next.t("enter_claim_name"),
     },
     {
       name: "claim_prefix",
       required: false,
-      label: "Claim Prefix",
-      tooltip: "Claim Prefix",
+      label: i18next.t("claim_prefix"),
+      tooltip: i18next.t("claim_prefix"),
       type: "string",
-      placeholder: "Enter Claim Prefix",
+      placeholder: i18next.t("enter_claim_prefix"),
     },
     {
       name: "claim_userinfo",
       required: false,
-      label: "Claim UserInfo",
+      label: i18next.t("claim_userinfo"),
       type: "on|off",
     },
     {
       name: "redirect_uri",
       required: false,
-      label: "Redirect URI",
+      label: i18next.t("redirect_uri"),
       type: "string",
       placeholder: "https://console-endpoint-url/oauth_callback",
     },
     {
       name: "scopes",
       required: false,
-      label: "Scopes",
+      label: i18next.t("scopes"),
       type: "string",
-      placeholder: "openid,profile,email",
+      placeholder: i18next.t("openid_profil_email"),
     },
   ],
   identity_ldap: [
     {
       name: "server_addr",
       required: true,
-      label: "Server Addr",
-      tooltip: 'AD/LDAP server address e.g. "myldapserver.com:636"',
+      label: i18next.t("server_addr"),
+      tooltip: i18next.t("AD_LDAP_server_address"),
       type: "string",
       placeholder: "myldapserver.com:636",
     },
     {
       name: "tls_skip_verify",
       required: false,
-      label: "TLS Skip Verify",
-      tooltip:
-        'Trust server TLS without verification, defaults to "off" (verify)',
+      label: i18next.t("TLS_slip_verify"),
+      tooltip:i18next.t("TLS_slip_verify_tooltip"),
       type: "on|off",
     },
     {
       name: "server_insecure",
       required: false,
-      label: "Server Insecure",
-      tooltip:
-        'Allow plain text connection to AD/LDAP server, defaults to "off"',
+      label: i18next.t("server_insecure"),
+      tooltip:i18next.t("server_insecure_tooltip"),
       type: "on|off",
     },
     {
       name: "server_starttls",
       required: false,
-      label: "Start TLS connection to AD/LDAP server",
-      tooltip: "Use StartTLS connection to AD/LDAP server",
+      label: i18next.t("start_TLS_connection"),
+      tooltip: i18next.t("start_TLS_connection_tooltip"),
       type: "on|off",
     },
     {
       name: "lookup_bind_dn",
       required: true,
-      label: "Lookup Bind DN",
-      tooltip:
-        "DN for LDAP read-only service account used to perform DN and group lookups",
+      label: i18next.t("lookup_bind_DN"),
+      tooltip:i18next.t("lookup_bind_DN_tooltip"),
       type: "string",
       placeholder: "cn=admin,dc=min,dc=io",
     },
     {
       name: "lookup_bind_password",
       required: false,
-      label: "Lookup Bind Password",
-      tooltip:
-        "Password for LDAP read-only service account used to perform DN and group lookups",
+      label: i18next.t("lookup_bind_password"),
+      tooltip:i18next.t("lookup_bind_password_tooltip"),
       type: "string",
-      placeholder: "admin",
+      placeholder: i18next.t("admin"),
     },
     {
       name: "user_dn_search_base_dn",
       required: false,
-      label: "User DN Search Base DN",
-      tooltip: "Base LDAP DN to search for user DN",
+      label: i18next.t("user_DN_search_base_DN"),
+      tooltip: i18next.t("user_DN_search_base_DN_tooltip"),
       type: "csv",
       placeholder: "dc=myldapserver",
     },
     {
       name: "user_dn_search_filter",
       required: false,
-      label: "User DN Search Filter",
-      tooltip: "Search filter to lookup user DN",
+      label: i18next.t("user_DN_filter"),
+      tooltip: i18next.t("user_DN_filter_tooltip"),
       type: "string",
       placeholder: "(sAMAcountName=%s)",
     },
     {
       name: "group_search_filter",
       required: false,
-      label: "Group Search Filter",
-      tooltip: "Search filter for groups",
+      label: i18next.t("group_search_filter"),
+      tooltip:i18next.t("group_search_filter_tooltip"),
       type: "string",
       placeholder: "(&(objectclass=groupOfNames)(member=%d))",
     },
     {
       name: "group_search_base_dn",
       required: false,
-      label: "Group Search Base DN",
-      tooltip: "List of group search base DNs",
+      label: i18next.t("group_search_base_DN"),
+      tooltip: i18next.t("group_search_base_DN_tooltip"),
       type: "csv",
       placeholder: "dc=minioad,dc=local",
     },
     {
       name: "comment",
       required: false,
-      label: "Comment",
-      tooltip: "Optionally add a comment to this setting",
+      label: i18next.t("comment"),
+      tooltip:i18next.t("comment_tooltip"),
       type: "comment",
-      placeholder: "Enter custom notes if any",
+      placeholder: i18next.t("enter_custom_notes"),
     },
   ],
 };

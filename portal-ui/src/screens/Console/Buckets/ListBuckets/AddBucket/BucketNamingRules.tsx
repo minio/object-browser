@@ -21,24 +21,23 @@ import { AppState } from "../../../../../store";
 import { useSelector } from "react-redux";
 import ShowTextIcon from "../../../../../icons/ShowTextIcon";
 import HideTextIcon from "../../../../../icons/HideTextIcon";
+import { useTranslation } from 'react-i18next';
 
 import ValidRule from "./ValidRule";
 import InvalidRule from "./InvalidRule";
 import NARule from "./NARule";
 
+
 const BucketNamingRules = ({ errorList }: { errorList: boolean[] }) => {
-  const lengthRuleText =
-    "Bucket names must be between 3 (min) and 63 (max) characters long.";
-  const characterRuleText =
-    "Bucket names can consist only of lowercase letters, numbers, dots (.), and hyphens (-).";
-  const periodRuleText =
-    "Bucket names must not contain two adjacent periods, or a period adjacent to a hyphen.";
-  const ipRuleText =
-    "Bucket names must not be formatted as an IP address (for example, 192.168.5.4).";
-  const prefixRuleText = "Bucket names must not start with the prefix xn--.";
-  const suffixRuleText =
-    "Bucket names must not end with the suffix -s3alias. This suffix is reserved for access point alias names.";
-  const uniqueRuleText = "Bucket names must be unique within a partition.";
+  const { t } = useTranslation();
+
+  const lengthRuleText = t("bucket_name_length_rule");
+  const characterRuleText = t("bucket_name_char_rule");
+  const periodRuleText = t("bucket_name_period_rule");
+  const ipRuleText = t("bucket_name_ip_rule");
+  const prefixRuleText = t("bucket_name_prefix_rule");
+  const suffixRuleText = t("bucket_name_suffix_rule");
+  const uniqueRuleText = t("bucket_name_unique_rule");
 
   const bucketName = useSelector((state: AppState) => state.addBucket.name);
 
@@ -62,11 +61,11 @@ const BucketNamingRules = ({ errorList }: { errorList: boolean[] }) => {
         {showNamingRules ? (
           <span>
             {" "}
-            Hide Bucket Naming Rules{" "}
+            {t("hide_bucket_naming_rule")}{" "}
           </span>
         ) : (
           <span>
-            View Bucket Naming Rules
+            {t("view_bucket_naming_rule")}
           </span>
         )}
         <Button

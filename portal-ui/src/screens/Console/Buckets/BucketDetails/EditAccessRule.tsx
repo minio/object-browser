@@ -31,6 +31,7 @@ import SelectWrapper from "../../Common/FormComponents/SelectWrapper/SelectWrapp
 import { AddAccessRuleIcon } from "../../../../icons";
 import { setErrorSnackMessage } from "../../../../systemSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IEditAccessRule {
   classes: any;
@@ -58,10 +59,12 @@ const EditAccessRule = ({
   const dispatch = useAppDispatch();
   const [selectedAccess, setSelectedAccess] = useState<any>(initial);
 
+  const { t } = useTranslation();
+
   const accessOptions = [
-    { label: "readonly", value: "readonly" },
-    { label: "writeonly", value: "writeonly" },
-    { label: "readwrite", value: "readwrite" },
+    { label: t("readonly"), value: "readonly" },
+    { label: t("writeonly"), value: "writeonly" },
+    { label: t("readwrite"), value: "readwrite" },
   ];
 
   const resetForm = () => {
@@ -87,7 +90,7 @@ const EditAccessRule = ({
     <React.Fragment>
       <ModalWrapper
         modalOpen={modalOpen}
-        title={`Edit Access Rule for ${`${bucket}/${toEdit || ""}`}`}
+        title={t("edit_access_rule")+` ${`${bucket}/${toEdit || ""}`}`}
         onClose={onClose}
         titleIcon={<AddAccessRuleIcon />}
       >
@@ -99,7 +102,7 @@ const EditAccessRule = ({
               onChange={(e) => {
                 setSelectedAccess(e.target.value);
               }}
-              label="Access"
+              label={t("access")}
               value={selectedAccess}
               options={accessOptions}
               disabled={false}
@@ -112,7 +115,7 @@ const EditAccessRule = ({
               variant="outlined"
               onClick={resetForm}
             >
-              Clear
+              {t("clear")}
             </Button>
             <Button
               type="submit"
@@ -120,7 +123,7 @@ const EditAccessRule = ({
               color="primary"
               onClick={createProcess}
             >
-              Save
+              {t("save")}
             </Button>
           </Grid>
         </Grid>

@@ -25,6 +25,7 @@ import { ConfirmDeleteIcon } from "../../../icons";
 import { encodeURLString } from "../../../common/utils";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IDeleteGroup {
   selectedGroups: string[];
@@ -38,6 +39,7 @@ const DeleteGroup = ({
   closeDeleteModalAndRefresh,
 }: IDeleteGroup) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const onDelSuccess = () => closeDeleteModalAndRefresh(true);
   const onDelError = (err: ErrorResponseHandler) => {
     dispatch(setErrorSnackMessage(err));
@@ -64,8 +66,8 @@ const DeleteGroup = ({
 
   return (
     <ConfirmDialog
-      title={`Delete Group${selectedGroups.length > 1 ? "s" : ""}`}
-      confirmText={"Delete"}
+      title={`${t("delete_group")}${selectedGroups.length > 1 ? "s" : ""}`}
+      confirmText={t("delete")}
       isOpen={deleteOpen}
       titleIcon={<ConfirmDeleteIcon />}
       isLoading={deleteLoading}
@@ -73,8 +75,8 @@ const DeleteGroup = ({
       onClose={onClose}
       confirmationContent={
         <DialogContentText>
-          Are you sure you want to delete the following {selectedGroups.length}{" "}
-          group{selectedGroups.length > 1 ? "s?" : "?"}
+          {t("are_you_sure_delete")} {selectedGroups.length}{" "}
+          {t("group")}{selectedGroups.length > 1 ? "s?" : "?"}
           {renderGroups}
         </DialogContentText>
       }

@@ -36,6 +36,7 @@ import api from "../../../common/api";
 import { ChangePasswordIcon } from "../../../icons";
 import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -62,6 +63,7 @@ const ChangeUserPassword = ({
   closeModal,
 }: IChangeUserPasswordProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState<string>("");
   const [reNewPassword, setReNewPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -108,7 +110,7 @@ const ChangeUserPassword = ({
 
   return open ? (
     <ModalWrapper
-      title="Change User Password"
+      title={t("change_user_password")}
       modalOpen={open}
       onClose={() => {
         setNewPassword("");
@@ -127,7 +129,7 @@ const ChangeUserPassword = ({
         <Grid container>
           <Grid item xs={12} className={classes.modalFormScrollable}>
             <div className={classes.spacerBottom}>
-              Change password for: {userName}
+              {t("change_password_for")} {userName}
             </div>
             <Grid item xs={12} className={classes.formFieldRow}>
               <InputBoxWrapper
@@ -136,7 +138,7 @@ const ChangeUserPassword = ({
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setNewPassword(event.target.value);
                 }}
-                label="New Password"
+                label={t("new_password")}
                 type="password"
                 value={newPassword}
               />
@@ -148,7 +150,7 @@ const ChangeUserPassword = ({
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setReNewPassword(event.target.value);
                 }}
-                label="Type New Password Again"
+                label={t('type_new_password_again')}
                 type="password"
                 value={reNewPassword}
               />
@@ -164,7 +166,7 @@ const ChangeUserPassword = ({
                 !(reNewPassword.length > 0 && newPassword === reNewPassword)
               }
             >
-              Save
+              {t("save")}
             </Button>
           </Grid>
           {loading && (

@@ -41,6 +41,8 @@ import {
 import { SecureComponent } from "../../../../common/SecureComponent";
 import RBIconButton from "../BucketDetails/SummaryItems/RBIconButton";
 import clsx from "clsx";
+import { useTranslation } from 'react-i18next';
+
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -175,6 +177,7 @@ const BucketListItem = ({
   noManage = false,
 }: IBucketListItem) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const usage = niceBytes(`${bucket.size}` || "0");
   const usageScalar = usage.split(" ")[0];
@@ -227,12 +230,12 @@ const BucketListItem = ({
                 <Grid container className={classes.bucketInfo}>
                   <Grid item xs={12} sm>
                     <Typography variant="body2">
-                      Created: {bucket.creation_date}
+                      {t("created")}: {bucket.creation_date}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm>
                     <Typography variant="body2">
-                      Access: {accessToStr(bucket)}
+                      {t("access")}: {accessToStr(bucket)}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -246,9 +249,9 @@ const BucketListItem = ({
                 resource={bucket.name}
               >
                 <RBIconButton
-                  tooltip={"Manage"}
+                  tooltip={t("manage")}
                   onClick={() => navigate(`/buckets/${bucket.name}/admin`)}
-                  text={"Manage"}
+                  text={t("manage")}
                   icon={<SettingsIcon />}
                   color={"primary"}
                   variant={"outlined"}
@@ -257,9 +260,9 @@ const BucketListItem = ({
               </SecureComponent>
             )}
             <RBIconButton
-              tooltip={"Browse"}
+              tooltip={t("browse")}
               onClick={() => navigate(`/buckets/${bucket.name}/browse`)}
-              text={"Browse"}
+              text={t("browse")}
               icon={<ArrowRightIcon />}
               color={"primary"}
               variant={"contained"}
@@ -296,7 +299,7 @@ const BucketListItem = ({
           </Grid>
           <Grid item textAlign={"left"} className={classes.metric}>
             <TotalObjectsIcon />
-            <span className={classes.metricLabel}>Objects</span>
+            <span className={classes.metricLabel}>{t("object")}</span>
             <div className={classes.metricText}>
               {bucket.objects ? prettyNumber(bucket.objects) : 0}
             </div>

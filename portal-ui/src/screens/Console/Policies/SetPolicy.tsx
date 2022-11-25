@@ -37,6 +37,7 @@ import PredefinedList from "../Common/FormComponents/PredefinedList/PredefinedLi
 import { encodeURLString } from "../../../common/utils";
 import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { AppState, useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 import { useSelector } from "react-redux";
 import { setSelectedPolicies } from "../Users/AddUsersSlice";
@@ -71,6 +72,7 @@ const SetPolicy = ({
   open,
 }: ISetPolicyProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   //Local States
   const [loading, setLoading] = useState<boolean>(false);
   const [actualPolicy, setActualPolicy] = useState<string[]>([]);
@@ -159,13 +161,13 @@ const SetPolicy = ({
           <Fragment>
             <Grid item xs={12}>
               <PredefinedList
-                label={`Selected ${selectedGroups !== null ? "Group" : "User"}`}
+                label={`${t("selected")} ${selectedGroups !== null ? t("group") : t("user")}`}
                 content={selectedGroups !== null ? selectedGroups[0] : userName}
               />
             </Grid>
             <Grid item xs={12}>
               <PredefinedList
-                label={"Current Policy"}
+                label={t("current_policy")}
                 content={actualPolicy.join(", ")}
               />
             </Grid>
@@ -173,7 +175,7 @@ const SetPolicy = ({
         )}
         {selectedGroups && selectedGroups?.length > 1 && (
           <PredefinedList
-            label={"Selected Groups"}
+            label={t("selected_group")}
             content={selectedGroups.join(", ")}
           />
         )}

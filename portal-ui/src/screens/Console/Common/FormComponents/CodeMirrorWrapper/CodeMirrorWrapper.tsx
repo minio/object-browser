@@ -26,6 +26,7 @@ import { CopyIcon } from "../../../../../icons";
 import RBIconButton from "../../../Buckets/BucketDetails/SummaryItems/RBIconButton";
 import CopyToClipboard from "react-copy-to-clipboard";
 import CodeEditor from "@uiw/react-textarea-code-editor";
+import { useTranslation } from 'react-i18next';
 
 interface ICodeWrapper {
   value: string;
@@ -54,6 +55,8 @@ const CodeMirrorWrapper = ({
   readOnly = false,
   editorHeight = "250px",
 }: ICodeWrapper) => {
+  const { t } = useTranslation();
+
   return (
     <React.Fragment>
       <Grid item xs={12} sx={{ marginBottom: "10px" }}>
@@ -126,7 +129,7 @@ const CodeMirrorWrapper = ({
         >
           <CopyToClipboard text={value}>
             <RBIconButton
-              tooltip={"Copy to Clipboard"}
+              tooltip={t("copy_to_clipboard")}
               onClick={() => {}}
               text={""}
               icon={<CopyIcon />}

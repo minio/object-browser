@@ -49,6 +49,8 @@ import {
   setAddLoading,
   setSendEnabled,
 } from "./AddUsersSlice";
+import { useTranslation } from 'react-i18next';
+
 interface IAddUserProps {
   classes: any;
 }
@@ -92,12 +94,14 @@ const AddUser = ({ classes }: IAddUserProps) => {
   const navigate = useNavigate();
   dispatch(setSendEnabled());
 
+  const { t } = useTranslation();
+
   const saveRecord = (event: React.FormEvent) => {
     event.preventDefault();
     if (secretKeylength < 8) {
       dispatch(
         setErrorSnackMessage({
-          errorMessage: "Passwords must be at least 8 characters long",
+          errorMessage: t("password_not_long_enough"),
           detailedError: "",
         })
       );
@@ -116,10 +120,10 @@ const AddUser = ({ classes }: IAddUserProps) => {
   return (
     <Fragment>
       <Grid item xs={12}>
-        <PageHeader label={<BackLink to={IAM_PAGES.USERS} label={"Users"} />} />
+        <PageHeader label={<BackLink to={IAM_PAGES.USERS} label={t("users")} />} />
         <PageLayout>
           <FormLayout
-            title={"Create User"}
+            title={t("create_user")}
             icon={<CreateUserIcon />}
             helpbox={<AddUserHelpBox />}
           >
@@ -168,7 +172,7 @@ const AddUser = ({ classes }: IAddUserProps) => {
                       dispatch(resetFormAsync());
                     }}
                   >
-                    Clear
+                    {t("clear")}
                   </Button>
 
                   <Button
@@ -177,7 +181,7 @@ const AddUser = ({ classes }: IAddUserProps) => {
                     color="primary"
                     disabled={addLoading || !sendEnabled}
                   >
-                    Save
+                    {t("save")}
                   </Button>
                 </Grid>
               </Grid>

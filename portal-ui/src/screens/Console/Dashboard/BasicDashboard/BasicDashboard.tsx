@@ -36,6 +36,7 @@ import RBIconButton from "../../Buckets/BucketDetails/SummaryItems/RBIconButton"
 import { Link } from "react-router-dom";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
 import TimeStatItem from "../TimeStatItem";
+import { useTranslation } from 'react-i18next';
 
 const BoxItem = ({ children }: { children: any }) => {
   return (
@@ -88,6 +89,8 @@ const prettyUsage = (usage: string | undefined) => {
 };
 
 const BasicDashboard = ({ usage }: IDashboardProps) => {
+  const { t } = useTranslation();
+
   const usageValue = usage && usage.usage ? usage.usage.toString() : "0";
   const usageToRepresent = prettyUsage(usageValue);
 
@@ -168,9 +171,9 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                     }}
                   >
                     <RBIconButton
-                      tooltip={"Browse"}
+                      tooltip={t("browse")}
                       onClick={() => {}}
-                      text={"Browse"}
+                      text={t("browse")}
                       icon={<ArrowRightIcon />}
                       color={"primary"}
                       variant={"outlined"}
@@ -181,7 +184,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
             </BoxItem>
             <BoxItem>
               <CounterCard
-                label={"Objects"}
+                label={t("objects")}
                 icon={<TotalObjectsIcon />}
                 counterValue={usage ? representationNumber(usage.objects) : 0}
               />
@@ -191,7 +194,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
               <StatusCountCard
                 onlineCount={onlineServers.length}
                 offlineCount={offlineServers.length}
-                label={"Servers"}
+                label={t("servers")}
                 icon={<ServersIcon />}
               />
             </BoxItem>
@@ -199,7 +202,7 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
               <StatusCountCard
                 offlineCount={offlineDrives.length}
                 onlineCount={onlineDrives.length}
-                label={"Drives"}
+                label={t("drives")}
                 icon={<DrivesIcon />}
               />
             </BoxItem>
@@ -240,9 +243,9 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                           },
                         }}
                       >
-                        Time since last
+                        {t("time_since_last")}
                       </Box>{" "}
-                      Heal Activity
+                      {t("heal_activity")}
                     </Box>
                   }
                   value={lastHeal}
@@ -259,16 +262,16 @@ const BasicDashboard = ({ usage }: IDashboardProps) => {
                           },
                         }}
                       >
-                        Time since last
+                        {t("time_since_last")}
                       </Box>{" "}
-                      Scan Activity
+                      {t("scan_activity")}
                     </Box>
                   }
                   value={lastScan}
                 />
                 <TimeStatItem
                   icon={<UptimeIcon />}
-                  label={"Uptime"}
+                  label={t("uptime")}
                   value={upTime}
                 />
               </Box>

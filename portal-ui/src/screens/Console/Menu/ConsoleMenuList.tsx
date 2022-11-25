@@ -29,6 +29,7 @@ import {
   menuItemTextStyles,
 } from "./MenuStyleUtils";
 import MenuItem from "./MenuItem";
+import { useTranslation } from 'react-i18next';
 
 import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
 
@@ -43,6 +44,7 @@ const ConsoleMenuList = ({
 }) => {
   const stateClsName = isOpen ? "wide" : "mini";
   const { pathname = "" } = useLocation();
+  const { t } = useTranslation();
   let groupToSelect = pathname.slice(1, pathname.length); //single path
   if (groupToSelect.indexOf("/") !== -1) {
     groupToSelect = groupToSelect.slice(0, groupToSelect.indexOf("/")); //nested path
@@ -153,7 +155,7 @@ const ConsoleMenuList = ({
             <LogoutIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Logout"
+            primary={t("logout")}
             id={"logout"}
             sx={{ ...menuItemTextStyles }}
             className={stateClsName}

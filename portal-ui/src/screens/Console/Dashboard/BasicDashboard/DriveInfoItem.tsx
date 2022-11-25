@@ -29,6 +29,7 @@ import { Cell, Pie, PieChart } from "recharts";
 import { CircleIcon } from "../../../../icons";
 import { commonDashboardInfocard } from "../../Common/FormComponents/common/styleLibrary";
 import { STATUS_COLORS } from "./Utils";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -52,6 +53,8 @@ const driveStatusColor = (health_status: string) => {
 };
 
 const DriveInfoItem = ({ drive }: ICardProps) => {
+  const { t } = useTranslation();
+
   const freeSpace = drive.totalSpace - drive.usedSpace;
 
   const plotValues = [
@@ -198,7 +201,7 @@ const DriveInfoItem = ({ drive }: ICardProps) => {
                   drive.totalSpace ? drive.totalSpace.toString() : "0"
                 )}
               </div>
-              <label className="info-label">Capacity</label>
+              <label className="info-label">{t("capacity")}</label>
             </Box>
 
             <Box
@@ -210,7 +213,7 @@ const DriveInfoItem = ({ drive }: ICardProps) => {
               <div className="info-value">
                 {niceBytes(drive.usedSpace ? drive.usedSpace.toString() : "0")}
               </div>
-              <label className="info-label">Used</label>
+              <label className="info-label">{t("used")}</label>
             </Box>
             <Box
               sx={{
@@ -223,7 +226,7 @@ const DriveInfoItem = ({ drive }: ICardProps) => {
                   drive.availableSpace ? drive.availableSpace.toString() : "0"
                 )}
               </div>
-              <label className="info-label">Available</label>
+              <label className="info-label">{t("available")}</label>
             </Box>
           </Box>
         </Box>

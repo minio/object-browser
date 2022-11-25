@@ -68,6 +68,8 @@ import {
   setBucketInfo,
 } from "./bucketDetailsSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 const BucketsIcon = React.lazy(() => import("../../../../icons/BucketsIcon"));
 const FolderIcon = React.lazy(() => import("../../../../icons/FolderIcon"));
@@ -182,6 +184,7 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
   const openBucketBrowser = () => {
     navigate(`/buckets/${bucketName}/browse`);
   };
+  const { t } = useTranslation();
 
   return (
     <Fragment>
@@ -198,7 +201,7 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
         label={<BackLink to={"/buckets"} label={"Buckets"} />}
         actions={
           <Fragment>
-            <Tooltip title={"Browse Bucket"}>
+            <Tooltip title={t("browse_bucket")}>
               <IconButton
                 color="primary"
                 aria-label="Browse Bucket"
@@ -229,7 +232,7 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
                 scopes={[IAM_SCOPES.S3_GET_BUCKET_POLICY]}
                 resource={bucketName}
               >
-                <span style={{ fontSize: 15 }}>Access: </span>
+                <span style={{ fontSize: 15 }}>{t("access")} </span>
                 <span
                   className={classes.capitalize}
                   style={{ fontWeight: 600, fontSize: 15 }}
@@ -249,11 +252,11 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
                   errorProps={{ disabled: true }}
                 >
                   <RBIconButton
-                    tooltip={"Delete Bucket"}
+                    tooltip={t("delete_bucket")}
                     onClick={() => {
                       setDeleteOpen(true);
                     }}
-                    text={"Delete Bucket"}
+                    text={t("delete_bucket")}
                     icon={<TrashIcon />}
                     color={"secondary"}
                     variant={"outlined"}
@@ -263,8 +266,8 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
                   onClick={() => {
                     dispatch(setBucketDetailsLoad(true));
                   }}
-                  text={`Refresh`}
-                  icon={<RefreshIcon />}
+                  text={t("refresh")}
+                  icon={<RefreshIcon />}  
                   color={"primary"}
                 />
               </Fragment>
@@ -293,7 +296,7 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
           >
             {{
               tabConfig: {
-                label: "Summary",
+                label: t("summary"),
                 value: "summary",
                 component: Link,
                 to: getRoutePath("summary"),
@@ -301,7 +304,7 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
             }}
             {{
               tabConfig: {
-                label: "Access Audit",
+                label: t("access_audit"),
                 value: "access",
                 component: Link,
                 disabled: !hasPermission(bucketName, [
@@ -314,7 +317,7 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
             }}
             {{
               tabConfig: {
-                label: "Access Rules",
+                label: t("access_rules"),
                 value: "prefix",
                 component: Link,
                 disabled: !hasPermission(bucketName, [

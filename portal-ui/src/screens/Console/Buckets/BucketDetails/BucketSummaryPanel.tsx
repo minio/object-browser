@@ -58,6 +58,8 @@ import {
   setBucketDetailsLoad,
 } from "./bucketDetailsSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 const SetAccessPolicy = withSuspense(
   React.lazy(() => import("./SetAccessPolicy"))
@@ -91,6 +93,7 @@ interface IBucketSummaryProps {
 
 const BucketSummary = ({ classes }: IBucketSummaryProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const params = useParams();
 
   const loadingBucket = useSelector(selBucketDetailsLoading);
@@ -248,6 +251,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
       loadAllBucketData();
     }
   };
+
   // @ts-ignore
   return (
     <Fragment>
@@ -276,7 +280,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
         />
       )}
 
-      <SectionTitle>Summary</SectionTitle>
+      <SectionTitle>{t("summary")}</SectionTitle>
       <Grid container spacing={1}>
         <SecureComponent
           scopes={[IAM_SCOPES.S3_GET_BUCKET_POLICY]}
@@ -292,8 +296,8 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                   <EditablePropertyItem
                     iamScopes={[IAM_SCOPES.S3_PUT_BUCKET_POLICY]}
                     resourceName={bucketName}
-                    property={"Access Policy:"}
-                    value={accessPolicy.toLowerCase()}
+                    property={t("access_policy")+":"}
+                    value={t(accessPolicy.toLowerCase())}
                     onEdit={() => {
                       setAccessPolicyScreenOpen(true);
                     }}
@@ -306,7 +310,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                   resource={bucketName}
                 >
                   <LabelValuePair
-                    label={"Object Locking:"}
+                    label={t("object_locking")+":"}
                     value={
                       <LabelWithIcon
                         icon={
@@ -314,7 +318,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                         }
                         label={
                           <label className={classes.textMuted}>
-                            {hasObjectLocking ? "Enabled" : "Disabled"}
+                            {hasObjectLocking ? t("enabled") : t("disabled")}
                           </label>
                         }
                       />
@@ -323,7 +327,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                 </SecureComponent>
                 <Box className={classes.spacerTop}>
                   <LabelValuePair
-                    label={"Tags:"}
+                    label={t("tags"+":")}
                     value={<BucketTags bucketName={bucketName} />}
                   />
                 </Box>
@@ -348,7 +352,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
             resource={bucketName}
           >
             <Grid item xs={12}>
-              <SectionTitle>Versioning</SectionTitle>
+              <SectionTitle>{t("versioning")}</SectionTitle>
 
               <Box
                 sx={{
@@ -364,7 +368,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                     iamScopes={[IAM_SCOPES.S3_PUT_BUCKET_VERSIONING]}
                     resourceName={bucketName}
                     property={"Current Status:"}
-                    value={isVersioned ? "Versioned" : "Unversioned (Default)"}
+                    value={isVersioned ? t("versioned") : t("unversioned")}
                     onEdit={setBucketVersioning}
                     isLoading={loadingVersioning}
                   />
@@ -380,7 +384,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
             resource={bucketName}
           >
             <Grid item xs={12}>
-              <SectionTitle>Retention</SectionTitle>
+              <SectionTitle>{t("retention")}</SectionTitle>
 
               <Box
                 sx={{
@@ -401,8 +405,8 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                   <EditablePropertyItem
                     iamScopes={[IAM_SCOPES.ADMIN_SET_BUCKET_QUOTA]}
                     resourceName={bucketName}
-                    property={"Retention:"}
-                    value={retentionEnabled ? "Enabled" : "Disabled"}
+                    property={t("retention")+":"}
+                    value={retentionEnabled ? t("enabled") : t("disabled")}
                     onEdit={() => {
                       setRetentionConfigOpen(true);
                     }}
@@ -423,7 +427,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
                     }
                   />
                   <LabelValuePair
-                    label={"Validity:"}
+                    label={t("validity")+":"}
                     value={
                       <label
                         className={classes.textMuted}

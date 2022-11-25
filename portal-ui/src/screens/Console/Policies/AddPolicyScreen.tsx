@@ -32,10 +32,13 @@ import { setErrorSnackMessage } from "../../../systemSlice";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../../store";
 import { emptyPolicy } from "./utils";
+import { t } from "i18next";
+import { useTranslation } from 'react-i18next';
 
 const AddPolicyScreen = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [policyName, setPolicyName] = useState<string>("");
@@ -82,11 +85,11 @@ const AddPolicyScreen = () => {
     <Fragment>
       <Grid item xs={12}>
         <PageHeader
-          label={<BackLink to={IAM_PAGES.POLICIES} label={"Policies"} />}
+          label={<BackLink to={IAM_PAGES.POLICIES} label={t("policies")} />}
         />
         <PageLayout>
           <FormLayout
-            title={"Create Policy"}
+            title={t('create_policy')}
             icon={<AddAccessRuleIcon />}
             helpbox={<AddPolicyHelpBox />}
           >
@@ -102,7 +105,7 @@ const AddPolicyScreen = () => {
                   <InputBoxWrapper
                     id="policy-name"
                     name="policy-name"
-                    label="Policy Name"
+                    label={t("policy_name")}
                     autoFocus={true}
                     value={policyName}
                     error={validatePolicyname(policyName)}
@@ -113,7 +116,7 @@ const AddPolicyScreen = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <CodeMirrorWrapper
-                    label={"Write Policy"}
+                    label={t("write_policy")}
                     value={policyDefinition}
                     onBeforeChange={(editor, data, value) => {
                       setPolicyDefinition(value);
@@ -137,7 +140,7 @@ const AddPolicyScreen = () => {
                       color="primary"
                       onClick={resetForm}
                     >
-                      Clear
+                      {t("clear")}
                     </Button>
 
                     <Button
@@ -146,7 +149,7 @@ const AddPolicyScreen = () => {
                       color="primary"
                       disabled={addLoading || !validSave}
                     >
-                      Save
+                      {t("save")}
                     </Button>
                   </Box>
                 </Grid>

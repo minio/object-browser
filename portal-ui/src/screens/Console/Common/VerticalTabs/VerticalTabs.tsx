@@ -109,7 +109,6 @@ const VerticalTabs = ({
     headerList.push(child.tabConfig);
     contentList.push(child.content);
   });
-
   return (
     <TabContext value={`${value}`}>
       <Box className={classes.tabsContainer}>

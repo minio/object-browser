@@ -36,6 +36,8 @@ import TableWrapper from "../Common/TableWrapper/TableWrapper";
 import SearchBox from "../Common/SearchBox";
 import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 interface IGroupsProps {
   classes: any;
@@ -75,6 +77,8 @@ const GroupsSelectors = ({
   setSelectedGroups,
 }: IGroupsProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
   // Local State
   const [records, setRecords] = useState<any[]>([]);
   const [loading, isLoading] = useState<boolean>(false);
@@ -141,11 +145,11 @@ const GroupsSelectors = ({
         {records !== null && records.length > 0 ? (
           <React.Fragment>
             <Grid item xs={12} className={classes.actionsTray}>
-              <label className={classes.actionsTitle}>Assign Groups</label>
+              <label className={classes.actionsTitle}>{t("assign_group")}</label>
 
               <div className={classes.searchBox}>
                 <SearchBox
-                  placeholder="Start typing to search for Groups"
+                  placeholder={t("group_search_placeholder")}
                   adornmentPosition="end"
                   onChange={setFilter}
                   value={filter}
@@ -154,7 +158,7 @@ const GroupsSelectors = ({
             </Grid>
             <Grid item xs={12} className={classes.tableBlock}>
               <TableWrapper
-                columns={[{ label: "Group", elementKey: "" }]}
+                columns={[{ label: t("group"), elementKey: "" }]}
                 onSelect={selectionChanged}
                 selectedItems={selGroups}
                 isLoading={loading}
@@ -166,7 +170,7 @@ const GroupsSelectors = ({
             </Grid>
           </React.Fragment>
         ) : (
-          <div className={classes.noFound}>No Groups Available</div>
+          <div className={classes.noFound}>{t("no_groups_available")}</div>
         )}
       </Grid>
     </React.Fragment>

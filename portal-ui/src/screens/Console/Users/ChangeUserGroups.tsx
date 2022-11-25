@@ -33,6 +33,7 @@ import AddMembersToGroup from "../../../icons/AddMembersToGroupIcon";
 import { encodeURLString } from "../../../common/utils";
 import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -57,6 +58,7 @@ const ChangeUserGroups = ({
   open,
 }: IChangeUserGroupsContentProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [addLoading, setAddLoading] = useState<boolean>(false);
   const [accessKey, setAccessKey] = useState<string>("");
   const [secretKey, setSecretKey] = useState<string>("");
@@ -151,7 +153,7 @@ const ChangeUserGroups = ({
         closeModalAndRefresh();
       }}
       modalOpen={open}
-      title={"Set Groups"}
+      title={t("set_groups")}
       titleIcon={<AddMembersToGroup />}
     >
       <React.Fragment>
@@ -179,7 +181,7 @@ const ChangeUserGroups = ({
                 className={classes.spacerRight}
                 onClick={resetForm}
               >
-                Clear
+                {t("clear")}
               </Button>
 
               <Button
@@ -188,7 +190,7 @@ const ChangeUserGroups = ({
                 color="primary"
                 disabled={addLoading || !sendEnabled}
               >
-                Save
+                {t("save")}
               </Button>
             </Grid>
             {addLoading && (

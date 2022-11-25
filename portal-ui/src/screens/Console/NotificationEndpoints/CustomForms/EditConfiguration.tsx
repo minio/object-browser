@@ -48,6 +48,7 @@ import {
 import { useAppDispatch } from "../../../../store";
 import Loader from "../../Common/Loader/Loader";
 import EndpointDisplay from "./EndpointDisplay";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -73,10 +74,11 @@ const EditConfiguration = ({
 }: IAddNotificationEndpointProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const { pathname = "" } = useLocation();
 
   let selConfigTab = pathname.substring(pathname.lastIndexOf("/") + 1);
-  selConfigTab = selConfigTab === "settings" ? "compression" : selConfigTab;
 
   //Local States
   const [valuesObj, setValueObj] = useState<IElementValue[]>([]);
@@ -86,7 +88,7 @@ const EditConfiguration = ({
   const [configSubsysList, setConfigSubsysList] = useState<any>([]);
   const [resetConfigurationOpen, setResetConfigurationOpen] =
     useState<boolean>(false);
-
+  const isLanguage = selConfigTab === "language"
   useEffect(() => {
     setLoadingConfig(true);
   }, [selConfigTab]);
@@ -95,7 +97,7 @@ const EditConfiguration = ({
     if (loadingConfig) {
       const configId = get(selectedConfiguration, "configuration_id", false);
 
-      if (configId) {
+      if (configId && !isLanguage) {
         api
           .invoke("GET", `/api/v1/configs/${configId}`)
           .then((res) => {
@@ -116,7 +118,7 @@ const EditConfiguration = ({
   }, [loadingConfig, selectedConfiguration, dispatch]);
 
   useEffect(() => {
-    if (saving) {
+    if (saving && !isLanguage) {
       const payload = {
         key_values: removeEmptyFields(valuesObj),
       };
@@ -130,7 +132,7 @@ const EditConfiguration = ({
           setSaving(false);
           dispatch(setServerNeedsRestart(res.restart));
           if (!res.restart) {
-            dispatch(setSnackBarMessage("Configuration saved successfully"));
+            dispatch(setSnackBarMessage(t("configuration_saved_successfully")));
           }
         })
         .catch((err: ErrorResponseHandler) => {
@@ -207,7 +209,8 @@ const EditConfiguration = ({
                 />
               )}
             </Grid>
-            <Grid
+            {!isLanguage?
+             <Grid
               item
               xs={12}
               sx={{
@@ -233,7 +236,7 @@ const EditConfiguration = ({
                   setResetConfigurationOpen(true);
                 }}
               >
-                Restore Defaults
+                {t("restore_defaults")}
               </Button>
               &nbsp; &nbsp;
               <Button
@@ -242,9 +245,9 @@ const EditConfiguration = ({
                 color="primary"
                 disabled={saving}
               >
-                Save
+                {t("save")}
               </Button>
-            </Grid>
+            </Grid>: null}
           </form>
         </Box>
       )}

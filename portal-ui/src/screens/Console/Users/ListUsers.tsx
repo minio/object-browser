@@ -55,6 +55,8 @@ import {
 } from "../../../common/SecureComponent";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
+
 
 const DeleteUser = withSuspense(React.lazy(() => import("./DeleteUser")));
 const AddToGroup = withSuspense(React.lazy(() => import("./BulkAddToGroup")));
@@ -180,6 +182,8 @@ const ListUsers = ({ classes }: IUsersProps) => {
     },
   ];
 
+  const { t } = useTranslation();
+
   return (
     <Fragment>
       {deleteOpen && (
@@ -200,11 +204,11 @@ const ListUsers = ({ classes }: IUsersProps) => {
           }}
         />
       )}
-      <PageHeader label={"Users"} />
+      <PageHeader label={t("users")} />
       <PageLayout>
         <Grid item xs={12} className={classes.actionsTray}>
           <SearchBox
-            placeholder={"Search Users"}
+            placeholder={t("search_users")}
             onChange={setFilter}
             overrideClass={classes.searchField}
             value={filter}
@@ -216,11 +220,11 @@ const ListUsers = ({ classes }: IUsersProps) => {
             errorProps={{ disabled: true }}
           >
             <RBIconButton
-              tooltip={"Delete Selected"}
+              tooltip={t("delete_selected")}
               onClick={() => {
                 setDeleteOpen(true);
               }}
-              text={"Delete Selected"}
+              text={t("delete_selected")}
               icon={<DeleteIcon />}
               color="secondary"
               disabled={checkedUsers.length === 0}
@@ -234,8 +238,8 @@ const ListUsers = ({ classes }: IUsersProps) => {
             errorProps={{ disabled: true }}
           >
             <RBIconButton
-              tooltip={"Add to Group"}
-              text={"Add to Group"}
+              tooltip={t("add_to_group")}
+              text={t("add_to_group")}
               icon={<GroupsIcon />}
               color="primary"
               disabled={checkedUsers.length <= 0}
@@ -258,8 +262,8 @@ const ListUsers = ({ classes }: IUsersProps) => {
             errorProps={{ disabled: true }}
           >
             <RBIconButton
-              tooltip={"Create User"}
-              text={"Create User"}
+              tooltip={t("create_user")}
+              text={t("create_user")}
               icon={<AddIcon />}
               color="primary"
               onClick={() => {
@@ -289,7 +293,7 @@ const ListUsers = ({ classes }: IUsersProps) => {
                     <TableWrapper
                       itemActions={tableActions}
                       columns={[
-                        { label: "Access Key", elementKey: "accessKey" },
+                        { label: t("access_key"), elementKey: "accessKey" },
                       ]}
                       onSelect={
                         addUserToGroup || deleteUser
@@ -305,37 +309,23 @@ const ListUsers = ({ classes }: IUsersProps) => {
                   </SecureComponent>
                 </Grid>
                 <HelpBox
-                  title={"Users"}
+                  title={t("users")}
                   iconComponent={<UsersIcon />}
                   help={
                     <Fragment>
-                      A Mantle SDS user consists of a unique access key (username)
-                      and corresponding secret key (password). Clients must
-                      authenticate their identity by specifying both a valid
-                      access key (username) and the corresponding secret key
-                      (password) of an existing Mantle SDS user.
+                      {t("create_user_info1")}
                       <br />
-                      Groups provide a simplified method for managing shared
-                      permissions among users with common access patterns and
-                      workloads.
+                      {t("create_user_info2")}
                       <br />
                       <br />
-                      Users inherit access permissions to data and resources
-                      through the groups they belong to.
+                      {t("create_user_info3")}
                       <br />
-                      Mantle SDS uses Policy-Based Access Control (PBAC) to define
-                      the authorized actions and resources to which an
-                      authenticated user has access. Each policy describes one
-                      or more actions and conditions that outline the
-                      permissions of a user or group of users.
+                      {t("create_user_info4")}
                       <br />
                       <br />
-                      Each user can access only those resources and operations
-                      which are explicitly granted by the built-in role. Mantle SDS
-                      denies access to any other resource or action by default.
+                      {t("create_user_info5")}.
                       <br />
                       <br />
-                      .
                     </Fragment>
                   }
                 />
@@ -354,31 +344,19 @@ const ListUsers = ({ classes }: IUsersProps) => {
                     iconComponent={<UsersIcon />}
                     help={
                       <Fragment>
-                        A Mantle SDS user consists of a unique access key (username)
-                        and corresponding secret key (password). Clients must
-                        authenticate their identity by specifying both a valid
-                        access key (username) and the corresponding secret key
-                        (password) of an existing Mantle SDS user.
-                        <br />
-                        Groups provide a simplified method for managing shared
-                        permissions among users with common access patterns and
-                        workloads.
-                        <br />
-                        <br />
-                        Users inherit access permissions to data and resources
-                        through the groups they belong to.
-                        <br />
-                        Mantle SDS uses Policy-Based Access Control (PBAC) to define
-                        the authorized actions and resources to which an
-                        authenticated user has access. Each policy describes one
-                        or more actions and conditions that outline the
-                        permissions of a user or group of users.
-                        <br />
-                        <br />
-                        Each user can access only those resources and operations
-                        which are explicitly granted by the built-in role. Mantle SDS
-                        denies access to any other resource or action by
-                        default.
+                      {t("create_user_info1")}
+                      <br />
+                      {t("create_user_info2")}
+                      <br />
+                      <br />
+                      {t("create_user_info3")}
+                      <br />
+                      {t("create_user_info4")}
+                      <br />
+                      <br />
+                      {t("create_user_info5")}.
+                      <br />
+                      <br />
                         <SecureComponent
                           scopes={[
                             IAM_SCOPES.ADMIN_CREATE_USER,
@@ -390,13 +368,13 @@ const ListUsers = ({ classes }: IUsersProps) => {
                         >
                           <br />
                           <br />
-                          To get started,{" "}
+                          {t("get_started")},{" "}
                           <AButton
                             onClick={() => {
                               navigate(`${IAM_PAGES.USER_ADD}`);
                             }}
                           >
-                            Create a User
+                            {t("create_user")}
                           </AButton>
                           .
                         </SecureComponent>

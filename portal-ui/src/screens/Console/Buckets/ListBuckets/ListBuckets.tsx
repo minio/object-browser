@@ -60,6 +60,8 @@ import { useAppDispatch } from "../../../../store";
 import { useSelector } from "react-redux";
 import { selFeatures } from "../../consoleSlice";
 import AutoColorIcon from "../../Common/Components/AutoColorIcon";
+import { useTranslation } from 'react-i18next';
+
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -199,7 +201,7 @@ const ListBuckets = ({ classes }: IListBucketsProps) => {
 
     setSelectedBuckets(selectAllBuckets);
   };
-
+  const { t } = useTranslation();
   const canCreateBucket = hasPermission("*", [IAM_SCOPES.S3_CREATE_BUCKET]);
 
   return (
@@ -228,7 +230,7 @@ const ListBuckets = ({ classes }: IListBucketsProps) => {
           )}
           <SearchBox
             onChange={setFilterBuckets}
-            placeholder="Search Buckets"
+            placeholder={t("search_buckets")}
             overrideClass={classes.searchField}
             value={filterBuckets}
           />
@@ -241,7 +243,7 @@ const ListBuckets = ({ classes }: IListBucketsProps) => {
             justifyContent={"flex-end"}
           >
             <RBIconButton
-              tooltip={"Refresh"}
+              tooltip={t("refresh")}
               onClick={() => {
                 setLoading(true);
               }}
@@ -253,11 +255,11 @@ const ListBuckets = ({ classes }: IListBucketsProps) => {
 
             {!obOnly && (
               <RBIconButton
-                tooltip={"Create Bucket"}
+                tooltip={t('create_bucket')}
                 onClick={() => {
                   navigate(IAM_PAGES.ADD_BUCKETS);
                 }}
-                text={"Create Bucket"}
+                text={t('create_bucket')}
                 icon={<AddIcon />}
                 color={"primary"}
                 variant={"contained"}
@@ -290,10 +292,10 @@ const ListBuckets = ({ classes }: IListBucketsProps) => {
                 <Grid item xs={8}>
                   <HelpBox
                     iconComponent={<BucketsIcon />}
-                    title={"No Results"}
+                    title={t('no_results')}
                     help={
                       <Fragment>
-                        No buckets match the filtering condition
+                        {t("no_buckets_match")}
                       </Fragment>
                     }
                   />
@@ -313,22 +315,20 @@ const ListBuckets = ({ classes }: IListBucketsProps) => {
                     title={"Buckets"}
                     help={
                       <Fragment>
-                        MinIO uses buckets to organize objects. A bucket is
-                        similar to a folder or directory in a filesystem, where
-                        each bucket can hold an arbitrary number of objects.
+                        {t("create_buckets_intro")}
                         <SecureComponent
                           scopes={[IAM_SCOPES.S3_CREATE_BUCKET]}
                           resource={CONSOLE_UI_RESOURCE}
                         >
                           <br />
                           <br />
-                          To get started,&nbsp;
+                          {t("get_started")}&nbsp;
                           <AButton
                             onClick={() => {
                               navigate(IAM_PAGES.ADD_BUCKETS);
                             }}
                           >
-                            Create a Bucket.
+                            {t("create_a_bucket")}
                           </AButton>
                         </SecureComponent>
                       </Fragment>

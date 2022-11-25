@@ -14,6 +14,7 @@ import { Theme } from "@mui/material/styles";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { deleteDialogStyles } from "../FormComponents/common/styleLibrary";
+import  i18next from 'i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -45,7 +46,7 @@ const ConfirmDialog = ({
   title = "",
   isLoading,
   confirmationContent,
-  cancelText = "Cancel",
+  cancelText = i18next.t("cancel"),
   confirmText = "Confirm",
   confirmButtonProps = {},
   cancelButtonProps = {},

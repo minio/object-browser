@@ -48,6 +48,7 @@ import { SecureComponent } from "../../../common/SecureComponent";
 import { encodeURLString } from "../../../common/utils";
 import { setErrorSnackMessage, setSnackBarMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IUserServiceAccountsProps {
   classes: any;
@@ -71,6 +72,7 @@ const UserServiceAccountsPanel = ({
   hasPolicy,
 }: IUserServiceAccountsProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [records, setRecords] = useState<string[]>([]);
@@ -139,7 +141,7 @@ const UserServiceAccountsPanel = ({
   const closeDeleteMultipleModalAndRefresh = (refresh: boolean) => {
     setDeleteMultipleOpen(false);
     if (refresh) {
-      dispatch(setSnackBarMessage(`Service accounts deleted successfully.`));
+      dispatch(setSnackBarMessage(t("Service accounts deleted successfully.")));
       setSelectedSAs([]);
       setLoading(true);
     }
@@ -223,14 +225,14 @@ const UserServiceAccountsPanel = ({
         />
       )}
       <div className={classes.actionsTray}>
-        <PanelTitle>Service Accounts</PanelTitle>
+        <PanelTitle>{t("service_accounts")}</PanelTitle>
         <Box>
           <RBIconButton
-            tooltip={"Delete Selected"}
+            tooltip={t("delete_selected")}
             onClick={() => {
               setDeleteMultipleOpen(true);
             }}
-            text={"Delete Selected"}
+            text={t("delete_selected")}
             icon={<DeleteIcon />}
             color="secondary"
             disabled={selectedSAs.length === 0}
@@ -248,8 +250,8 @@ const UserServiceAccountsPanel = ({
             errorProps={{ disabled: true }}
           >
             <RBIconButton
-              tooltip={"Create service account"}
-              text={"Create service account"}
+              tooltip={t("create_service_account")}
+              text={t("create_service_account")}
               variant="contained"
               color="primary"
               icon={<AddIcon />}
@@ -267,9 +269,9 @@ const UserServiceAccountsPanel = ({
         <TableWrapper
           isLoading={loading}
           records={records}
-          entityName={"Service Accounts"}
+          entityName={t("service_accounts")}
           idField={""}
-          columns={[{ label: "Service Account", elementKey: "" }]}
+          columns={[{ label: t("service_accounts"), elementKey: "" }]}
           itemActions={tableActions}
           selectedItems={selectedSAs}
           onSelect={(e) => selectSAs(e, setSelectedSAs, selectedSAs)}

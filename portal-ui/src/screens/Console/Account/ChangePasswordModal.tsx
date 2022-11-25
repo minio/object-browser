@@ -37,6 +37,7 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -58,6 +59,7 @@ const ChangePassword = ({
   closeModal,
 }: IChangePasswordProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [reNewPassword, setReNewPassword] = useState<string>("");
@@ -72,7 +74,7 @@ const ChangePassword = ({
     if (newPassword !== reNewPassword) {
       dispatch(
         setModalErrorSnackMessage({
-          errorMessage: "New passwords don't match",
+          errorMessage: t("new_password_dont_match"),
           detailedError: "",
         })
       );
@@ -82,7 +84,7 @@ const ChangePassword = ({
     if (newPassword.length < 8) {
       dispatch(
         setModalErrorSnackMessage({
-          errorMessage: "Passwords must be at least 8 characters long",
+          errorMessage: t("password_not_long_enough"),
           detailedError: "",
         })
       );
@@ -130,8 +132,7 @@ const ChangePassword = ({
       titleIcon={<ChangePasswordIcon />}
     >
       <div>
-        This will change your Console password. Please note your new password
-        down, as it will be required to log into Console after this session.
+      {t("new_password_write_down")}
       </div>
       <form
         noValidate
@@ -149,7 +150,7 @@ const ChangePassword = ({
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setCurrentPassword(event.target.value);
                 }}
-                label="Current Password"
+                label={t("current_password")}
                 type={showPassword ? "text" : "password"}
                 value={currentPassword}
                 overlayAction={() => setShowPassword(!showPassword)}
@@ -165,7 +166,7 @@ const ChangePassword = ({
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setNewPassword(event.target.value);
                 }}
-                label="New Password"
+                label={t("new_password")}
                 type={showPassword ? "text" : "password"}
                 value={newPassword}
                 overlayAction={() => setShowPassword(!showPassword)}
@@ -181,7 +182,7 @@ const ChangePassword = ({
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setReNewPassword(event.target.value);
                 }}
-                label="Type New Password Again"
+                label={t('type_new_password_again')}
                 type={showPassword ? "text" : "password"}
                 value={reNewPassword}
                 overlayAction={() => setShowPassword(!showPassword)}

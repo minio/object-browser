@@ -87,6 +87,7 @@ import {
   updateProgress,
 } from "../../../../ObjectBrowser/objectBrowserSlice";
 import RenameLongFileName from "../../../../ObjectBrowser/RenameLongFilename";
+import { useTranslation } from 'react-i18next';
 
 const styles = () =>
   createStyles({
@@ -157,6 +158,7 @@ const ObjectDetailPanel = ({
   onClosePanel,
 }: IObjectDetailPanelProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   const distributedSetup = useSelector(selDistSet);
   const versionsMode = useSelector(
@@ -398,46 +400,46 @@ const ObjectDetailPanel = ({
       action: () => {
         downloadObject(actualInfo);
       },
-      label: "Download",
+      label: t("download"),
       disabled:
         !!actualInfo.is_delete_marker ||
         !hasPermission(objectResources, [IAM_SCOPES.S3_GET_OBJECT]),
       icon: <DownloadIcon />,
-      tooltip: "Download this Object",
+      tooltip: t("download_this_object"),
     },
     {
       action: () => {
         shareObject();
       },
-      label: "Share",
+      label: t("share"),
       disabled:
         !!actualInfo.is_delete_marker ||
         !hasPermission(objectResources, [IAM_SCOPES.S3_GET_OBJECT]),
       icon: <ShareIcon />,
-      tooltip: "Share this File",
+      tooltip: t("share_this_file"),
     },
     {
       action: () => {
         setPreviewOpen(true);
       },
-      label: "Preview",
+      label: t("preview"),
       disabled:
         !!actualInfo.is_delete_marker ||
         extensionPreview(currentItem) === "none" ||
         !hasPermission(objectResources, [IAM_SCOPES.S3_GET_OBJECT]),
       icon: <PreviewIcon />,
-      tooltip: "Preview this File",
+      tooltip: t("preview_this_file"),
     },
     {
       action: openRetentionModal,
-      label: "Retention",
+      label: t("retention"),
       disabled:
         !distributedSetup ||
         !!actualInfo.is_delete_marker ||
         !hasPermission(objectResources, [IAM_SCOPES.S3_GET_OBJECT_RETENTION]) ||
         selectedVersion !== "",
       icon: <RetentionIcon />,
-      tooltip: "Change Retention rules for this File",
+      tooltip: t("change_retention_for_this_file"),
     },
     {
       action: () => {
@@ -449,20 +451,20 @@ const ObjectDetailPanel = ({
         selectedVersion !== "" ||
         !hasPermission(objectResources, [IAM_SCOPES.S3_PUT_OBJECT_TAGGING]),
       icon: <TagsIcon />,
-      tooltip: "Change Tags for this File",
+      tooltip: t("change_tags_for_this_file"),
     },
     {
       action: () => {
         setInspectModalOpen(true);
       },
-      label: "Inspect",
+      label: t("inspect"),
       disabled:
         !distributedSetup ||
         !!actualInfo.is_delete_marker ||
         selectedVersion !== "" ||
         !hasPermission(objectResources, [IAM_SCOPES.ADMIN_INSPECT_DATA]),
       icon: <InspectMenuIcon />,
-      tooltip: "Inspect this file",
+      tooltip: t("inspect_this_file"),
     },
     {
       action: () => {
@@ -473,7 +475,7 @@ const ObjectDetailPanel = ({
           })
         );
       },
-      label: versionsMode ? "Hide Object Versions" : "Display Object Versions",
+      label: versionsMode ? t("hide_object_version") : t("display_object_versions"),
       icon: <VersionsIcon />,
       disabled:
         !distributedSetup ||
@@ -483,7 +485,7 @@ const ObjectDetailPanel = ({
           IAM_SCOPES.S3_PUT_BUCKET_VERSIONING,
           IAM_SCOPES.S3_GET_OBJECT_VERSION,
         ]),
-      tooltip: "Display Versions for this file",
+      tooltip: t("display_version_for_this_file"),
     },
   ];
 
@@ -613,28 +615,28 @@ const ObjectDetailPanel = ({
                   },
                 }}
               >
-                Delete{selectedVersion !== "" ? " version" : ""}
+                {t("delete")}{selectedVersion !== "" ? " version" : ""}
               </Button>
             </SecureComponent>
           </Grid>
           <Grid item xs={12} className={classes.headerForSection}>
-            <span>Object Info</span>
+            <span>{t("object_info")}</span>
             <ObjectInfoIcon />
           </Grid>
           <Box className={classes.detailContainer}>
-            <strong>Name:</strong>
+            <strong>{t("name")}:</strong>
             <br />
             <div style={{ overflowWrap: "break-word" }}>{objectName}</div>
           </Box>
           {selectedVersion !== "" && (
             <Box className={classes.detailContainer}>
-              <strong>Version ID:</strong>
+              <strong>{t("version_ID")}:</strong>
               <br />
               {selectedVersion}
             </Box>
           )}
           <Box className={classes.detailContainer}>
-            <strong>Size:</strong>
+            <strong>{t("size")}:</strong>
             <br />
             {niceBytes(actualInfo.size || "0")}
           </Box>
@@ -642,15 +644,15 @@ const ObjectDetailPanel = ({
             actualInfo.version_id !== "null" &&
             selectedVersion === "" && (
               <Box className={classes.detailContainer}>
-                <strong>Versions:</strong>
+                <strong>{t("version")}:</strong>
                 <br />
-                {versions.length} version{versions.length !== 1 ? "s" : ""},{" "}
+                {versions.length} {t("version")}{versions.length !== 1 ? "s" : ""},{" "}
                 {niceBytesInt(totalVersionsSize)}
               </Box>
             )}
           {selectedVersion === "" && (
             <Box className={classes.detailContainer}>
-              <strong>Last Modified:</strong>
+              <strong>{t("last_modified")}:</strong>
               <br />
               {calculateLastModifyTime(actualInfo.last_modified)}
             </Box>
@@ -661,7 +663,7 @@ const ObjectDetailPanel = ({
             {actualInfo.etag || "N/A"}
           </Box>
           <Box className={classes.detailContainer}>
-            <strong>Tags:</strong>
+            <strong>{t("tags")}:</strong>
             <br />
             {tagKeys.length === 0
               ? "N/A"
@@ -680,7 +682,7 @@ const ObjectDetailPanel = ({
               resource={bucketName}
             >
               <Fragment>
-                <strong>Retention Policy:</strong>
+                <strong>{t("retention_policy")}:</strong>
                 <br />
                 <span className={classes.capitalizeFirst}>
                   {actualInfo.version_id && actualInfo.version_id !== "null" ? (

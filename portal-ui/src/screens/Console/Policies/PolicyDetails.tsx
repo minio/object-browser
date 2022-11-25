@@ -62,6 +62,7 @@ import { decodeURLString, encodeURLString } from "../../../common/utils";
 import { setErrorSnackMessage, setSnackBarMessage } from "../../../systemSlice";
 import { selFeatures } from "../consoleSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const DeletePolicy = withSuspense(React.lazy(() => import("./DeletePolicy")));
 
@@ -101,6 +102,7 @@ interface IPolicyDetailsProps {
 const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const params = useParams();
 
   const features = useSelector(selFeatures);
@@ -327,7 +329,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
       <PageHeader
         label={
           <Fragment>
-            <BackLink to={IAM_PAGES.POLICIES} label={"Policy"} />
+            <BackLink to={IAM_PAGES.POLICIES} label={t("policy")} />
           </Fragment>
         }
       />
@@ -341,7 +343,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
               </Fragment>
             }
             title={policyName}
-            subTitle={<Fragment>IAM Policy</Fragment>}
+            subTitle={<Fragment>{t("IAM_policies")}</Fragment>}
             actions={
               <Fragment>
                 <SecureComponent
@@ -350,8 +352,8 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
                   errorProps={{ disabled: true }}
                 >
                   <RBIconButton
-                    tooltip={"Delete Policy"}
-                    text={"Delete Policy"}
+                    tooltip={t("delete_policy")}
+                    text={t("delete_policy")}
                     variant="outlined"
                     color="secondary"
                     icon={<TrashIcon />}
@@ -360,8 +362,8 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
                 </SecureComponent>
 
                 <RBIconButton
-                  tooltip={"Refresh"}
-                  text={"Refresh"}
+                  tooltip={t("refresh")}
+                  text={t("refresh")}
                   variant="outlined"
                   color="primary"
                   icon={<RefreshIcon />}
@@ -378,10 +380,10 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
 
         <VerticalTabs>
           {{
-            tabConfig: { label: "Summary", disabled: !displayPolicy },
+            tabConfig: { label: t("summary"), disabled: !displayPolicy },
             content: (
               <Fragment>
-                <div className={classes.sectionTitle}>Policy Summary</div>
+                <div className={classes.sectionTitle}>{t("policy_summary")}</div>
                 <Paper className={classes.paperContainer}>
                   <PolicyView policyStatements={policyStatements} />
                 </Paper>
@@ -395,11 +397,11 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
             },
             content: (
               <Fragment>
-                <div className={classes.sectionTitle}>Users</div>
+                <div className={classes.sectionTitle}>{t("users")}</div>
                 <Grid container>
                   <Grid item xs={12} className={classes.actionsTray}>
                     <TextField
-                      placeholder="Search Users"
+                      placeholder={t("search_users")}
                       className={classes.searchField}
                       id="search-resource"
                       label=""
@@ -420,7 +422,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
 
                   <TableWrapper
                     itemActions={userTableActions}
-                    columns={[{ label: "Name", elementKey: "name" }]}
+                    columns={[{ label: t("name"), elementKey: "name" }]}
                     isLoading={loadingUsers}
                     records={filteredUsers}
                     entityName="Users"
@@ -432,7 +434,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
           }}
           {{
             tabConfig: {
-              label: "Groups",
+              label: t("groups"),
               disabled: !displayGroups || ldapIsEnabled,
             },
             content: (
@@ -441,7 +443,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
                 <Grid container>
                   <Grid item xs={12} className={classes.actionsTray}>
                     <TextField
-                      placeholder="Search Groups"
+                      placeholder={t("search_groups")}
                       className={classes.searchField}
                       id="search-resource"
                       label=""
@@ -461,7 +463,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
                   </Grid>
                   <TableWrapper
                     itemActions={groupTableActions}
-                    columns={[{ label: "Name", elementKey: "name" }]}
+                    columns={[{ label: t("name"), elementKey: "name" }]}
                     isLoading={loadingGroups}
                     records={filteredGroups}
                     entityName="Groups"
@@ -472,10 +474,10 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
             ),
           }}
           {{
-            tabConfig: { label: "Raw Policy", disabled: !displayPolicy },
+            tabConfig: { label: t("raw_policy"), disabled: !displayPolicy },
             content: (
               <Fragment>
-                <div className={classes.sectionTitle}>Raw Policy</div>
+                <div className={classes.sectionTitle}>{t("raw_policy")}</div>
                 <form
                   noValidate
                   autoComplete="off"
@@ -504,7 +506,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
                             resetForm();
                           }}
                         >
-                          Clear
+                          {t("clear")}
                         </button>
                       )}
                       <SecureComponent
@@ -518,7 +520,7 @@ const PolicyDetails = ({ classes }: IPolicyDetailsProps) => {
                           color="primary"
                           disabled={addLoading || !validSave}
                         >
-                          Save
+                          {t("save")}
                         </Button>
                       </SecureComponent>
                     </Grid>

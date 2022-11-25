@@ -37,6 +37,7 @@ import SearchBox from "../Common/SearchBox";
 
 import { setModalErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IGroupsProps {
   classes: any;
@@ -85,6 +86,7 @@ const UsersSelectors = ({
   editMode = false,
 }: IGroupsProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   //Local States
   const [records, setRecords] = useState<any[]>([]);
   const [loading, isLoading] = useState<boolean>(false);
@@ -155,11 +157,11 @@ const UsersSelectors = ({
             <React.Fragment>
               <Grid item xs={12} className={classes.actionsTray}>
                 <label className={classes.actionsTitle}>
-                  {editMode ? "Edit Members" : "Assign Users"}
+                  {editMode ? t("edit_members") : t("assign_members")}
                 </label>
                 <div className={classes.searchBox}>
                   <SearchBox
-                    placeholder="Filter Users"
+                    placeholder={t('filter_users')}
                     adornmentPosition="end"
                     onChange={setFilter}
                     value={filter}
@@ -168,7 +170,7 @@ const UsersSelectors = ({
               </Grid>
               <Grid item xs={12} className={classes.tableBlock}>
                 <TableWrapper
-                  columns={[{ label: "Access Key", elementKey: "accessKey" }]}
+                  columns={[{ label: t("access_key"), elementKey: "accessKey" }]}
                   onSelect={selectionChanged}
                   selectedItems={selUsers}
                   isLoading={loading}
@@ -180,7 +182,7 @@ const UsersSelectors = ({
               </Grid>
             </React.Fragment>
           ) : (
-            <div className={classes.noFound}>No Users to display</div>
+            <div className={classes.noFound}>{t("no_users_to_display")}</div>
           )}
         </Paper>
       </Grid>

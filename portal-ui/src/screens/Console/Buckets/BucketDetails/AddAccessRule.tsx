@@ -32,6 +32,7 @@ import SelectWrapper from "../../Common/FormComponents/SelectWrapper/SelectWrapp
 import { AddAccessRuleIcon } from "../../../../icons";
 import { setErrorSnackMessage } from "../../../../systemSlice";
 import { useAppDispatch } from "../../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IAddAccessRule {
   classes: any;
@@ -56,11 +57,12 @@ const AddAccessRule = ({
 
   const [prefix, setPrefix] = useState("");
   const [selectedAccess, setSelectedAccess] = useState<any>("readonly");
+  const { t } = useTranslation();
 
   const accessOptions = [
-    { label: "readonly", value: "readonly" },
-    { label: "writeonly", value: "writeonly" },
-    { label: "readwrite", value: "readwrite" },
+    { label: t("readonly"), value: "readonly" },
+    { label: t("writeonly"), value: "writeonly" },
+    { label: t("readwrite"), value: "readwrite" },
   ];
 
   const resetForm = () => {
@@ -86,24 +88,22 @@ const AddAccessRule = ({
   return (
     <ModalWrapper
       modalOpen={modalOpen}
-      title="Add Access Rule"
+      title= {t("add_access_rule")}
       onClose={onClose}
       titleIcon={<AddAccessRuleIcon />}
-    >
+    > 
       <Grid container>
         <Grid item xs={12} className={classes.formFieldRow}>
           <InputBoxWrapper
             value={prefix}
-            label={"Prefix"}
+            label={t("prefix")}
             id={"prefix"}
             name={"prefix"}
-            placeholder={"Enter Prefix"}
+            placeholder={t("enter_prefix")}
             onChange={(e) => {
               setPrefix(e.target.value);
             }}
-            tooltip={
-              "Leave this field blank to apply the rule to all prefixes and objects at the bucket root. Do not include the wildcard asterisk ``*`` as part of the prefix *unless* it is an explicit part of the prefix name. The Console automatically appends an asterisk to the appropriate sections of the resulting IAM policy."
-            }
+            tooltip={t("prefix_tooltip")}
           />
         </Grid>
         <Grid item xs={12}>
@@ -113,7 +113,7 @@ const AddAccessRule = ({
             onChange={(e) => {
               setSelectedAccess(e.target.value);
             }}
-            label="Access"
+            label={t("access")}
             value={selectedAccess}
             options={accessOptions}
             disabled={false}
@@ -126,7 +126,7 @@ const AddAccessRule = ({
             variant="outlined"
             onClick={resetForm}
           >
-            Clear
+            {t("clear")}
           </Button>
           <Button
             type="submit"
@@ -135,7 +135,7 @@ const AddAccessRule = ({
             disabled={prefix.trim() === ""}
             onClick={createProcess}
           >
-            Save
+            {t("save")}
           </Button>
         </Grid>
       </Grid>

@@ -55,6 +55,8 @@ import {
 import SettingsIcon from "../../icons/SettingsIcon";
 import React from "react";
 import LicenseBadge from "./Menu/LicenseBadge";
+import i18next, { t } from "i18next";
+
 
 export const validRoutes = (
   features: string[] | null | undefined,
@@ -62,9 +64,10 @@ export const validRoutes = (
   directPVMode: boolean
 ) => {
   const ldapIsEnabled = (features && features.includes("ldap-idp")) || false;
+
   let consoleMenus: IMenuItem[] = [
     {
-      name: "Buckets",
+      name: "Bucket",
       id: "buckets",
       component: NavLink,
       to: IAM_PAGES.BUCKETS,
@@ -73,7 +76,7 @@ export const validRoutes = (
       children: [],
     },
     {
-      name: "Identity",
+      name: i18next.t("identity"),
       id: "identity",
       icon: IdentityMenuIcon,
       children: [
@@ -84,7 +87,7 @@ export const validRoutes = (
           customPermissionFnc: () =>
             hasPermission(CONSOLE_UI_RESOURCE, [IAM_SCOPES.ADMIN_LIST_USERS]) ||
             hasPermission(S3_ALL_RESOURCES, [IAM_SCOPES.ADMIN_CREATE_USER]),
-          name: "Users",
+          name: i18next.t("users"),
           icon: UsersMenuIcon,
           fsHidden: ldapIsEnabled,
         },
@@ -92,7 +95,7 @@ export const validRoutes = (
           component: NavLink,
           id: "groups",
           to: IAM_PAGES.GROUPS,
-          name: "Groups",
+          name: i18next.t("groups"),
           icon: GroupsMenuIcon,
           fsHidden: ldapIsEnabled,
         },
@@ -100,21 +103,21 @@ export const validRoutes = (
           component: NavLink,
           id: "serviceaccounts",
           to: IAM_PAGES.ACCOUNT,
-          name: "Service Accounts",
+          name: i18next.t("service_accounts"),
           icon: AccountsMenuIcon,
           forceDisplay: true,
         },
       ],
     },
     {
-      name: "Access",
+      name: i18next.t("access"),
       component: NavLink,
       id: "access",
       to: IAM_PAGES.POLICIES,
       icon: AccessMenuIcon,
     },
     {
-      name: "Monitoring",
+      name: i18next.t("monitoring"),
       id: "monitorMetrics",
       to: IAM_PAGES.DASHBOARD,
       icon: MetricsMenuIcon,
@@ -130,14 +133,14 @@ export const validRoutes = (
     // {
     //   component: NavLink,
     //   to: IAM_PAGES.TIERS,
-    //   name: "Billing",
+    //   name: i18next.t("billing"),
     //   icon: MoneyIcon,
     //   id: "billing",
     // },
     {
       component: NavLink,
       to: IAM_PAGES.SETTINGS,
-      name: "Configurations",
+      name: i18next.t("configurations"),
       id: "configurations",
       icon: SettingsIcon,
     },

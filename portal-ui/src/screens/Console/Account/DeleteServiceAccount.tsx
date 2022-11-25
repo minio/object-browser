@@ -28,6 +28,7 @@ import { ConfirmDeleteIcon } from "../../../icons";
 import { encodeURLString } from "../../../common/utils";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -52,6 +53,7 @@ const DeleteServiceAccount = ({
   selectedServiceAccount,
 }: IDeleteServiceAccountProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const onDelSuccess = () => closeDeleteModalAndRefresh(true);
   const onDelError = (err: ErrorResponseHandler) =>
     dispatch(setErrorSnackMessage(err));
@@ -72,8 +74,8 @@ const DeleteServiceAccount = ({
 
   return (
     <ConfirmDialog
-      title={`Delete Service Account`}
-      confirmText={"Delete"}
+      title={t('delete_service_accounts')}
+      confirmText={t("delete")}
       isOpen={deleteOpen}
       titleIcon={<ConfirmDeleteIcon />}
       isLoading={deleteLoading}
@@ -81,7 +83,7 @@ const DeleteServiceAccount = ({
       onClose={onClose}
       confirmationContent={
         <DialogContentText>
-          Are you sure you want to delete service account{" "}
+          {t("are_you_sure_delete_service_account")}{" "}
           <b className={classes.wrapText}>{selectedServiceAccount}</b>?
         </DialogContentText>
       }

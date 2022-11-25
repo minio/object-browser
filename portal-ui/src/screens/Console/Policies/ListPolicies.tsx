@@ -53,6 +53,7 @@ import RBIconButton from "../Buckets/BucketDetails/SummaryItems/RBIconButton";
 import { encodeURLString } from "../../../common/utils";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 const DeletePolicy = withSuspense(React.lazy(() => import("./DeletePolicy")));
 
@@ -74,6 +75,7 @@ interface IPoliciesProps {
 const ListPolicies = ({ classes }: IPoliciesProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [records, setRecords] = useState<Policy[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -177,13 +179,13 @@ const ListPolicies = ({ classes }: IPoliciesProps) => {
           closeDeleteModalAndRefresh={closeDeleteModalAndRefresh}
         />
       )}
-      <PageHeader label="IAM Policies" />
+      <PageHeader label={t("IAM_policies")} />
       <PageLayout className={classes.pageContainer}>
         <Grid container spacing={1}>
           <Grid item xs={12} className={classes.actionsTray}>
             <SearchBox
               onChange={setFilterPolicies}
-              placeholder="Search Policies"
+              placeholder={t('search_policies')}
               overrideClass={classes.searchField}
               value={filterPolicies}
             />
@@ -194,8 +196,8 @@ const ListPolicies = ({ classes }: IPoliciesProps) => {
               errorProps={{ disabled: true }}
             >
               <RBIconButton
-                tooltip={"Create Policy"}
-                text={"Create Policy"}
+                tooltip={t("create_policy")}
+                text={t("create_policy")}
                 variant="contained"
                 color="primary"
                 icon={<AddIcon />}
@@ -213,7 +215,7 @@ const ListPolicies = ({ classes }: IPoliciesProps) => {
             >
               <TableWrapper
                 itemActions={tableActions}
-                columns={[{ label: "Name", elementKey: "name" }]}
+                columns={[{ label: t("name"), elementKey: "name" }]}
                 isLoading={loading}
                 records={filteredRecords}
                 entityName="Policies"
@@ -223,33 +225,16 @@ const ListPolicies = ({ classes }: IPoliciesProps) => {
           </Grid>
           <Grid item xs={12}>
             <HelpBox
-              title={"Learn more about IAM POLICIES"}
+              title={t("learn_more_IAM_polices")}
               iconComponent={<IAMPoliciesIcon />}
               help={
                 <Fragment>
-                  MinIO uses Policy-Based Access Control (PBAC) to define the
-                  authorized actions and resources to which an authenticated
-                  user has access. Each policy describes one or more actions and
-                  conditions that outline the permissions of a user or group of
-                  users.
+                  {t("PBAC_info")}
                   <br />
                   <br />
-                  MinIO PBAC is built for compatibility with AWS IAM policy
-                  syntax, structure, and behavior. The MinIO documentation makes
-                  a best-effort to cover IAM-specific behavior and
-                  functionality. Consider deferring to the IAM documentation for
-                  more complete documentation on AWS IAM-specific topics.
+                    {t("AWS_IAM_compatibility")}
                   <br />
                   <br />
-                  You can learn more at our{" "}
-                  <a
-                    href="https://docs.min.io/minio/baremetal/security/minio-identity-management/policy-based-access-control.html?ref=con"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    documentation
-                  </a>
-                  .
                 </Fragment>
               }
             />

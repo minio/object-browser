@@ -58,6 +58,8 @@ import { resetForm, setJwt } from "./loginSlice";
 import StrategyForm from "./StrategyForm";
 import { LoginField } from "./LoginField";
 import DirectPVLogo from "../../icons/DirectPVLogo";
+import { useTranslation } from 'react-i18next';
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -278,9 +280,11 @@ export const getTargetPath = () => {
   return targetPath;
 };
 
+
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const classes = useStyles();
 
   const jwt = useSelector((state: AppState) => state.login.jwt);
@@ -432,7 +436,7 @@ const Login = () => {
                 className={classes.submit}
                 disabled={jwt === "" || loginSending}
               >
-                Login
+                {t("login")}
               </Button>
             </Grid>
             <Grid item xs={12} className={classes.linearPredef}>
@@ -452,9 +456,9 @@ const Login = () => {
             <React.Fragment>
               <div>
                 <p style={{ color: "#000", textAlign: "center" }}>
-                  An error has occurred
+                    {t("error_has_occured")}
                   <br />
-                  The backend cannot be reached.
+                  {t("backend_not_reached")}
                 </p>
               </div>
               <div>
@@ -527,7 +531,7 @@ const Login = () => {
                 color: "#551C27",
               }}
             >
-              Secure Distributed Storage
+             {t('app_title')}
             </Box>
           </Grid>
           <Grid

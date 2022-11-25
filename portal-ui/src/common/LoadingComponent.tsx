@@ -17,8 +17,11 @@
 import React from "react";
 import { Grid } from "@mui/material";
 import Loader from "../screens/Console/Common/Loader/Loader";
+import { useTranslation } from 'react-i18next';
 
 const LoadingComponent = () => {
+    const { t } = useTranslation();
+
   return (
     <Grid
       container
@@ -31,7 +34,7 @@ const LoadingComponent = () => {
       <Grid item xs={3} style={{ textAlign: "center" }}>
         <Loader style={{ width: 35, height: 35 }} />
         <br />
-        Loading...
+        {t("loading")}...
       </Grid>
     </Grid>
   );

@@ -24,6 +24,7 @@ import { ConfirmDeleteIcon } from "../../../icons";
 import { encodeURLString } from "../../../common/utils";
 import { setErrorSnackMessage } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
+import { useTranslation } from 'react-i18next';
 
 interface IDeletePolicyProps {
   closeDeleteModalAndRefresh: (refresh: boolean) => void;
@@ -37,6 +38,7 @@ const DeletePolicy = ({
   selectedPolicy,
 }: IDeletePolicyProps) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const onDelSuccess = () => closeDeleteModalAndRefresh(true);
   const onDelError = (err: ErrorResponseHandler) =>
     dispatch(setErrorSnackMessage(err));
@@ -57,8 +59,8 @@ const DeletePolicy = ({
 
   return (
     <ConfirmDialog
-      title={`Delete Policy`}
-      confirmText={"Delete"}
+      title={t("delete_policy")}
+      confirmText={t("delete")}
       isOpen={deleteOpen}
       titleIcon={<ConfirmDeleteIcon />}
       isLoading={deleteLoading}
@@ -66,7 +68,7 @@ const DeletePolicy = ({
       onClose={onClose}
       confirmationContent={
         <DialogContentText>
-          Are you sure you want to delete policy <br />
+          {t("are_you_sure_delete_policy")} <br />
           <b>{selectedPolicy}</b>?
         </DialogContentText>
       }

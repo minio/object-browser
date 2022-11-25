@@ -25,6 +25,7 @@ import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
 import useApi from "../Common/Hooks/useApi";
 import ConfirmDialog from "../Common/ModalWrapper/ConfirmDialog";
 import Loader from "../Common/Loader/Loader";
+import { useTranslation } from 'react-i18next';
 
 interface IDeleteUserProps {
   closeDeleteModalAndRefresh: (refresh: boolean) => void;
@@ -40,6 +41,7 @@ const DeleteUser = ({
   setErrorSnackMessage,
 }: IDeleteUserProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const onDelSuccess = () => closeDeleteModalAndRefresh(true);
   const onDelError = (err: ErrorResponseHandler) => setErrorSnackMessage(err);
@@ -67,8 +69,8 @@ const DeleteUser = ({
     for (let user of selectedUsers) {
       if (user === userLoggedIn) {
         setErrorSnackMessage({
-          errorMessage: "Cannot delete currently logged in user",
-          detailedError: `Cannot delete currently logged in user ${userLoggedIn}`,
+          errorMessage: t("delete_logged_in_error"),
+          detailedError: t("delete_logged_in_error") + userLoggedIn,
         });
         closeDeleteModalAndRefresh(true);
       } else {
@@ -80,18 +82,18 @@ const DeleteUser = ({
   };
 
   const text =
-    "Are you sure you want to delete the following " +
+    t("are_you_sure_delete") +
     selectedUsers.length +
     " " +
-    "user" +
+    t("user") +
     (selectedUsers.length > 1 ? "s?" : "?");
 
   return loadingSA ? (
     <Loader />
   ) : (
     <ConfirmDialog
-      title={`Delete User${selectedUsers.length > 1 ? "s" : ""}`}
-      confirmText={"Delete"}
+      title={`${t("delete_user")}${selectedUsers.length > 1 ? "s" : ""}`}
+      confirmText={t("delete")}
       isOpen={deleteOpen}
       titleIcon={<ConfirmDeleteIcon />}
       isLoading={deleteLoading}

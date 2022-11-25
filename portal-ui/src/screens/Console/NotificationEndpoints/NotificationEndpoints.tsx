@@ -16,6 +16,7 @@
 
 import React, { Fragment } from "react";
 import PageHeader from "../Common/PageHeader/PageHeader";
+import { useTranslation } from 'react-i18next';
 
 import withSuspense from "../Common/Components/withSuspense";
 
@@ -24,9 +25,11 @@ const ListNotificationEndpoints = withSuspense(
 );
 
 const NotificationEndpoints = () => {
+  const { t } = useTranslation();
+
   return (
     <Fragment>
-      <PageHeader label="Notification Endpoints" />
+      <PageHeader label={t("notification_endpoint")} />
       <ListNotificationEndpoints />
     </Fragment>
   );

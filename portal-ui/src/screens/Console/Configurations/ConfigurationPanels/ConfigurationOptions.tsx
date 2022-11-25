@@ -35,6 +35,7 @@ import PageLayout from "../../Common/Layout/PageLayout";
 import ScreenTitle from "../../Common/ScreenTitle/ScreenTitle";
 import ConfigurationForm from "./ConfigurationForm";
 import { IAM_PAGES } from "../../../../common/SecureComponent/permissions";
+import { useTranslation } from 'react-i18next';
 
 interface IConfigurationOptions {
   classes: any;
@@ -62,13 +63,14 @@ const getRoutePath = (path: string) => {
 
 const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
   const { pathname = "" } = useLocation();
+  const { t } = useTranslation();
 
   let selConfigTab = pathname.substring(pathname.lastIndexOf("/") + 1);
-  selConfigTab = selConfigTab === "settings" ? "compression" : selConfigTab;
+  selConfigTab = selConfigTab === "configurations" ? "language" : selConfigTab;
 
   return (
     <Fragment>
-      <PageHeader label={"Configurations"} />
+      <PageHeader label={t("configurations")} />
 
       <PageLayout>
         <Grid item xs={12}>
@@ -76,7 +78,7 @@ const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
             id="settings-container"
             className={classes.settingsOptionsContainer}
           >
-            <ScreenTitle icon={<SettingsIcon />} title={"Configuration:"} />
+            <ScreenTitle icon={<SettingsIcon />} title={t("configuration")+":"} />
             <VerticalTabs
               selectedTab={selConfigTab}
               isRouteTabs
@@ -91,7 +93,7 @@ const ConfigurationOptions = ({ classes }: IConfigurationOptions) => {
                   ))}
                   <Route
                     path={"/"}
-                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/identity_openid`} />}
+                    element={<Navigate to={`${IAM_PAGES.SETTINGS}/language`} />}
                   />
                 </Routes>
               }
