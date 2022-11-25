@@ -81,18 +81,8 @@ const DeleteUser = ({
     }
   };
 
-<<<<<<< HEAD
-  interface userSACount {
-    userName: string;
-    numSAs: number;
-  }
-
-  const noSAtext =
-    t("are_you_sure_delete") +
-=======
   const text =
-    "Are you sure you want to delete the following " +
->>>>>>> main
+    t("are_you_sure_delete") +
     selectedUsers.length +
     " " +
     t("user") +
@@ -112,33 +102,7 @@ const DeleteUser = ({
       confirmationContent={
         <DialogContentText>
             <Fragment>
-<<<<<<< HEAD
-              <WarningMessage
-                label={t("delete_user_service_account_associated_deleted")}
-                title={t("warning_user_selected_has_service_account")}
-              />
-              <TableWrapper
-                itemActions={tableActions}
-                columns={[
-                  { label: t("username"), elementKey: "userName" },
-                  {
-                    label: t('associated_service_account'),
-                    elementKey: "numSAs",
-                  },
-                ]}
-                isLoading={loadingSA}
-                records={userSAList}
-                entityName="User Service Accounts"
-                idField="userName"
-                customPaperHeight="250"
-              />
-            </Fragment>
-          ) : (
-            <Fragment>
-              {noSAtext}
-=======
               {text}
->>>>>>> main
               {renderUsers}
             </Fragment>
         </DialogContentText>

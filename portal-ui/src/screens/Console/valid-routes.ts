@@ -130,23 +130,13 @@ export const validRoutes = (
       icon: LambdaIcon,
       id: "lambda",
     },
-<<<<<<< HEAD
-    {
-      component: NavLink,
-      to: IAM_PAGES.TIERS,
-      name: i18next.t("billing"),
-      icon: MoneyIcon,
-      id: "billing",
-    },
-=======
     // {
     //   component: NavLink,
     //   to: IAM_PAGES.TIERS,
-    //   name: "Billing",
+    //   name: i18next.t("billing"),
     //   icon: MoneyIcon,
     //   id: "billing",
     // },
->>>>>>> main
     {
       component: NavLink,
       to: IAM_PAGES.SETTINGS,

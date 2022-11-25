@@ -87,7 +87,7 @@ const tabStripStyle = {
 const VerticalTabs = ({
   children,
   classes,
-  selectedTab = "language",
+  selectedTab = "0",
   routes,
   isRouteTabs,
 }: VerticalTabsProps) => {

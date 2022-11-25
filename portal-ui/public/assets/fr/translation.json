@@ -77,6 +77,7 @@
   "search_users":"Rechercher des utilisateurs",
   "delete_selected": "Supprimer sélectionnée",
   "add_to_group": "Ajouter au groupe",
+  "add_to_groups": "Ajouter au groupes",
   "create_user": "Créer un utilisateur",
   "access_key": "Clé d'accès",
   "create_user_info1": "Un utilisateur Mantle SDS se compose d'une clé d'accès unique (nom d'utilisateur) et d'une clé secrète correspondante (mot de passe). Les clients doivent authentifier leur identité en spécifiant à la fois une clé d'accès valide (nom d'utilisateur) et la clé secrète correspondante (mot de passe) d'un utilisateur Mantle SDS existant.",

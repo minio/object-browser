@@ -330,7 +330,7 @@ const UserDetails = ({ classes }: IUserDetailsProps) => {
                   <div className={classes.tableBlock}>
                     <TableWrapper
                       itemActions={groupTableActions}
-                      columns={[{ label: t("name"), elementKey: t("group") }]}
+                      columns={[{ label: t("name"), elementKey: "group" }]}
                       isLoading={loading}
                       records={currentGroups}
                       entityName="Groups"
