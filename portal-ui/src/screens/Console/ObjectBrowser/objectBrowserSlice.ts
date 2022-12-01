@@ -16,7 +16,6 @@
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IFileItem, ObjectBrowserState } from "./types";
-import i18next, { t } from "i18next";
 
 const defaultRewind = {
   rewindEnabled: false,
@@ -87,7 +86,6 @@ export const objectBrowserSlice = createSlice({
     setNewObject: (state, action: PayloadAction<IFileItem>) => {
       state.objectManager.objectsToManage.push(action.payload);
       state.objectManager.newItems = true;
-      
     },
     updateProgress: (
       state,
@@ -99,20 +97,14 @@ export const objectBrowserSlice = createSlice({
       const itemUpdate = state.objectManager.objectsToManage.findIndex(
         (item) => item.instanceID === action.payload.instanceID
       );
-      const currentObj = state.objectManager.objectsToManage[itemUpdate];
 
       if (itemUpdate === -1) {
-        return; 
+        return;
       }
-      if(action.payload.progress===100){
-        currentObj.waitingForFile = true;
-        currentObj.currentStep = currentObj.type === "upload"? i18next.t("sharding"): i18next.t("restoring");
-      }
-      else{
-        currentObj.currentStep = currentObj.type;
-        currentObj.percentage = action.payload.progress;
-        currentObj.waitingForFile = false;
-      }
+
+      state.objectManager.objectsToManage[itemUpdate].percentage =
+        action.payload.progress;
+      state.objectManager.objectsToManage[itemUpdate].waitingForFile = false;
     },
     completeObject: (state, action: PayloadAction<string>) => {
       const objectToComplete = state.objectManager.objectsToManage.findIndex(
@@ -122,7 +114,7 @@ export const objectBrowserSlice = createSlice({
       if (objectToComplete === -1) {
         return;
       }
-      state.objectManager.objectsToManage[objectToComplete].currentStep = i18next.t("done")
+
       state.objectManager.objectsToManage[objectToComplete].percentage = 100;
       state.objectManager.objectsToManage[objectToComplete].waitingForFile =
         false;
@@ -206,6 +198,9 @@ export const objectBrowserSlice = createSlice({
     },
     setObjectDetailsView: (state, action: PayloadAction<boolean>) => {
       state.objectDetailsOpen = action.payload;
+      state.selectedInternalPaths = action.payload
+        ? state.selectedInternalPaths
+        : null;
     },
     setSelectedObjectView: (state, action: PayloadAction<string | null>) => {
       state.selectedInternalPaths = action.payload;

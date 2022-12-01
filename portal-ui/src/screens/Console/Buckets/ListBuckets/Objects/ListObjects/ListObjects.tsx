@@ -821,8 +821,26 @@ const ListObjects = () => {
       else{
         elements.push(idElement)
       }
-
       setSelectedObjects(elements)
+      if (selectedObjects.length === 1) {
+        const objectName = selectedObjects[0];
+  
+        if (extensionPreview(objectName) !== "none") {
+          setCanPreviewFile(true);
+        } else {
+          setCanPreviewFile(false);
+        }
+  
+        if (objectName.endsWith("/")) {
+          setCanShareFile(false);
+        } else {
+          setCanShareFile(true);
+        }
+      } else {
+        setCanShareFile(false);
+        setCanPreviewFile(false);
+      }
+      dispatch(setObjectDetailsView(true));
       dispatch(setSelectedObjectView(null));
       dispatch(setSelectedObjectView(`${idElement ? `${encodeURLString(idElement)}` : ``}`)); 
     }
