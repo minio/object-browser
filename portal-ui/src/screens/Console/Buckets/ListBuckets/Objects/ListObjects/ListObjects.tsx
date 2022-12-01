@@ -390,8 +390,7 @@ const ListObjects = () => {
       dispatch(setObjectDetailsView(true));
       return;
     }
-
-    if (selectedObjects.length === 0 && selectedInternalPaths === null) {
+    if (selectedObjects.length === 0) {
       dispatch(setObjectDetailsView(false));
     }
   }, [selectedObjects, selectedInternalPaths, dispatch]);
@@ -815,7 +814,6 @@ const ListObjects = () => {
     else{
       var elements = selectedObjects
       if(elements.includes(idElement)){
-        
         elements = elements.filter((element) => element !== idElement);
       }
       else{
