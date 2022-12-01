@@ -61,8 +61,10 @@ const styles = (theme: Theme) =>
       },
     },
     copyShareLinkInput: {
+      width: "100%",
       "& div:first-child": {
         marginTop: 0,
+        width: "100%"
       },
       "@media (max-width: 900px)": {
         minWidth: 250,
