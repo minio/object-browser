@@ -804,6 +804,7 @@ const ListObjects = () => {
 
   const openPath = (idElement: string) => {
     var isPath = idElement.lastIndexOf("/") === idElement.length-1;
+    console.log(isPath)
     if(isPath){
       setSelectedObjects([]);
       
@@ -820,9 +821,9 @@ const ListObjects = () => {
       else{
         elements.push(idElement)
       }
+
       setSelectedObjects(elements)
-      dispatch(setObjectDetailsView(true));
-      dispatch(setLoadingVersions(true));
+      dispatch(setSelectedObjectView(null));
       dispatch(setSelectedObjectView(`${idElement ? `${encodeURLString(idElement)}` : ``}`)); 
     }
   };
@@ -1569,15 +1570,6 @@ const ListObjects = () => {
                   <ActionsListSection
                     items={multiActionButtons}
                     title={`${t("selected_objects")}:`}
-                  />
-                )}
-                {selectedInternalPaths !== null && (
-                  <ObjectDetailPanel
-                    internalPaths={selectedInternalPaths}
-                    bucketName={bucketName}
-                    onClosePanel={onClosePanel}
-                    versioning={isVersioned}
-                    locking={lockingEnabled}
                   />
                 )}
               </DetailsListPanel>

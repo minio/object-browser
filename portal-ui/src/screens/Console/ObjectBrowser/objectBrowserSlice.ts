@@ -198,9 +198,6 @@ export const objectBrowserSlice = createSlice({
     },
     setObjectDetailsView: (state, action: PayloadAction<boolean>) => {
       state.objectDetailsOpen = action.payload;
-      state.selectedInternalPaths = action.payload
-        ? state.selectedInternalPaths
-        : null;
     },
     setSelectedObjectView: (state, action: PayloadAction<string | null>) => {
       state.selectedInternalPaths = action.payload;
