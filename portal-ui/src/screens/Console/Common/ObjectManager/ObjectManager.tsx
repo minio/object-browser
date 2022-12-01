@@ -27,6 +27,7 @@ import {
   cleanList,
   deleteFromList,
 } from "../../ObjectBrowser/objectBrowserSlice";
+import { useTranslation } from 'react-i18next';
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -87,6 +88,7 @@ interface IObjectManager {
 
 const ObjectManager = ({ classes }: IObjectManager) => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   const objects = useSelector(
     (state: AppState) => state.objectBrowser.objectManager.objectsToManage
@@ -114,7 +116,7 @@ const ObjectManager = ({ classes }: IObjectManager) => {
               </IconButton>
             </Tooltip>
           </div>
-          <div className={classes.title}>Downloads / Uploads</div>
+          <div className={classes.title}>{t("downloads_uploads")}</div>
           <div className={classes.actionsContainer}>
             {objects.map((object, key) => (
               <ObjectHandled

@@ -797,6 +797,7 @@ const ListObjects = () => {
         failed: false,
         cancelled: false,
         errorMessage: "",
+        currentStep: "download"
       })
     );
 
@@ -986,6 +987,7 @@ const ListObjects = () => {
                   failed: false,
                   cancelled: false,
                   errorMessage: "",
+                  currentStep: "upload"
                 })
               );
 

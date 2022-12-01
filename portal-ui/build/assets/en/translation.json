@@ -511,5 +511,10 @@
   "object_info": "Object Info",
   "version_ID": "Version ID",
   "retention_policy": "Retention Policy",
-  "download": "Download"
+  "download": "Download",
+  "restoring": "Restoring",
+  "sharding": "Sharding",
+  "operation": "Operation",
+  "downloads_uploads": "Downloads / Uploads",
+  "done": "Done"
 }

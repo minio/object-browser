@@ -30,6 +30,7 @@ import {
 } from "../../../../icons";
 import clsx from "clsx";
 import { callForObjectID } from "../../ObjectBrowser/transferManager";
+import { useTranslation } from 'react-i18next';
 
 interface IObjectHandled {
   classes: any;
@@ -158,6 +159,7 @@ const ObjectHandled = ({
   objectToDisplay,
   deleteFromList,
 }: IObjectHandled) => {
+  const { t } = useTranslation();
   const prefix = `${objectToDisplay.prefix}`;
   return (
     <Fragment>
@@ -170,7 +172,6 @@ const ObjectHandled = ({
           <button
             onClick={() => {
               if (!objectToDisplay.done) {
-                console.log("//abort");
                 const call = callForObjectID(objectToDisplay.ID);
                 if (call) {
                   call.abort();
@@ -241,11 +242,16 @@ const ObjectHandled = ({
             </span>
           </div>
         </div>
+        <span className={classes.bucketName}>
+              <strong>{t("operation")}: </strong>
+              {objectToDisplay.currentStep}
+            </span>
         <div className={classes.progressContainer}>
           {objectToDisplay.waitingForFile ? (
             <ProgressBarWrapper indeterminate value={0} ready={false} />
           ) : (
             <ProgressBarWrapper
+              
               value={objectToDisplay.percentage}
               ready={objectToDisplay.done}
               error={objectToDisplay.failed}
