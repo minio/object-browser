@@ -805,7 +805,6 @@ const ListObjects = () => {
 
   const openPath = (idElement: string) => {
     var isPath = idElement.lastIndexOf("/") === idElement.length-1;
-    console.log(isPath)
     if(isPath){
       setSelectedObjects([]);
       
