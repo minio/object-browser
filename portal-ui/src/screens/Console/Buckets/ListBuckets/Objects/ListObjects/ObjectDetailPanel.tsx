@@ -338,6 +338,7 @@ const ObjectDetailPanel = ({
         failed: false,
         cancelled: false,
         errorMessage: "",
+        currentStep: "restoring"
       })
     );
 

@@ -100,6 +100,7 @@ export interface IFileItem {
   failed: boolean;
   cancelled: boolean;
   errorMessage: string;
+  currentStep?: string;
 }
 
 interface RewindSetEnabled {

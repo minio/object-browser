@@ -511,5 +511,10 @@
   "object_info": "Info sur l'objet",
   "version_ID": "ID de version",
   "retention_policy": "Politique de conservation",
-  "download": "Télécharger"
+  "download": "Télécharger",
+  "restoring": "Restauration",
+  "sharding": "Partitionnement",
+  "operation": "Opération",
+  "downloads_uploads": "Téléchargements / Téléversement",
+  "done": "Terminé"
 }
