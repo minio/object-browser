@@ -368,6 +368,7 @@ const ListObjects = () => {
   useEffect(() => {
     if (selectedObjects.length === 1) {
       const objectName = selectedObjects[0];
+
       if (extensionPreview(objectName) !== "none") {
         setCanPreviewFile(true);
       } else {
@@ -1120,7 +1121,7 @@ const ListObjects = () => {
     const targetD = e.target;
     const value = targetD.value;
     const checked = targetD.checked;
-  
+
     let elements: string[] = [...selectedObjects]; // We clone the selectedBuckets array
 
     if (checked) {
@@ -1145,6 +1146,7 @@ const ListObjects = () => {
 
   const pageTitle = decodeURLString(internalPaths);
   const currentPath = pageTitle.split("/").filter((i: string) => i !== "");
+
   const plSelect = filteredRecords;
   const sortASC = plSelect.sort(sortListObjects(currentSortField));
 
@@ -1563,10 +1565,21 @@ const ListObjects = () => {
                 }}
                 className={`${versionsMode ? classes.hideListOnSmall : ""}`}
               >
+                {selectedObjects.length > 0 && (
                   <ActionsListSection
                     items={multiActionButtons}
                     title={`${t("selected_objects")}:`}
                   />
+                )}
+                {selectedInternalPaths !== null && (
+                  <ObjectDetailPanel
+                    internalPaths={selectedInternalPaths}
+                    bucketName={bucketName}
+                    onClosePanel={onClosePanel}
+                    versioning={isVersioned}
+                    locking={lockingEnabled}
+                  />
+                )}
               </DetailsListPanel>
             </SecureComponent>
           </Grid>
