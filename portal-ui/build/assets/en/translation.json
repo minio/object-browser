@@ -512,7 +512,7 @@
   "version_ID": "Version ID",
   "retention_policy": "Retention Policy",
   "download": "Download",
-  "restoring": "Restoring",
+  "restoring": "Restoring Shards",
   "sharding": "Sharding",
   "operation": "Operation",
   "downloads_uploads": "Downloads / Uploads",

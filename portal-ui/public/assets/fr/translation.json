@@ -512,8 +512,8 @@
   "version_ID": "ID de version",
   "retention_policy": "Politique de conservation",
   "download": "Télécharger",
-  "restoring": "Restauration",
-  "sharding": "Partitionnement",
+  "restoring": "Restauration des fragments",
+  "sharding": "Fragmentation",
   "operation": "Opération",
   "downloads_uploads": "Téléchargements / Téléversement",
   "done": "Terminé"
