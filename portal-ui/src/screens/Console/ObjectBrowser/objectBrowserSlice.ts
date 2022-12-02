@@ -16,6 +16,7 @@
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IFileItem, ObjectBrowserState } from "./types";
+import i18next, { t } from "i18next";
 
 const defaultRewind = {
   rewindEnabled: false,
@@ -98,10 +99,20 @@ export const objectBrowserSlice = createSlice({
         (item) => item.instanceID === action.payload.instanceID
       );
 
+      const currentObj = state.objectManager.objectsToManage[itemUpdate];
+
       if (itemUpdate === -1) {
         return;
       }
-
+      if(action.payload.progress===100){
+        currentObj.waitingForFile = true;
+        currentObj.currentStep = currentObj.type === "upload"? i18next.t("sharding"): i18next.t("restoring");
+      }
+      else{
+        currentObj.currentStep = i18next.t(currentObj.type);
+        currentObj.percentage = action.payload.progress;
+        currentObj.waitingForFile = false;
+      }
       state.objectManager.objectsToManage[itemUpdate].percentage =
         action.payload.progress;
       state.objectManager.objectsToManage[itemUpdate].waitingForFile = false;
@@ -110,6 +121,8 @@ export const objectBrowserSlice = createSlice({
       const objectToComplete = state.objectManager.objectsToManage.findIndex(
         (item) => item.instanceID === action.payload
       );
+
+      state.objectManager.objectsToManage[objectToComplete].currentStep = i18next.t("done")
 
       if (objectToComplete === -1) {
         return;

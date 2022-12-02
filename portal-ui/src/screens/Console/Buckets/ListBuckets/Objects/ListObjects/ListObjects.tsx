@@ -129,6 +129,7 @@ import {
 import RenameLongFileName from "../../../../ObjectBrowser/RenameLongFilename";
 import { selFeatures } from "../../../../consoleSlice";
 import { useTranslation } from 'react-i18next';
+import i18next from "i18next";
 
 const HistoryIcon = React.lazy(
   () => import("../../../../../../icons/HistoryIcon")
@@ -796,7 +797,7 @@ const ListObjects = () => {
         failed: false,
         cancelled: false,
         errorMessage: "",
-        currentStep: "download"
+        currentStep: i18next.t("restoring")
       })
     );
 
@@ -1012,7 +1013,7 @@ const ListObjects = () => {
                   failed: false,
                   cancelled: false,
                   errorMessage: "",
-                  currentStep: "upload"
+                  currentStep: i18next.t("upload")
                 })
               );
 
