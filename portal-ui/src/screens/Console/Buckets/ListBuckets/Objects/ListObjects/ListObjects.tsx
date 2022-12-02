@@ -1384,7 +1384,7 @@ const ListObjects = () => {
                       <span className={classes.detailsSpacer}>
                         {bucketInfo.objects && (
                           <Fragment>
-                            {bucketInfo.objects}&nbsp;{t("objects")}
+                            {bucketInfo.objects}&nbsp;{t("object")}
                             {bucketInfo.objects && bucketInfo.objects !== 1
                               ? "s"
                               : ""}
