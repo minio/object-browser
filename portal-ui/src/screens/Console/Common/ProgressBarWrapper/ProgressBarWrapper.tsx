@@ -49,6 +49,7 @@ const SmallBorderLinearProgress = styled(BorderLinearProgress)(() => ({
     borderRadius: 3,
   },
 }));
+
 function LinearProgressWithLabel(
   props: { error: boolean; cancelled: boolean } & LinearProgressProps
 ) {
@@ -62,7 +63,6 @@ function LinearProgressWithLabel(
     color = "#FFBD62";
     size = 14;
   }
-  console.log(props.value)
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
       <Box sx={{ width: "100%", mr: 3 }}>

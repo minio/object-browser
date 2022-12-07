@@ -106,7 +106,6 @@ export const objectBrowserSlice = createSlice({
       }
       if(action.payload.progress===100){
         currentObj.waitingForFile = true;
-        currentObj.percentage = 0;
         currentObj.currentStep = currentObj.type === "upload"? i18next.t("sharding"): i18next.t("restoring");
       }
       else{
