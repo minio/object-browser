@@ -63,7 +63,6 @@ function LinearProgressWithLabel(
     color = "#FFBD62";
     size = 14;
   }
-
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
       <Box sx={{ width: "100%", mr: 3 }}>

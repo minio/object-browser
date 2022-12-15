@@ -113,9 +113,6 @@ export const objectBrowserSlice = createSlice({
         currentObj.percentage = action.payload.progress;
         currentObj.waitingForFile = false;
       }
-      state.objectManager.objectsToManage[itemUpdate].percentage =
-        action.payload.progress;
-      state.objectManager.objectsToManage[itemUpdate].waitingForFile = false;
     },
     completeObject: (state, action: PayloadAction<string>) => {
       const objectToComplete = state.objectManager.objectsToManage.findIndex(

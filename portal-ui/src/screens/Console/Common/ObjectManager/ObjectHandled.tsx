@@ -251,7 +251,6 @@ const ObjectHandled = ({
             <ProgressBarWrapper indeterminate value={0} ready={false} />
           ) : (
             <ProgressBarWrapper
-              
               value={objectToDisplay.percentage}
               ready={objectToDisplay.done}
               error={objectToDisplay.failed}
