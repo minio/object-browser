@@ -69,6 +69,22 @@ export const addBucketAsync = createAsyncThunk(
       }
     }
 
+    var fileInput = document.getElementById('fileInput') as any;
+    var promise = new Promise<void>((resolve, reject) => {
+      if (fileInput !== null) {
+        console.log(fileInput.files[0])
+        var reader = new FileReader()
+        reader.onload = async (e) => {
+          request.file = e.target?.result
+          console.log("req file: ", request.file)
+          resolve()
+        }
+        reader.readAsText(fileInput.files[0])
+      }
+    })
+
+    await promise
+  console.log(request)
     return api
       .invoke("POST", "/api/v1/buckets", request)
       .then((res) => {

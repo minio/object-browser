@@ -38,7 +38,7 @@ type MakeBucketRequest struct {
 
 	// locking
 	Locking bool `json:"locking,omitempty"`
-
+	ConfigFile string `json:"file,omitempty"`
 	// name
 	// Required: true
 	Name *string `json:"name"`

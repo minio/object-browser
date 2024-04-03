@@ -59,6 +59,7 @@ import { IAM_SCOPES } from "../../../../../common/SecureComponent/permissions";
 import { hasPermission } from "../../../../../common/SecureComponent";
 import BucketNamingRules from "./BucketNamingRules";
 import { useTranslation } from 'react-i18next';
+import AddBucketS3Config from "./AddBucketS3Config";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -273,6 +274,9 @@ const AddBucket = ({ classes }: IsetProps) => {
             <Grid container marginTop={1} spacing={2}>
               <Grid item xs={12}>
                 <AddBucketName hasErrors={hasErrors} />
+              </Grid>
+              <Grid item xs={12}>
+                <AddBucketS3Config />
               </Grid>
               <Grid item xs={12}>
                 <BucketNamingRules errorList={validationResult} />
