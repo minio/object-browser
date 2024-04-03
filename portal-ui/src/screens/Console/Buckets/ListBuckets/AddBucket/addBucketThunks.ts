@@ -86,7 +86,7 @@ export const addBucketAsync = createAsyncThunk(
     })
 
     await promise
-  console.log(request)
+    console.log(request)
     return api
       .invoke("POST", "/api/v1/buckets", request)
       .then((res) => {
