@@ -71,7 +71,7 @@ export const addBucketAsync = createAsyncThunk(
 
     var fileInput = document.getElementById('fileInput') as any;
     var promise = new Promise<void>((resolve, reject) => {
-      if (fileInput !== null) {
+      if (fileInput !== null && fileInput.files[0] !== undefined) {
         console.log(fileInput.files[0])
         var reader = new FileReader()
         reader.onload = async (e) => {
@@ -80,6 +80,8 @@ export const addBucketAsync = createAsyncThunk(
           resolve()
         }
         reader.readAsText(fileInput.files[0])
+      } else {
+        resolve()
       }
     })
 

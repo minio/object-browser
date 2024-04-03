@@ -517,9 +517,11 @@ func getMakeBucketResponse(session *models.Principal, br *models.MakeBucketReque
 	}
 
 	//TODO: this is not the place to put this logic
-	reader := bytes.NewReader([]byte(br.ConfigFile))
-	configName := fmt.Sprintf(".sds-config.%s.json", *br.Name)
-	minioClient.client.PutObject(ctx, *br.Name, configName, reader, int64(len(br.ConfigFile)), minio.PutObjectOptions{})
+	if len(br.ConfigFile) > 0 {
+		reader := bytes.NewReader([]byte(br.ConfigFile))
+		configName := fmt.Sprintf(".sds-config.%s.json", *br.Name)
+		minioClient.client.PutObject(ctx, *br.Name, configName, reader, int64(len(br.ConfigFile)), minio.PutObjectOptions{})
+	}
 
 	return nil
 }
