@@ -42,20 +42,7 @@ const AddBucketS3Config = () => {
       tabIndex={-1}
     >
       Upload s3 config file
-      <VisuallyHiddenInput type="file" id="fileInput" onChange={async (event) => {
-        if (event?.target.files !== null) {
-
-          var aa = document.getElementById('fileInput') as any;
-          if (aa !== null) {
-            console.log(aa.files[0])
-            var reader = new FileReader()
-            reader.onload = async (e) => {
-              console.log(e.target?.result)
-            }
-            reader.readAsText(aa.files[0])
-          }
-        }
-      }} />
+      <VisuallyHiddenInput type="file" id="fileInput" />
     </Button>
 
 
