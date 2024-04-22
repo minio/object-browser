@@ -135,6 +135,7 @@ export interface MakeBucketRequest {
   locking: boolean;
   quota?: QuotaRequest;
   retention?: RetentionRequest;
+  file?: string | ArrayBuffer | null | undefined;
 }
 
 export interface ChangePasswordRequest {

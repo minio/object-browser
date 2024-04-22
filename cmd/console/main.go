@@ -18,13 +18,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"time"
 
-	"github.com/minio/cli"
 	"github.com/mantle-labs/console/pkg"
+	"github.com/minio/cli"
 	"github.com/minio/pkg/console"
 	"github.com/minio/pkg/trie"
 	"github.com/minio/pkg/words"
@@ -128,6 +129,7 @@ func main() {
 	appName := filepath.Base(args[0])
 	// Run the app - exit on error.
 	if err := newApp(appName).Run(args); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }

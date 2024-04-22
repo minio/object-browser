@@ -17,6 +17,7 @@
 package restapi
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -514,6 +515,14 @@ func getMakeBucketResponse(session *models.Principal, br *models.MakeBucketReque
 			return prepareError(err)
 		}
 	}
+
+	//TODO: this is not the place to put this logic
+	if len(br.ConfigFile) > 0 {
+		reader := bytes.NewReader([]byte(br.ConfigFile))
+		configName := fmt.Sprintf(".sds-config.%s.json", *br.Name)
+		minioClient.client.PutObject(ctx, *br.Name, configName, reader, int64(len(br.ConfigFile)), minio.PutObjectOptions{})
+	}
+
 	return nil
 }
 
@@ -549,7 +558,8 @@ func setBucketAccessPolicy(ctx context.Context, client MinioClient, bucketName s
 }
 
 // getBucketSetPolicyResponse calls setBucketAccessPolicy() to set a access policy to a bucket
-//   and returns the serialized output.
+//
+//	and returns the serialized output.
 func getBucketSetPolicyResponse(session *models.Principal, bucketName string, req *models.SetBucketPolicyRequest) (*models.Bucket, *models.Error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
