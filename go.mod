@@ -1,5 +1,7 @@
 module github.com/mantle-labs/console
 
+replace github.com/minio/minio-go/v7 v7.0.23 => github.com/mantle-labs/minio-go/v7 v7.0.24
+
 go 1.17
 
 require (
