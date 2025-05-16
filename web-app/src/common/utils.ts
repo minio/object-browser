@@ -33,7 +33,6 @@ export const units = [
   "YiB",
 ];
 const k8sUnits = ["Ki", "Mi", "Gi", "Ti", "Pi", "Ei"];
-const k8sCalcUnits = ["B", ...k8sUnits];
 
 export const niceBytes = (x: string, showK8sUnits: boolean = false) => {
   let n = parseInt(x, 10) || 0;
