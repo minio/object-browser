@@ -1,5 +1,8 @@
 # MinIO Console
 
+This fork restores the old functionality of the minio console, whilst incorporating security updates from the object browser 2.0
+
+
 ![build](https://github.com/minio/console/workflows/Go/badge.svg) ![license](https://img.shields.io/badge/license-AGPL%20V3-blue)
 
 A graphical user interface for [MinIO](https://github.com/minio/minio)
