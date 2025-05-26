@@ -12,7 +12,6 @@ Changes:
 - Updated License page information
 
 
-
 ## Release v2.0.0
 
 Community version is going back to be an object browser only.

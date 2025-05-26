@@ -22,13 +22,9 @@ import (
 	"reflect"
 	"testing"
 
-	xoauth2 "golang.org/x/oauth2"
-
 	"github.com/minio/madmin-go/v3"
 
 	iampolicy "github.com/minio/pkg/v3/policy"
-
-	"github.com/minio/console/pkg/auth"
 
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/stretchr/testify/assert"
@@ -77,100 +73,26 @@ func TestLogin(t *testing.T) {
 	funcAssert.NotNil(err, "not error returned creating a session")
 }
 
-type IdentityProviderMock struct{}
-
-var (
-	idpVerifyIdentityMock            func(ctx context.Context, code, state string) (*credentials.Credentials, error)
-	idpVerifyIdentityForOperatorMock func(ctx context.Context, code, state string) (*xoauth2.Token, error)
-	idpGenerateLoginURLMock          func() string
-)
-
-func (ac IdentityProviderMock) VerifyIdentity(ctx context.Context, code, state string) (*credentials.Credentials, error) {
-	return idpVerifyIdentityMock(ctx, code, state)
-}
-
-func (ac IdentityProviderMock) VerifyIdentityForOperator(ctx context.Context, code, state string) (*xoauth2.Token, error) {
-	return idpVerifyIdentityForOperatorMock(ctx, code, state)
-}
-
-func (ac IdentityProviderMock) GenerateLoginURL() string {
-	return idpGenerateLoginURLMock()
-}
-
-func Test_validateUserAgainstIDP(t *testing.T) {
-	provider := IdentityProviderMock{}
-	mockCode := "EAEAEAE"
-	mockState := "HUEHUEHUE"
-	type args struct {
-		ctx      context.Context
-		provider auth.IdentityProviderI
-		code     string
-		state    string
-	}
-	tests := []struct {
-		name     string
-		args     args
-		want     *credentials.Credentials
-		wantErr  bool
-		mockFunc func()
-	}{
-		{
-			name: "failed to verify user identity with idp",
-			args: args{
-				ctx:      context.Background(),
-				provider: provider,
-				code:     mockCode,
-				state:    mockState,
-			},
-			want:    nil,
-			wantErr: true,
-			mockFunc: func() {
-				idpVerifyIdentityMock = func(_ context.Context, _, _ string) (*credentials.Credentials, error) {
-					return nil, errors.New("something went wrong")
-				}
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(_ *testing.T) {
-			if tt.mockFunc != nil {
-				tt.mockFunc()
-			}
-			got, err := verifyUserAgainstIDP(tt.args.ctx, tt.args.provider, tt.args.code, tt.args.state)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("verifyUserAgainstIDP() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("verifyUserAgainstIDP() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_getAccountInfo(t *testing.T) {
-	client := AdminClientMock{}
 	type args struct {
-		ctx    context.Context
-		client MinioAdmin
+		ctx context.Context
 	}
 	tests := []struct {
 		name     string
 		args     args
 		want     *iampolicy.Policy
 		wantErr  bool
-		mockFunc func()
+		mockFunc func(client *AdminClientMock)
 	}{
 		{
 			name: "error getting account info",
 			args: args{
-				ctx:    context.Background(),
-				client: client,
+				ctx: context.Background(),
 			},
 			want:    nil,
 			wantErr: true,
-			mockFunc: func() {
-				minioAccountInfoMock = func(_ context.Context) (madmin.AccountInfo, error) {
+			mockFunc: func(client *AdminClientMock) {
+				client.minioAccountInfoMock = func(_ context.Context) (madmin.AccountInfo, error) {
 					return madmin.AccountInfo{}, errors.New("something went wrong")
 				}
 			},
@@ -178,10 +100,11 @@ func Test_getAccountInfo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(_ *testing.T) {
+			client := AdminClientMock{}
 			if tt.mockFunc != nil {
-				tt.mockFunc()
+				tt.mockFunc(&client)
 			}
-			got, err := getAccountInfo(tt.args.ctx, tt.args.client)
+			got, err := getAccountInfo(tt.args.ctx, client)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getAccountInfo() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -131,27 +131,6 @@ func registerObjectsHandlers(api *operations.ConsoleAPI) {
 		}
 		return objectApi.NewShareObjectOK().WithPayload(*resp)
 	})
-	// set object legalhold status
-	api.ObjectPutObjectLegalHoldHandler = objectApi.PutObjectLegalHoldHandlerFunc(func(params objectApi.PutObjectLegalHoldParams, session *models.Principal) middleware.Responder {
-		if err := getSetObjectLegalHoldResponse(session, params); err != nil {
-			return objectApi.NewPutObjectLegalHoldDefault(err.Code).WithPayload(err.APIError)
-		}
-		return objectApi.NewPutObjectLegalHoldOK()
-	})
-	// set object retention
-	api.ObjectPutObjectRetentionHandler = objectApi.PutObjectRetentionHandlerFunc(func(params objectApi.PutObjectRetentionParams, session *models.Principal) middleware.Responder {
-		if err := getSetObjectRetentionResponse(session, params); err != nil {
-			return objectApi.NewPutObjectRetentionDefault(err.Code).WithPayload(err.APIError)
-		}
-		return objectApi.NewPutObjectRetentionOK()
-	})
-	// delete object retention
-	api.ObjectDeleteObjectRetentionHandler = objectApi.DeleteObjectRetentionHandlerFunc(func(params objectApi.DeleteObjectRetentionParams, session *models.Principal) middleware.Responder {
-		if err := deleteObjectRetentionResponse(session, params); err != nil {
-			return objectApi.NewDeleteObjectRetentionDefault(err.Code).WithPayload(err.APIError)
-		}
-		return objectApi.NewDeleteObjectRetentionOK()
-	})
 	// set tags in object
 	api.ObjectPutObjectTagsHandler = objectApi.PutObjectTagsHandlerFunc(func(params objectApi.PutObjectTagsParams, session *models.Principal) middleware.Responder {
 		if err := getPutObjectTagsResponse(session, params); err != nil {
@@ -1051,91 +1030,6 @@ func getRequestURLWithScheme(r *http.Request) string {
 	}
 
 	return fmt.Sprintf("%s://%s", scheme, r.Host)
-}
-
-func getSetObjectLegalHoldResponse(session *models.Principal, params objectApi.PutObjectLegalHoldParams) *CodedAPIError {
-	ctx := params.HTTPRequest.Context()
-	mClient, err := newMinioClient(session, getClientIP(params.HTTPRequest))
-	if err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	// create a minioClient interface implementation
-	// defining the client to be used
-	minioClient := minioClient{client: mClient}
-	err = setObjectLegalHold(ctx, minioClient, params.BucketName, params.Prefix, params.VersionID, *params.Body.Status)
-	if err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	return nil
-}
-
-func setObjectLegalHold(ctx context.Context, client MinioClient, bucketName, prefix, versionID string, status models.ObjectLegalHoldStatus) error {
-	var lstatus minio.LegalHoldStatus
-	if status == models.ObjectLegalHoldStatusEnabled {
-		lstatus = minio.LegalHoldEnabled
-	} else {
-		lstatus = minio.LegalHoldDisabled
-	}
-	return client.putObjectLegalHold(ctx, bucketName, prefix, minio.PutObjectLegalHoldOptions{VersionID: versionID, Status: &lstatus})
-}
-
-func getSetObjectRetentionResponse(session *models.Principal, params objectApi.PutObjectRetentionParams) *CodedAPIError {
-	ctx := params.HTTPRequest.Context()
-	mClient, err := newMinioClient(session, getClientIP(params.HTTPRequest))
-	if err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	// create a minioClient interface implementation
-	// defining the client to be used
-	minioClient := minioClient{client: mClient}
-	err = setObjectRetention(ctx, minioClient, params.BucketName, params.VersionID, params.Prefix, params.Body)
-	if err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	return nil
-}
-
-func setObjectRetention(ctx context.Context, client MinioClient, bucketName, versionID, prefix string, retentionOps *models.PutObjectRetentionRequest) error {
-	if retentionOps == nil {
-		return errors.New("object retention options can't be nil")
-	}
-	if retentionOps.Expires == nil {
-		return errors.New("object retention expires can't be nil")
-	}
-
-	var mode minio.RetentionMode
-	if *retentionOps.Mode == models.ObjectRetentionModeGovernance {
-		mode = minio.Governance
-	} else {
-		mode = minio.Compliance
-	}
-	retentionUntilDate, err := time.Parse(time.RFC3339, *retentionOps.Expires)
-	if err != nil {
-		return err
-	}
-	opts := minio.PutObjectRetentionOptions{
-		GovernanceBypass: retentionOps.GovernanceBypass,
-		RetainUntilDate:  &retentionUntilDate,
-		Mode:             &mode,
-		VersionID:        versionID,
-	}
-	return client.putObjectRetention(ctx, bucketName, prefix, opts)
-}
-
-func deleteObjectRetentionResponse(session *models.Principal, params objectApi.DeleteObjectRetentionParams) *CodedAPIError {
-	ctx := params.HTTPRequest.Context()
-	mClient, err := newMinioClient(session, getClientIP(params.HTTPRequest))
-	if err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	// create a minioClient interface implementation
-	// defining the client to be used
-	minioClient := minioClient{client: mClient}
-	err = deleteObjectRetention(ctx, minioClient, params.BucketName, params.Prefix, params.VersionID)
-	if err != nil {
-		return ErrorWithContext(ctx, err)
-	}
-	return nil
 }
 
 func deleteObjectRetention(ctx context.Context, client MinioClient, bucketName, prefix, versionID string) error {

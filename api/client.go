@@ -26,14 +26,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/minio/minio-go/v7/pkg/replication"
 	"github.com/minio/minio-go/v7/pkg/sse"
 	xnet "github.com/minio/pkg/v3/net"
 
 	"github.com/minio/console/models"
 	"github.com/minio/console/pkg"
-	"github.com/minio/console/pkg/auth"
-	"github.com/minio/console/pkg/auth/ldap"
 	xjwt "github.com/minio/console/pkg/auth/token"
 	mc "github.com/minio/mc/cmd"
 	"github.com/minio/mc/pkg/probe"
@@ -136,11 +133,6 @@ func (c minioClient) getBucketPolicy(ctx context.Context, bucketName string) (st
 // implements minio.getBucketVersioning(ctx, bucketName)
 func (c minioClient) getBucketVersioning(ctx context.Context, bucketName string) (minio.BucketVersioningConfiguration, error) {
 	return c.client.GetBucketVersioning(ctx, bucketName)
-}
-
-// implements minio.getBucketVersioning(ctx, bucketName)
-func (c minioClient) getBucketReplication(ctx context.Context, bucketName string) (replication.Config, error) {
-	return c.client.GetBucketReplication(ctx, bucketName)
 }
 
 // implements minio.listObjects(ctx)
@@ -247,14 +239,6 @@ func (c mcClient) watch(ctx context.Context, options mc.WatchOptions) (*mc.Watch
 	return c.client.Watch(ctx, options)
 }
 
-func (c mcClient) setReplication(ctx context.Context, cfg *replication.Config, opts replication.Options) *probe.Error {
-	return c.client.SetReplication(ctx, cfg, opts)
-}
-
-func (c mcClient) deleteAllReplicationRules(ctx context.Context) *probe.Error {
-	return c.client.RemoveReplication(ctx)
-}
-
 func (c mcClient) setVersioning(ctx context.Context, status string, excludePrefix []string, excludeFolders bool) *probe.Error {
 	return c.client.SetVersion(ctx, status, excludePrefix, excludeFolders)
 }
@@ -346,44 +330,6 @@ func stsCredentials(minioURL, accessKey, secretKey, location string, client *htt
 
 func NewConsoleCredentials(accessKey, secretKey, location string, client *http.Client) (*credentials.Credentials, error) {
 	minioURL := getMinIOServer()
-
-	// LDAP authentication for Console
-	if ldap.GetLDAPEnabled() {
-		creds, err := auth.GetCredentialsFromLDAP(client, minioURL, accessKey, secretKey)
-		if err != nil {
-			return nil, err
-		}
-
-		credContext := &credentials.CredContext{
-			Client: client,
-		}
-
-		// We verify if LDAP credentials are correct and no error is returned
-		_, err = creds.GetWithContext(credContext)
-
-		if err != nil && strings.Contains(strings.ToLower(err.Error()), "not found") {
-			// We try to use STS Credentials in case LDAP credentials are incorrect.
-			stsCreds, errSTS := stsCredentials(minioURL, accessKey, secretKey, location, client)
-
-			// If there is an error with STS too, then we return the original LDAP error
-			if errSTS != nil {
-				LogError("error in STS credentials for LDAP case: %v ", errSTS)
-
-				// We return LDAP result
-				return creds, nil
-			}
-
-			_, err := stsCreds.GetWithContext(credContext)
-			// There is an error with STS credentials, We return the result of LDAP as STS is not a priority in this case.
-			if err != nil {
-				return creds, nil
-			}
-
-			return stsCreds, nil
-		}
-
-		return creds, nil
-	}
 
 	return stsCredentials(minioURL, accessKey, secretKey, location, client)
 }

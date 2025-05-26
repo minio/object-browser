@@ -53,8 +53,6 @@ const Login = () => {
   );
   const navigateTo = useSelector((state: AppState) => state.login.navigateTo);
 
-  const isK8S = useSelector((state: AppState) => state.login.isK8S);
-
   const backgroundAnimation = useSelector(
     (state: AppState) => state.login.backgroundAnimation,
   );
@@ -75,7 +73,6 @@ const Login = () => {
   let loginComponent;
 
   switch (loginStrategy.loginStrategy) {
-    case loginStrategyType.redirect:
     case loginStrategyType.form: {
       let redirectItems: RedirectRule[] = [];
 
@@ -135,10 +132,6 @@ const Login = () => {
   }
 
   let docsURL = "https://min.io/docs/minio/linux/index.html?ref=con";
-  if (isK8S) {
-    docsURL =
-      "https://min.io/docs/minio/kubernetes/upstream/index.html?ref=con";
-  }
 
   useEffect(() => {
     dispatch(setHelpName("login"));
