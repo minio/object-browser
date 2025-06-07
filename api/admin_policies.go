@@ -611,10 +611,8 @@ func getPolicyInfoResponse(session *models.Principal, params policyApi.PolicyInf
 
 // SetPolicy calls MinIO server to assign policy to a group or user.
 func SetPolicy(ctx context.Context, client MinioAdmin, name, entityName string, entityType models.PolicyEntity) error {
-	isGroup := false
-	if entityType == models.PolicyEntityGroup {
-		isGroup = true
-	}
+	isGroup := entityType == models.PolicyEntityGroup
+
 	return client.setPolicy(ctx, name, entityName, isGroup)
 }
 
