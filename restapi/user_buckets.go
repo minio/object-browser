@@ -180,6 +180,17 @@ func registerBucketsHandlers(api *operations.ConsoleAPI) {
 		}
 		return user_api.NewGetBucketRewindOK().WithPayload(getBucketRewind)
 	})
+
+	api.UserAPIGetBucketHealthHandler = user_api.GetBucketHealthHandlerFunc(func(params user_api.GetBucketHealthParams, session *models.Principal) middleware.Responder {
+		//TODO:need to update cli
+		resp := &models.BucketHealthResponse{
+			URL:    "google.ca",
+			Status: "up",
+			Region: "us-east-1",
+		}
+
+		return user_api.NewGetBucketHealthOK().WithPayload(resp)
+	})
 }
 
 type VersionState string

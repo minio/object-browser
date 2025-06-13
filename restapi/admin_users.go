@@ -22,10 +22,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/go-openapi/swag"
-
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/swag"
 	"github.com/mantle-labs/console/models"
 	"github.com/mantle-labs/console/restapi/operations"
 	"github.com/mantle-labs/console/restapi/operations/admin_api"
@@ -237,7 +236,7 @@ func getUserAddResponse(session *models.Principal, params admin_api.AddUserParam
 	return user, nil
 }
 
-//removeUser invokes removing an user on `MinioAdmin`, then we return the response from API
+// removeUser invokes removing an user on `MinioAdmin`, then we return the response from API
 func removeUser(ctx context.Context, client MinioAdmin, accessKey string) error {
 	return client.removeUser(ctx, accessKey)
 }
