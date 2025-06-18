@@ -14,20 +14,6 @@ import { ErrorResponseHandler } from '../../../../common/types';
 import { useAppDispatch } from '../../../../store';
 import { setErrorSnackMessage } from '../../../../systemSlice';
 
-
-//TODO:call sdk to have actual data.
-const healthData = [
-    { url: 'storage1.example.com', status: 'Healthy' },
-    { url: 'storage3.example.com', status: 'Healthy' },
-    { url: 'storage4.example.com', status: 'Healthy' },
-    { url: 'storage5.example.com', status: 'Healthy' },
-    { url: 'storage6.example.com', status: 'Healthy' },
-    { url: 'storage7.example.com', status: 'Healthy' },
-    { url: 'storage8.example.com', status: 'Healthy' },
-    { url: 'storage2.example.com', status: 'Down' },
-    { url: 'storage3.example.com', status: 'Warning' },
-];
-
 const getStatusChip = (status: string) => {
     switch (status) {
         case 'up':
@@ -44,6 +30,7 @@ const getStatusChip = (status: string) => {
 export default function BucketHealthInfo() {
     const dispatch = useAppDispatch();
     const [bucketHealth, setBucketHealth] = useState<BucketHealth[]>([])
+    
     useEffect(()=>{
         api
         .invoke("GET", `/api/v1/buckets/default/health`)
