@@ -142,7 +142,6 @@ const BucketDetails = ({ classes }: IBucketDetailsProps) => {
 
   useEffect(() => {
     if (loadingBucket) {
-      //TODO: sds healthcheck here.
       api
         .invoke("GET", `/api/v1/buckets/${bucketName}`)
         .then((res: BucketInfo) => {

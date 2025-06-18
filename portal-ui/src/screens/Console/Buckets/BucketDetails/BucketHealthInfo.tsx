@@ -7,8 +7,12 @@ import {
     CardContent,
 } from '@mui/material';
 import SectionTitle from '../../Common/SectionTitle';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import api from "../../../../common/api";
+import { BucketHealth } from '../types';
+import { ErrorResponseHandler } from '../../../../common/types';
+import { useAppDispatch } from '../../../../store';
+import { setErrorSnackMessage } from '../../../../systemSlice';
 
 
 //TODO:call sdk to have actual data.
@@ -26,11 +30,11 @@ const healthData = [
 
 const getStatusChip = (status: string) => {
     switch (status) {
-        case 'Healthy':
+        case 'up':
             return <Chip label="Healthy" color="success" icon={<span>🟢</span>} />;
-        case 'Down':
+        case 'down':
             return <Chip label="Down" color="error" icon={<span>🔴</span>} />;
-        case 'Warning':
+        case 'warning':
             return <Chip label="Warning" color="warning" icon={<span>🟡</span>} />;
         default:
             return <Chip label="Unknown" />;
@@ -38,15 +42,16 @@ const getStatusChip = (status: string) => {
 };
 
 export default function BucketHealthInfo() {
+    const dispatch = useAppDispatch();
+    const [bucketHealth, setBucketHealth] = useState<BucketHealth[]>([])
     useEffect(()=>{
         api
-        .invoke("GET", `/api/v1/buckets/test123/health`)
-        .then((res: any) => {
-            console.log("aaaaaa")
-
-            console.log(res)
+        .invoke("GET", `/api/v1/buckets/default/health`)
+        .then((res: BucketHealth[]) => {
+            setBucketHealth(res)
         })
-        .catch((err: any) => {
+        .catch((err: ErrorResponseHandler) => {
+            dispatch(setErrorSnackMessage(err));
         });
     },[])
     return (
@@ -55,7 +60,7 @@ export default function BucketHealthInfo() {
                 Health Info
             </Typography>
             <Grid container spacing={2}>
-                {healthData.map(({ url, status }) => (
+                {bucketHealth.map(({ url, status }) => (
                     <Grid item xs={12} sm={6} md={4} key={url}>
                         <Card
                             sx={{

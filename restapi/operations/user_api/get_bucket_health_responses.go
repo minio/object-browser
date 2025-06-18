@@ -26,7 +26,7 @@ type GetBucketHealthOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.BucketHealthResponse `json:"body,omitempty"`
+	Payload []*models.BucketHealthResponse `json:"body,omitempty"`
 }
 
 // NewGetBucketHealthOK creates GetBucketHealthOK with default headers values
@@ -36,13 +36,13 @@ func NewGetBucketHealthOK() *GetBucketHealthOK {
 }
 
 // WithPayload adds the payload to the get bucket health o k response
-func (o *GetBucketHealthOK) WithPayload(payload *models.BucketHealthResponse) *GetBucketHealthOK {
+func (o *GetBucketHealthOK) WithPayload(payload []*models.BucketHealthResponse) *GetBucketHealthOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get bucket health o k response
-func (o *GetBucketHealthOK) SetPayload(payload *models.BucketHealthResponse) {
+func (o *GetBucketHealthOK) SetPayload(payload []*models.BucketHealthResponse) {
 	o.Payload = payload
 }
 
