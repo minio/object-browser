@@ -41,6 +41,9 @@ const ListBuckets = () => {
   const loadingBuckets = useSelector(
     (state: AppState) => state.system.loadBucketsListing,
   );
+  const sidebarOpen = useSelector(
+    (state: AppState) => state.system.sidebarOpen,
+  );
 
   const [records, setRecords] = useState<Bucket[]>([]);
 
@@ -125,27 +128,29 @@ const ListBuckets = () => {
                 />
               </Box>
             )}
-            {filteredRecords.length === 0 && filterBuckets !== "" && (
-              <Box
-                sx={{
-                  "& .helpbox-container": {
-                    backgroundColor: "transparent",
-                    color: get(theme, "menu.vertical.textColor", "#FFF"),
-                    border: 0,
-                  },
-                }}
-              >
-                <HelpBox
-                  iconComponent={<BucketsIcon />}
-                  title={"No Results"}
-                  help={
-                    <Box sx={{ textAlign: "center" }}>
-                      No buckets match the filtering condition
-                    </Box>
-                  }
-                />
-              </Box>
-            )}
+            {filteredRecords.length === 0 &&
+              filterBuckets !== "" &&
+              sidebarOpen && (
+                <Box
+                  sx={{
+                    "& .helpbox-container": {
+                      backgroundColor: "transparent",
+                      color: get(theme, "menu.vertical.textColor", "#FFF"),
+                      border: 0,
+                    },
+                  }}
+                >
+                  <HelpBox
+                    iconComponent={<BucketsIcon />}
+                    title={"No Results"}
+                    help={
+                      <Box sx={{ textAlign: "center" }}>
+                        No buckets match the filtering condition
+                      </Box>
+                    }
+                  />
+                </Box>
+              )}
           </Box>
           <MenuDivider />
         </Fragment>

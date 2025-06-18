@@ -14,54 +14,76 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from "react";
-import { Box, InputBox, SearchIcon } from "mds";
+import React, { RefObject, useRef } from "react";
+import { Box, InputBox, MenuItem, SearchIcon } from "mds";
 import get from "lodash/get";
 import { useTheme } from "styled-components";
 import { AppState, useAppDispatch } from "../../../../store";
-import { setFilterBucket } from "../../../../systemSlice";
+import { menuOpen, setFilterBucket } from "../../../../systemSlice";
 import { useSelector } from "react-redux";
 
 const BucketFiltering = () => {
   const theme = useTheme();
+  const ref = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
   const bucketFilter = useSelector(
     (state: AppState) => state.system.filterBucketList,
   );
+  const sidebarOpen = useSelector(
+    (state: AppState) => state.system.sidebarOpen,
+  );
+
+  const expandSearchBox = () => {
+    dispatch(menuOpen(true));
+    ref.current?.focus();
+  };
 
   return (
-    <Box
-      sx={{
-        padding: `5px 15px`,
-        "& .startOverlayIcon svg": {
-          fill: `${get(theme, "menu.vertical.textColor", "#FFF")}!important`,
-        },
-      }}
-    >
-      <InputBox
-        id={"filter-buckets"}
-        placeholder={"Filter Buckets"}
+    <>
+      {!sidebarOpen ? (
+        <MenuItem
+          name={"Filter Bucket"}
+          icon={<SearchIcon />}
+          onClick={expandSearchBox}
+          id={`filter-buckets-expand`}
+        />
+      ) : null}
+      <Box
         sx={{
-          "& input": {
-            backgroundColor: "rgba(255,255,255,0.1)",
-            borderColor: get(
-              theme,
-              "menu.vertical.sectionDividerColor",
-              "#0F446C",
-            ),
-            color: get(theme, "menu.vertical.textColor", "#FFF"),
-            "&::placeholder": {
-              color: get(theme, "menu.vertical.textColor", "#FFF"),
-            },
+          opacity: sidebarOpen ? 1 : 0,
+          height: sidebarOpen ? "inherit" : "0",
+          padding: `5px 15px`,
+          "& .startOverlayIcon svg": {
+            fill: `${get(theme, "menu.vertical.textColor", "#FFF")}!important`,
           },
         }}
-        value={bucketFilter}
-        onChange={(e) => {
-          dispatch(setFilterBucket(e.target.value));
-        }}
-        startIcon={<SearchIcon />}
-      />
-    </Box>
+      >
+        <InputBox
+          id={"filter-buckets"}
+          placeholder={"Filter Buckets"}
+          sx={{
+            "& input": {
+              backgroundColor: "rgba(255,255,255,0.1)",
+              borderColor: get(
+                theme,
+                "menu.vertical.sectionDividerColor",
+                "#0F446C",
+              ),
+              color: get(theme, "menu.vertical.textColor", "#FFF"),
+              "&::placeholder": {
+                color: get(theme, "menu.vertical.textColor", "#FFF"),
+              },
+            },
+          }}
+          value={bucketFilter}
+          onChange={(e) => {
+            dispatch(setFilterBucket(e.target.value));
+          }}
+          startIcon={<SearchIcon />}
+          ref={ref as unknown as RefObject<HTMLInputElement>}
+        />
+      </Box>
+    </>
   );
 };
 
