@@ -172,9 +172,18 @@ const LicenseConsentModal = () => {
               marginTop: "19px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "space-between",
             }}
           >
+            <Box>
+              <a
+                href={"https://min.io/privacy-policy"}
+                target={"_blank"}
+                rel={"noreferrer"}
+              >
+                Privacy Policy
+              </a>
+            </Box>
             <Button
               id={"acknowledge-confirm"}
               type="button"
