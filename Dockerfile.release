@@ -1,0 +1,19 @@
+FROM scratch
+
+ARG TAG
+
+LABEL name="Console" \
+      maintainer="Georg Mangold" \
+      version="${TAG}" \
+      release="${TAG}" \
+      summary="A graphical user interface for MinIO" \
+      description="See Github for more information https://github.com/georgmangold/console"
+
+COPY console /console
+
+EXPOSE 9090
+
+ENV CONSOLE_ANIMATED_LOGIN=off
+
+ENTRYPOINT ["/console"]
+CMD [ "server"]

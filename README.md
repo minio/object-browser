@@ -19,6 +19,8 @@ A graphical user interface for [MinIO](https://github.com/minio/minio)
 
 - [Console](#console)
   - [Install](#install)
+        - [Binary Releases](#binary-releases)
+        - [Docker](#docker)
     - [Build from source](#build-from-source)
   - [Setup](#setup)
     - [1. Create a user `console` using `mc`](#1-create-a-user-console-using-mc)
@@ -30,8 +32,36 @@ A graphical user interface for [MinIO](https://github.com/minio/minio)
 - [Contribute to console Project](#contribute-to-console-project)
 
 <!-- markdown-toc end -->
-
 Console is a library that provides a management and browser UI overlay for the MinIO Server.
+## Install
+
+### Binary Releases
+
+|   OS    |  ARCH   |                                                Binary                                                       |
+|:-------:|:-------:|:-----------------------------------------------------------------------------------------------------------:|
+|  Linux  |  amd64  |     [linux-amd64](https://github.com/georgmangold/console/releases/latest/download/console-linux-amd64)     |
+|  Linux  |  arm64  |     [linux-arm64](https://github.com/georgmangold/console/releases/latest/download/console-linux-arm64)     |
+|  Linux  |   arm   |       [linux-arm](https://github.com/georgmangold/console/releases/latest/download/console-linux-arm)       |
+|  Apple  |  amd64  |    [darwin-amd64](https://github.com/georgmangold/console/releases/latest/download/console-darwin-amd64)    |
+|  Apple  |  arm64  |    [darwin-amd64](https://github.com/georgmangold/console/releases/latest/download/console-darwin-arm64)    |
+| Windows |  amd64  | [windows-amd64](https://github.com/georgmangold/console/releases/latest/download/console-windows-amd64.exe) |
+
+### Docker
+
+Pull the latest release via:
+
+```
+docker pull ghcr.io/minio/console
+```
+
+### Build from source
+
+> You will need a working Go environment. Therefore, please follow [How to install Go](https://golang.org/doc/install).
+> Minimum version required is go1.23
+
+```
+go install github.com/minio/console/cmd/console@latest
+```
 
 ## Setup
 
