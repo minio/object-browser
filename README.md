@@ -1,6 +1,12 @@
-# MinIO Console
+> [!NOTE]
+> This is just a fork of the [MinIO Console](https://github.com/minio/object-browser) for my own personal educational purposes, and therefore it incorporates MinIO® source code. You may also want to look for other maintained [forks](https://github.com/minio/object-browser/forks).
 
-![build](https://github.com/minio/console/workflows/Go/badge.svg) ![license](https://img.shields.io/badge/license-AGPL%20V3-blue)
+> [!NOTE]
+> It is important to note that **MINIO** is a registered trademark of the MinIO Corporation. Consequently, this project is not affiliated with or endorsed by the MinIO Corporation.
+
+# Console
+
+![Workflow](https://github.com/georgmangold/console/actions/workflows/jobs.yaml/badge.svg) ![license](https://img.shields.io/badge/license-AGPL%20V3-blue)
 
 A graphical user interface for [MinIO](https://github.com/minio/minio)
 
@@ -11,7 +17,7 @@ A graphical user interface for [MinIO](https://github.com/minio/minio)
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
-- [MinIO Console](#minio-console)
+- [Console](#console)
   - [Install](#install)
     - [Build from source](#build-from-source)
   - [Setup](#setup)
@@ -25,7 +31,7 @@ A graphical user interface for [MinIO](https://github.com/minio/minio)
 
 <!-- markdown-toc end -->
 
-MinIO Console is a library that provides a management and browser UI overlay for the MinIO Server.
+Console is a library that provides a management and browser UI overlay for the MinIO Server.
 
 ## Setup
 
