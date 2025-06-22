@@ -58,7 +58,7 @@ docker run -p 127.0.0.1:9090:9090 -e CONSOLE_MINIO_SERVER=https://YOUR_MINIO_SER
 ### Build from source
 
 > You will need a working Go environment. Therefore, please follow [How to install Go](https://golang.org/doc/install).
-> Minimum version required is go1.23
+> Minimum version required is go1.24
 
 ```
 go install github.com/georgmangold/console/cmd/console@latest
