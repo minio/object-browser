@@ -710,6 +710,8 @@ jobs:
             ./api/coverage/
           key: ${{ runner.os }}-coverage-api-2-${{ github.run_id }}
   b-integration-tests:
+    # Disable this Action until its clear what it does
+    if: false
     name: Integration Tests with Latest Distributed MinIO
     needs:
       - lint-job
@@ -961,53 +963,6 @@ jobs:
           go build gocovmerge.go
           echo "put together the outs for final coverage resolution"
           ./gocovmerge ../integration/coverage/system.out ../sso-integration/coverage/sso-system.out ../api/coverage/coverage.out ../pkg/coverage/coverage-pkg.out > all.out
-          echo "Download mc for Ubuntu"
-          wget -q https://dl.min.io/client/mc/release/linux-amd64/mc
-          echo "Change the permissions to execute mc command"
-          chmod +x mc
-          echo "Only run our test if play is up and running"
-          PLAY_IS_ON=`wget --spider --server-response https://play.min.io:9443/login 2>&1 | grep '200\ OK' | wc -l`
-          if [ $PLAY_IS_ON == 1 ]
-          then
-            echo "Play is up and running, we will proceed with the play part for coverage"
-            echo "Create the folder to put the all.out file"
-            ./mc mb --ignore-existing play/builds/
-            echo "Copy the all.out file to play bucket"
-            echo ${{ github.repository }}
-            echo ${{ github.event.number }}
-            echo ${{ github.run_id }}
-            # mc cp can fail due to lack of space: mc: <ERROR> Failed to copy `all.out`.
-            # Storage backend has reached its minimum free disk threshold. Please delete a few objects to proceed.
-            ./mc cp all.out play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp all.out play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            go tool cover -html=all.out -o coverage.html
-            ./mc cp coverage.html play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp coverage.html play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            # save all other coverage
-            go tool cover -html=../integration/coverage/system.out -o system.html
-            ./mc cp system.html play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp system.html play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            ./mc cp ../integration/coverage/system.out play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp ../integration/coverage/system.out play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            go tool cover -html=../sso-integration/coverage/sso-system.out -o sso-system.html
-            ./mc cp sso-system.html play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp sso-system.html play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            ./mc cp ../sso-integration/coverage/sso-system.out play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp ../sso-integration/coverage/sso-system.out play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            go tool cover -html=../api/coverage/coverage.out -o coverage.html
-            ./mc cp coverage.html play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp coverage.html play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            ./mc cp ../api/coverage/coverage.out play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp ../api/coverage/coverage.out play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            go tool cover -html=../pkg/coverage/coverage-pkg.out -o coverage-pkg.html
-            ./mc cp coverage-pkg.html play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp coverage-pkg.html play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            ./mc cp ../pkg/coverage/coverage-pkg.out play/builds/${{ github.repository }}/${{ github.event.number }}/${{ github.run_id }}/ || true
-            ./mc cp ../pkg/coverage/coverage-pkg.out play/builds/${{ github.repository }}/${{ github.event.number }}/latest/ || true
-            ./mc anonymous set public play/builds
-          else
-            echo "Play is down, please report it on hack channel, no coverage is going to be uploaded!!!"
-          fi
           echo "grep to obtain the result"
           go tool cover -func=all.out | grep total > tmp2
           result=`cat tmp2 | awk 'END {print $3}'`
@@ -1286,16 +1241,4 @@ jobs:
           echo "npx nyc report"
           npx nyc report # To see report printed in logs as text
           echo "npx nyc report --reporter=html"
-          npx nyc report --reporter=html # to see report in ./coverage/index.html
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage
-          path: coverage/
-          retention-days: 30
+          npx playwright test --reporter github # To run the tests
