@@ -1,5 +1,24 @@
 # Changelog
 
+## Release v1.7.8
+
+Bug Fix:
+
+- Fixed Dependencies vulnerabilities + updated Dependencies
+- Allow console to recognize s3.Delete*
+- Fix regex pattern in webhook management
+- Fix golangci-lint issues 
+- Decreased Browser direct download threshold to 5GiB
+
+## Release v1.7.7
+
+There are actually no changes compared to v1.7.6; I'm just getting the release and builds ready.
+- Binary Releases
+- Packages
+- Container Builds
+
+See Releases
+
 ## Release v1.7.6
 
 Bug Fix:
