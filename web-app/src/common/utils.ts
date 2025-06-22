@@ -108,7 +108,7 @@ const getBytesNumber = (
   return total;
 };
 
-export const setMemoryResource = (
+const setMemoryResource = (
   memorySize: number,
   capacitySize: string,
   maxMemorySize: number,
@@ -182,7 +182,7 @@ export const setMemoryResource = (
 };
 
 // Erasure Code Parity Calc
-export const erasureCodeCalc = (
+const erasureCodeCalc = (
   parityValidValues: string[],
   totalDisks: number,
   pvSize: number,
