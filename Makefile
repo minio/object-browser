@@ -68,7 +68,6 @@ swagger-console:
 swagger-typescript-api:
 	@(cd web-app; yarn swagger-typescript-api -p $(path) -o $(output) -n $(name) --custom-config ../generator.config.js; cd ..)
 
-
 assets:
 	@(if [ -f "${NVM_DIR}/nvm.sh" ]; then \. "${NVM_DIR}/nvm.sh" && nvm install && nvm use && npm install -g yarn ; fi &&\
 	  cd web-app; corepack enable; yarn install --prefer-offline; make build-static; yarn prettier --write . --log-level warn; cd ..)

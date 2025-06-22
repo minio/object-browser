@@ -67,7 +67,7 @@
     "@types/lodash": "^4.17.18",
     "@types/luxon": "^3.6.2",
     "@types/node": "20.17.47",
-    "@types/react": "18.3.23",
+    "@types/react": "19.1.8",
     "@types/react-copy-to-clipboard": "^5.0.7",
     "@types/react-dom": "18.3.7",
     "@types/react-redux": "^7.1.34",
