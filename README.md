@@ -19,8 +19,8 @@ A graphical user interface for [MinIO](https://github.com/minio/minio)
 
 - [Console](#console)
   - [Install](#install)
-        - [Binary Releases](#binary-releases)
-        - [Docker](#docker)
+    - [Binary Releases](#binary-releases)
+    - [Docker](#docker)
     - [Build from source](#build-from-source)
   - [Setup](#setup)
     - [1. Create a user `console` using `mc`](#1-create-a-user-console-using-mc)
@@ -36,7 +36,6 @@ Console is a library that provides a management and browser UI overlay for the M
 ## Install
 
 ### Binary Releases
-
 |   OS    |  ARCH   |                                                Binary                                                       |
 |:-------:|:-------:|:-----------------------------------------------------------------------------------------------------------:|
 |  Linux  |  amd64  |     [linux-amd64](https://github.com/georgmangold/console/releases/latest/download/console-linux-amd64)     |
@@ -47,11 +46,13 @@ Console is a library that provides a management and browser UI overlay for the M
 | Windows |  amd64  | [windows-amd64](https://github.com/georgmangold/console/releases/latest/download/console-windows-amd64.exe) |
 
 ### Docker
-
 Pull the latest release via:
-
 ```
-docker pull ghcr.io/minio/console
+docker pull ghcr.io/georgmangold/console
+```
+Run it with and replace YOUR_MINIO_SERVER_URL with your own Minio Server URL
+```
+docker run -p 127.0.0.1:9090:9090 -e CONSOLE_MINIO_SERVER=https://YOUR_MINIO_SERVER_URL ghcr.io/georgmangold/console
 ```
 
 ### Build from source
@@ -60,8 +61,9 @@ docker pull ghcr.io/minio/console
 > Minimum version required is go1.23
 
 ```
-go install github.com/minio/console/cmd/console@latest
+go install github.com/georgmangold/console/cmd/console@latest
 ```
+Refer to [DEVELOPMENT.md](DEVELOPMENT.md) for more Information.
 
 ## Setup
 

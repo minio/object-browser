@@ -1,13 +1,17 @@
 FROM scratch
 
 ARG TAG
+ARG SOURCE
 
 LABEL name="Console" \
       maintainer="Georg Mangold" \
       version="${TAG}" \
       release="${TAG}" \
       summary="A graphical user interface for MinIO" \
-      description="See Github for more information https://github.com/georgmangold/console"
+      description="See Github for more information https://github.com/georgmangold/console" \
+      org.opencontainers.image.source="https://github.com/georgmangold/console" \
+      org.opencontainers.image.description="A graphical user interface for MinIO" \
+      org.opencontainers.image.licenses="AGPL-3.0-only"
 
 COPY console /console
 
