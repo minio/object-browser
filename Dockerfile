@@ -1,43 +1,46 @@
-ARG NODE_VERSION
-FROM node:$NODE_VERSION as uilayer
+ARG GO_VERSION=1.24
+ARG NODE_VERSION=24
+FROM node:${NODE_VERSION}-alpine AS uilayer
 
 WORKDIR /app
 
-COPY ./web-app/package.json ./
-COPY ./web-app/yarn.lock ./
+# Git is required for some dependencies pulled from repositories
+RUN apk add --no-cache git
+
+RUN corepack enable && corepack prepare yarn@4.4.0 --activate
+
+COPY ./web-app/package.json ./web-app/yarn.lock ./web-app/.yarnrc.yml ./
+
 RUN yarn install
 
 COPY ./web-app .
 
-RUN make build-static
+RUN yarn build
 
 USER node
 
-FROM golang:1.19 as golayer
+FROM golang:${GO_VERSION}-alpine AS golayer
+WORKDIR /console/
 
-RUN apt-get update -y && apt-get install -y ca-certificates
-
-ADD go.mod /go/src/github.com/minio/console/go.mod
-ADD go.sum /go/src/github.com/minio/console/go.sum
-WORKDIR /go/src/github.com/minio/console/
+ADD go.mod .
+ADD go.sum .
 
 # Get dependencies - will also be cached if we won't change mod/sum
 RUN go mod download
 
-ADD . /go/src/github.com/minio/console/
-WORKDIR /go/src/github.com/minio/console/
+ADD . .
 
 ENV CGO_ENABLED=0
+ENV GO111MODULE=on
 
-COPY --from=uilayer /app/build /go/src/github.com/minio/console/web-app/build
-RUN go build --tags=kqueue,operator -ldflags "-w -s" -a -o console ./cmd/console
+COPY --from=uilayer /app/build ./web-app/build
+RUN go build -trimpath --tags=kqueue,operator -ldflags "-w -s" -a -o console ./cmd/console
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.7
-MAINTAINER MinIO Development "dev@min.io"
+FROM scratch
+ENV CONSOLE_ANIMATED_LOGIN=off
 EXPOSE 9090
 
-
-COPY --from=golayer /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=golayer /go/src/github.com/minio/console/console .
+COPY --from=golayer /console/console .
 
 ENTRYPOINT ["/console"]
+CMD [ "server"]
