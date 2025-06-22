@@ -1,19 +1,17 @@
-# This is an example goreleaser.yaml file with some sane defaults.
 # Make sure to check the documentation at http://goreleaser.com
+version: 2
 project_name: console
 
 release:
   name_template: "Release version {{.Tag}}"
   github:
-    owner: minio
+    owner: georgmangold
     name: console
-  extra_files:
-    - glob: "*.minisig"
 
 before:
   hooks:
     # you may remove this if you don't use vgo
-    - go mod tidy -compat=1.19
+    - go mod tidy
 
 builds:
   - goos:
@@ -22,9 +20,8 @@ builds:
       - windows
     goarch:
       - amd64
-      - ppc64le
-      - s390x
       - arm64
+      - arm
     ignore:
       - goos: darwin
         goarch: arm
@@ -47,29 +44,19 @@ builds:
 
 archives:
   - name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
-    format: binary
-    replacements:
-      arm: arm
-
-signs:
-  - signature: "${artifact}.minisig"
-    cmd: "sh"
-    args:
-      - '-c'
-      - 'minisign -s /media/${USER}/minio/minisign.key -Sm ${artifact} < /media/${USER}/minio/minisign-passphrase'
-    artifacts: all
+    formats: [ 'binary' ]
 
 snapshot:
-  name_template: v0.0.0@{{.ShortCommit}}
+  version_template: SNAPSHOT@{{.ShortCommit}}
 
 changelog:
   sort: asc
 
 nfpms:
-  - vendor: MinIO, Inc.
-    homepage: https://github.com/minio/console
-    maintainer: MinIO Development <dev@min.io>
-    description: MinIO Console Server
+  - vendor: "Georg Mangold"
+    homepage: https://github.com/georgmangold/console
+    maintainer: "Georg Mangold"
+    description: Console UI for MinIO Server
     license: GNU Affero General Public License v3.0
     formats:
       - deb
@@ -81,111 +68,29 @@ nfpms:
 
 dockers:
   - image_templates:
-      - "minio/console:{{ .Tag }}-amd64"
+      - "ghcr.io/minio/console:{{ .Tag }}-amd64"
     use: buildx
     goarch: amd64
     dockerfile: Dockerfile.release
-    extra_files:
-      - LICENSE
-      - CREDITS
     build_flag_templates:
       - "--platform=linux/amd64"
       - "--build-arg=TAG={{ .Tag }}"
   - image_templates:
-      - "minio/console:{{ .Tag }}-ppc64le"
-    use: buildx
-    goarch: ppc64le
-    dockerfile: Dockerfile.release
-    extra_files:
-      - LICENSE
-      - CREDITS
-    build_flag_templates:
-      - "--platform=linux/ppc64le"
-      - "--build-arg=TAG={{ .Tag }}"
-  - image_templates:
-      - "minio/console:{{ .Tag }}-s390x"
-    use: buildx
-    goarch: s390x
-    dockerfile: Dockerfile.release
-    extra_files:
-      - LICENSE
-      - CREDITS
-    build_flag_templates:
-      - "--platform=linux/s390x"
-      - "--build-arg=TAG={{ .Tag }}"
-  - image_templates:
-      - "minio/console:{{ .Tag }}-arm64"
+      - "ghcr.io/minio/console:{{ .Tag }}-arm64"
     use: buildx
     goarch: arm64
     goos: linux
     dockerfile: Dockerfile.release
-    extra_files:
-      - LICENSE
-      - CREDITS
-    build_flag_templates:
-      - "--platform=linux/arm64"
-      - "--build-arg=TAG={{ .Tag }}"
-  - image_templates:
-      - "quay.io/minio/console:{{ .Tag }}-amd64"
-    use: buildx
-    goarch: amd64
-    dockerfile: Dockerfile.release
-    extra_files:
-      - LICENSE
-      - CREDITS
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--build-arg=TAG={{ .Tag }}"
-  - image_templates:
-      - "quay.io/minio/console:{{ .Tag }}-ppc64le"
-    use: buildx
-    goarch: ppc64le
-    dockerfile: Dockerfile.release
-    extra_files:
-      - LICENSE
-      - CREDITS
-    build_flag_templates:
-      - "--platform=linux/ppc64le"
-      - "--build-arg=TAG={{ .Tag }}"
-  - image_templates:
-      - "quay.io/minio/console:{{ .Tag }}-s390x"
-    use: buildx
-    goarch: s390x
-    dockerfile: Dockerfile.release
-    extra_files:
-      - LICENSE
-      - CREDITS
-    build_flag_templates:
-      - "--platform=linux/s390x"
-      - "--build-arg=TAG={{ .Tag }}"
-  - image_templates:
-      - "quay.io/minio/console:{{ .Tag }}-arm64"
-    use: buildx
-    goarch: arm64
-    goos: linux
-    dockerfile: Dockerfile.release
-    extra_files:
-      - LICENSE
-      - CREDITS
     build_flag_templates:
       - "--platform=linux/arm64"
       - "--build-arg=TAG={{ .Tag }}"
 docker_manifests:
-  - name_template: minio/console:{{ .Tag }}
+  - name_template: ghcr.io/minio/console:{{ .Tag }}
     image_templates:
-      - minio/console:{{ .Tag }}-amd64
-      - minio/console:{{ .Tag }}-arm64
-      - minio/console:{{ .Tag }}-ppc64le
-      - minio/console:{{ .Tag }}-s390x
-  - name_template: quay.io/minio/console:{{ .Tag }}
+      - ghcr.io/minio/console:{{ .Tag }}-amd64
+      - ghcr.io/minio/console:{{ .Tag }}-arm64
+  - name_template: ghcr.io/minio/console:latest
     image_templates:
-      - quay.io/minio/console:{{ .Tag }}-amd64
-      - quay.io/minio/console:{{ .Tag }}-arm64
-      - quay.io/minio/console:{{ .Tag }}-ppc64le
-      - quay.io/minio/console:{{ .Tag }}-s390x
-  - name_template: minio/console:latest
-    image_templates:
-      - minio/console:{{ .Tag }}-amd64
-      - minio/console:{{ .Tag }}-arm64
-      - minio/console:{{ .Tag }}-ppc64le
-      - minio/console:{{ .Tag }}-s390x
+      - ghcr.io/minio/console:{{ .Tag }}-amd64
+      - ghcr.io/minio/console:{{ .Tag }}-arm64
+
