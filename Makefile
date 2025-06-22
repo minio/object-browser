@@ -19,7 +19,7 @@ console:
 
 getdeps:
 	@mkdir -p ${GOPATH}/bin
-	@echo "Installing golangci-lint" && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.64.8
+	@echo "Installing golangci-lint" && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin
 
 verifiers: getdeps fmt lint
 
@@ -59,14 +59,18 @@ clean-swagger:
 swagger-console:
 	@echo "Generating swagger server code from yaml"
 	@swagger generate server -A console --main-package=management --server-package=api --exclude-main -P models.Principal -f ./swagger.yml -r NOTICE
+	@echo "Ensure basic install"
+	@(cd web-app; yarn; cd ..)
 	@echo "Generating typescript api"
-	@npx swagger-typescript-api -p ./swagger.yml -o ./web-app/src/api -n consoleApi.ts --custom-config generator.config.js
+	@make swagger-typescript-api path="../swagger.yml" output="./src/api" name="consoleApi.ts"
 	@git restore api/server.go
 
+swagger-typescript-api:
+	@(cd web-app; yarn swagger-typescript-api -p $(path) -o $(output) -n $(name) --custom-config ../generator.config.js; cd ..)
 
 assets:
 	@(if [ -f "${NVM_DIR}/nvm.sh" ]; then \. "${NVM_DIR}/nvm.sh" && nvm install && nvm use && npm install -g yarn ; fi &&\
-	  cd web-app; corepack enable; yarn install --prefer-offline; make build-static; yarn prettier --write . --loglevel warn; cd ..)
+	  cd web-app; corepack enable; yarn install --prefer-offline; make build-static; yarn prettier --write . --log-level warn; cd ..)
 
 test-integration:
 	@(docker stop pgsqlcontainer || true)

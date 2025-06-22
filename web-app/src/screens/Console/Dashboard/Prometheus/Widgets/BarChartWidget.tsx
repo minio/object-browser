@@ -91,7 +91,7 @@ const BarChartWidget = ({
     window.innerWidth >= breakPoints.md,
   );
 
-  const componentRef = useRef<HTMLElement>();
+  const componentRef = useRef<HTMLElement>(null);
   const widgetVersion = useSelector(
     (state: AppState) => state.dashboard.widgetLoadVersion,
   );

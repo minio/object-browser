@@ -486,11 +486,7 @@ func getMakeBucketResponse(session *models.Principal, params bucketApi.MakeBucke
 		}
 	}()
 
-	versioningEnabled := false
-
-	if br.Versioning != nil && br.Versioning.Enabled {
-		versioningEnabled = true
-	}
+	versioningEnabled := br.Versioning != nil && br.Versioning.Enabled
 
 	// enable versioning if indicated or retention enabled
 	if versioningEnabled || br.Retention != nil {

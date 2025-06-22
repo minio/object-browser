@@ -24,7 +24,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-openapi/runtime/middleware"
 	"github.com/minio/console/api/operations/system"
 	"github.com/minio/console/models"
 
@@ -90,7 +89,7 @@ func TestRegisterAdminArnsHandlers(t *testing.T) {
 	modelsPrincipal := models.Principal{
 		STSAccessKeyID: "accesskey",
 	}
-	var value middleware.Responder = api.SystemArnListHandler.Handle(ArnListParamsStruct, &modelsPrincipal)
+	value := api.SystemArnListHandler.Handle(ArnListParamsStruct, &modelsPrincipal)
 	str := fmt.Sprintf("%#v", value)
 	fmt.Println("value: ", str)
 	assert.Equal(strings.Contains(str, "_statusCode:500"), true)
