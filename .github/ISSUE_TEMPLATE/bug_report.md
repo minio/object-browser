@@ -9,7 +9,7 @@ assignees: ''
 
 ## NOTE
 
-This is just a fork for my own personal educational purposes, therefore no real support.
+This is just a fork for my own personal educational purposes, therefore no real support but thanks anyway.
 
 <!--- Provide a general summary of the issue in the title above -->
 
