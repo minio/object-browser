@@ -1,0 +1,14 @@
+ARG NODE_VERSION
+FROM node:$NODE_VERSION as uilayer
+
+WORKDIR /app
+
+COPY ./web-app/package.json ./
+COPY ./web-app/yarn.lock ./
+RUN yarn install
+
+COPY ./web-app .
+
+RUN yarn install && make build-static
+
+USER node
