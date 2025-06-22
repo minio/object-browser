@@ -63,10 +63,10 @@ remove_policies() {
   mc admin policy remove minio inspect-not-allowed-"$TIMESTAMP"
   mc admin policy remove minio fix-prefix-policy-ui-crash-"$TIMESTAMP"
   mc admin policy remove minio delete-object-with-prefix-"$TIMESTAMP"
-  mc admin policy remove conditions-policy-"$TIMESTAMP"
-  mc admin policy remove conditions-policy-2-"$TIMESTAMP"
-  mc admin policy remove conditions-policy-3-"$TIMESTAMP"
-  mc admin policy remove conditions-policy-4-"$TIMESTAMP"
+  mc admin policy remove minio conditions-policy-"$TIMESTAMP"
+  mc admin policy remove minio conditions-policy-2-"$TIMESTAMP"
+  mc admin policy remove minio conditions-policy-3-"$TIMESTAMP"
+  mc admin policy remove minio conditions-policy-4-"$TIMESTAMP"
 }
 
 remove_buckets() {

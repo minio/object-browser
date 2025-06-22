@@ -4,7 +4,10 @@ GOPATH := $(shell go env GOPATH)
 BUILD_VERSION:=$(shell git describe --exact-match --tags $(git log -n1 --pretty='%h') 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null)
 BUILD_TIME:=$(shell date 2>/dev/null)
 TAG ?= "minio/console:$(BUILD_VERSION)-dev"
-MINIO_VERSION ?= "quay.io/minio/minio:latest"
+#MINIO_VERSION ?= "quay.io/minio/minio:latest"
+MINIO_VERSION ?= "quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z"
+
+Digest	OS/ARCH	
 TARGET_BUCKET ?= "target"
 NODE_VERSION := $(shell cat .nvmrc)
 
@@ -17,7 +20,7 @@ console:
 
 getdeps:
 	@mkdir -p ${GOPATH}/bin
-	@echo "Installing golangci-lint" && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin
+	@echo "Installing golangci-lint" && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin v1.64.8
 
 verifiers: getdeps fmt lint
 

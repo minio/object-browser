@@ -9,7 +9,7 @@ assignees: ''
 
 ## NOTE
 
-Please subscribe to our [paid subscription plans](https://min.io/pricing) for 24x7 support from our Engineering team.
+This is just a fork for my own personal educational purposes, therefore no real support.
 
 <!--- Provide a general summary of the issue in the title above -->
 
