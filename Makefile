@@ -7,7 +7,6 @@ TAG ?= "minio/console:$(BUILD_VERSION)-dev"
 #MINIO_VERSION ?= "quay.io/minio/minio:latest"
 MINIO_VERSION ?= "quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z"
 
-Digest	OS/ARCH	
 TARGET_BUCKET ?= "target"
 NODE_VERSION := $(shell cat .nvmrc)
 
