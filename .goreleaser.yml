@@ -68,7 +68,7 @@ nfpms:
 
 dockers:
   - image_templates:
-      - "ghcr.io/minio/console:{{ .Tag }}-amd64"
+      - "ghcr.io/georgmangold/console:{{ .Tag }}-amd64"
     use: buildx
     goarch: amd64
     dockerfile: Dockerfile.release
@@ -76,7 +76,7 @@ dockers:
       - "--platform=linux/amd64"
       - "--build-arg=TAG={{ .Tag }}"
   - image_templates:
-      - "ghcr.io/minio/console:{{ .Tag }}-arm64"
+      - "ghcr.io/georgmangold/console:{{ .Tag }}-arm64"
     use: buildx
     goarch: arm64
     goos: linux
@@ -85,12 +85,12 @@ dockers:
       - "--platform=linux/arm64"
       - "--build-arg=TAG={{ .Tag }}"
 docker_manifests:
-  - name_template: ghcr.io/minio/console:{{ .Tag }}
+  - name_template: ghcr.io/georgmangold/console:{{ .Tag }}
     image_templates:
-      - ghcr.io/minio/console:{{ .Tag }}-amd64
-      - ghcr.io/minio/console:{{ .Tag }}-arm64
-  - name_template: ghcr.io/minio/console:latest
+      - ghcr.io/georgmangold/console:{{ .Tag }}-amd64
+      - ghcr.io/georgmangold/console:{{ .Tag }}-arm64
+  - name_template: ghcr.io/georgmangold/console:latest
     image_templates:
-      - ghcr.io/minio/console:{{ .Tag }}-amd64
-      - ghcr.io/minio/console:{{ .Tag }}-arm64
+      - ghcr.io/georgmangold/console:{{ .Tag }}-amd64
+      - ghcr.io/georgmangold/console:{{ .Tag }}-arm64
 
