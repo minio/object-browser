@@ -1,5 +1,17 @@
 # Changelog
 
+## Release v2.0.2
+
+Bug Fix:
+
+- Updated project dependencies for vulnerabilities
+- Fixed buckets search box positioning during sidebar closed state
+
+Changes:
+
+- Added Privacy Policy to the License modal box
+
+
 ## Release v2.0.1
 
 Bug Fix:
