@@ -66,7 +66,7 @@ swagger-console:
 	@git restore api/server.go
 
 swagger-typescript-api:
-	@(cd web-app; yarn swagger-typescript-api -p $(path) -o $(output) -n $(name) --custom-config ../generator.config.js; cd ..)
+	@(cd web-app; yarn swagger-typescript-api generate -p $(path) -o $(output) -n $(name) --custom-config ../generator.config.js; cd ..)
 
 assets:
 	@(if [ -f "${NVM_DIR}/nvm.sh" ]; then \. "${NVM_DIR}/nvm.sh" && nvm install && nvm use && npm install -g yarn ; fi &&\

@@ -73,7 +73,7 @@ func (o *DeleteRemoteBucketParams) BindRequest(r *http.Request, route *middlewar
 		res = append(res, err)
 	}
 
-	rSourceBucketName, rhkSourceBucketName, _ := route.Params.GetOK("source-bucket-name")
+	rSourceBucketName, rhkSourceBucketName, _ := route.Params.GetOK("source_bucket_name")
 	if err := o.bindSourceBucketName(rSourceBucketName, rhkSourceBucketName, route.Formats); err != nil {
 		res = append(res, err)
 	}

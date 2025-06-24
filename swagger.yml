@@ -2759,12 +2759,12 @@ paths:
             $ref: "#/definitions/ApiError"
       tags:
         - Bucket
-  /remote-buckets/{source-bucket-name}/{arn}:
+  /remote-buckets/{source_bucket_name}/{arn}:
     delete:
       summary: Delete Remote Bucket
       operationId: DeleteRemoteBucket
       parameters:
-        - name: source-bucket-name
+        - name: source_bucket_name
           in: path
           required: true
           type: string
@@ -5041,21 +5041,6 @@ definitions:
       status:
         type: string
 
-  license:
-    type: object
-    properties:
-      email:
-        type: string
-      organization:
-        type: string
-      account_id:
-        type: integer
-      storage_capacity:
-        type: integer
-      plan:
-        type: string
-      expires_at:
-        type: string
   apiKey:
     type: object
     properties:
@@ -5608,25 +5593,6 @@ definitions:
         type: string
       subscriptions_url:
         type: string
-
-  callHomeGetResponse:
-    type: object
-    properties:
-      diagnosticsStatus:
-        type: boolean
-      logsStatus:
-        type: boolean
-
-  callHomeSetStatus:
-    type: object
-    required:
-      - diagState
-      - logsState
-    properties:
-      diagState:
-        type: boolean
-      logsState:
-        type: boolean
 
   ldapEntitiesRequest:
     type: object

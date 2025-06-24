@@ -1611,7 +1611,7 @@ func (o *ConsoleAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/remote-buckets/{source-bucket-name}/{arn}"] = bucket.NewDeleteRemoteBucket(o.context, o.BucketDeleteRemoteBucketHandler)
+	o.handlers["DELETE"]["/remote-buckets/{source_bucket_name}/{arn}"] = bucket.NewDeleteRemoteBucket(o.context, o.BucketDeleteRemoteBucketHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

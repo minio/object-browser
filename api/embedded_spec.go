@@ -4020,7 +4020,7 @@ func init() {
         }
       }
     },
-    "/remote-buckets/{source-bucket-name}/{arn}": {
+    "/remote-buckets/{source_bucket_name}/{arn}": {
       "delete": {
         "tags": [
           "Bucket"
@@ -4030,7 +4030,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "source-bucket-name",
+            "name": "source_bucket_name",
             "in": "path",
             "required": true
           },
@@ -5496,32 +5496,6 @@ func init() {
         }
       }
     },
-    "callHomeGetResponse": {
-      "type": "object",
-      "properties": {
-        "diagnosticsStatus": {
-          "type": "boolean"
-        },
-        "logsStatus": {
-          "type": "boolean"
-        }
-      }
-    },
-    "callHomeSetStatus": {
-      "type": "object",
-      "required": [
-        "diagState",
-        "logsState"
-      ],
-      "properties": {
-        "diagState": {
-          "type": "boolean"
-        },
-        "logsState": {
-          "type": "boolean"
-        }
-      }
-    },
     "changeUserPasswordRequest": {
       "type": "object",
       "required": [
@@ -6110,29 +6084,6 @@ func init() {
         },
         "user": {
           "type": "string"
-        }
-      }
-    },
-    "license": {
-      "type": "object",
-      "properties": {
-        "account_id": {
-          "type": "integer"
-        },
-        "email": {
-          "type": "string"
-        },
-        "expires_at": {
-          "type": "string"
-        },
-        "organization": {
-          "type": "string"
-        },
-        "plan": {
-          "type": "string"
-        },
-        "storage_capacity": {
-          "type": "integer"
         }
       }
     },
@@ -12461,7 +12412,7 @@ func init() {
         }
       }
     },
-    "/remote-buckets/{source-bucket-name}/{arn}": {
+    "/remote-buckets/{source_bucket_name}/{arn}": {
       "delete": {
         "tags": [
           "Bucket"
@@ -12471,7 +12422,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "source-bucket-name",
+            "name": "source_bucket_name",
             "in": "path",
             "required": true
           },
@@ -14102,32 +14053,6 @@ func init() {
         }
       }
     },
-    "callHomeGetResponse": {
-      "type": "object",
-      "properties": {
-        "diagnosticsStatus": {
-          "type": "boolean"
-        },
-        "logsStatus": {
-          "type": "boolean"
-        }
-      }
-    },
-    "callHomeSetStatus": {
-      "type": "object",
-      "required": [
-        "diagState",
-        "logsState"
-      ],
-      "properties": {
-        "diagState": {
-          "type": "boolean"
-        },
-        "logsState": {
-          "type": "boolean"
-        }
-      }
-    },
     "changeUserPasswordRequest": {
       "type": "object",
       "required": [
@@ -14716,29 +14641,6 @@ func init() {
         },
         "user": {
           "type": "string"
-        }
-      }
-    },
-    "license": {
-      "type": "object",
-      "properties": {
-        "account_id": {
-          "type": "integer"
-        },
-        "email": {
-          "type": "string"
-        },
-        "expires_at": {
-          "type": "string"
-        },
-        "organization": {
-          "type": "string"
-        },
-        "plan": {
-          "type": "string"
-        },
-        "storage_capacity": {
-          "type": "integer"
         }
       }
     },
