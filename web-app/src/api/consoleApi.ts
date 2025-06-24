@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -9,14 +10,54 @@
  * ---------------------------------------------------------------
  */
 
-export interface AccountChangePasswordRequest {
-  current_secret_key: string;
-  new_secret_key: string;
+export enum ObjectRetentionUnit {
+  Days = "days",
+  Years = "years",
 }
 
-export interface ChangeUserPasswordRequest {
-  selectedUser: string;
-  newSecretKey: string;
+export enum ObjectRetentionMode {
+  Governance = "governance",
+  Compliance = "compliance",
+}
+
+export enum ObjectLegalHoldStatus {
+  Enabled = "enabled",
+  Disabled = "disabled",
+}
+
+export enum NofiticationService {
+  Webhook = "webhook",
+  Amqp = "amqp",
+  Kafka = "kafka",
+  Mqtt = "mqtt",
+  Nats = "nats",
+  Nsq = "nsq",
+  Mysql = "mysql",
+  Postgres = "postgres",
+  Elasticsearch = "elasticsearch",
+  Redis = "redis",
+}
+
+export enum NotificationEventType {
+  Put = "put",
+  Delete = "delete",
+  Get = "get",
+  Replica = "replica",
+  Ilm = "ilm",
+  Scanner = "scanner",
+}
+
+/** @default "user" */
+export enum PolicyEntity {
+  User = "user",
+  Group = "group",
+}
+
+/** @default "PRIVATE" */
+export enum BucketAccess {
+  PRIVATE = "PRIVATE",
+  PUBLIC = "PUBLIC",
+  CUSTOM = "CUSTOM",
 }
 
 /** @default "sse-s3" */
@@ -25,11 +66,14 @@ export enum BucketEncryptionType {
   SseKms = "sse-kms",
 }
 
-/** @default "PRIVATE" */
-export enum BucketAccess {
-  PRIVATE = "PRIVATE",
-  PUBLIC = "PUBLIC",
-  CUSTOM = "CUSTOM",
+export interface AccountChangePasswordRequest {
+  current_secret_key: string;
+  new_secret_key: string;
+}
+
+export interface ChangeUserPasswordRequest {
+  selectedUser: string;
+  newSecretKey: string;
 }
 
 export interface UserServiceAccountItem {
@@ -185,12 +229,6 @@ export interface Policy {
   policy?: string;
 }
 
-/** @default "user" */
-export enum PolicyEntity {
-  User = "user",
-  Group = "group",
-}
-
 export interface SetPolicyRequest {
   entityType: PolicyEntity;
   entityName: string;
@@ -289,15 +327,6 @@ export interface SetConfigRequest {
   key_values: ConfigurationKV[];
   /** Used if configuration is an event notification's target */
   arn_resource_id?: string;
-}
-
-export enum NotificationEventType {
-  Put = "put",
-  Delete = "delete",
-  Get = "get",
-  Replica = "replica",
-  Ilm = "ilm",
-  Scanner = "scanner",
 }
 
 export interface NotificationConfig {
@@ -629,19 +658,6 @@ export interface UpdateUserGroups {
   groups: string[];
 }
 
-export enum NofiticationService {
-  Webhook = "webhook",
-  Amqp = "amqp",
-  Kafka = "kafka",
-  Mqtt = "mqtt",
-  Nats = "nats",
-  Nsq = "nsq",
-  Mysql = "mysql",
-  Postgres = "postgres",
-  Elasticsearch = "elasticsearch",
-  Redis = "redis",
-}
-
 export interface NotificationEndpointItem {
   service?: NofiticationService;
   account_id?: string;
@@ -847,18 +863,8 @@ export interface LogSearchResponse {
   results?: object;
 }
 
-export enum ObjectLegalHoldStatus {
-  Enabled = "enabled",
-  Disabled = "disabled",
-}
-
 export interface PutObjectLegalHoldRequest {
   status: ObjectLegalHoldStatus;
-}
-
-export enum ObjectRetentionMode {
-  Governance = "governance",
-  Compliance = "compliance",
 }
 
 export interface PutObjectRetentionRequest {
@@ -873,11 +879,6 @@ export interface PutObjectTagsRequest {
 
 export interface PutBucketTagsRequest {
   tags?: any;
-}
-
-export enum ObjectRetentionUnit {
-  Days = "days",
-  Years = "years",
 }
 
 export interface PutBucketRetentionRequest {
@@ -1097,15 +1098,6 @@ export interface ConfigExportResponse {
   status?: string;
 }
 
-export interface License {
-  email?: string;
-  organization?: string;
-  account_id?: number;
-  storage_capacity?: number;
-  plan?: string;
-  expires_at?: string;
-}
-
 export interface ApiKey {
   apiKey?: string;
 }
@@ -1234,43 +1226,6 @@ export interface IamPolicyStatement {
 
 export interface Metadata {
   objectMetadata?: Record<string, any>;
-}
-
-export interface SubnetLoginResponse {
-  access_token?: string;
-  organizations?: SubnetOrganization[];
-  mfa_token?: string;
-  registered?: boolean;
-}
-
-export interface SubnetLoginRequest {
-  username?: string;
-  password?: string;
-  apiKey?: string;
-}
-
-export interface SubnetLoginMFARequest {
-  username: string;
-  otp: string;
-  mfa_token: string;
-}
-
-export interface SubnetRegisterRequest {
-  token: string;
-  account_id: string;
-}
-
-export interface SubnetRegTokenResponse {
-  regToken?: string;
-}
-
-export interface SubnetOrganization {
-  userId?: number;
-  accountId?: number;
-  subscriptionStatus?: string;
-  isAccountOwner?: boolean;
-  company?: string;
-  shortName?: string;
 }
 
 export interface PermissionResource {
@@ -1438,16 +1393,6 @@ export interface ReleaseAuthor {
   subscriptions_url?: string;
 }
 
-export interface CallHomeGetResponse {
-  diagnosticsStatus?: boolean;
-  logsStatus?: boolean;
-}
-
-export interface CallHomeSetStatus {
-  diagState: boolean;
-  logsState: boolean;
-}
-
 export interface LdapEntitiesRequest {
   users?: string[];
   groups?: string[];
@@ -1530,6 +1475,7 @@ type CancelToken = Symbol | string | number;
 
 export enum ContentType {
   Json = "application/json",
+  JsonApi = "application/vnd.api+json",
   FormData = "multipart/form-data",
   UrlEncoded = "application/x-www-form-urlencoded",
   Text = "text/plain",
@@ -1593,6 +1539,10 @@ export class HttpClient<SecurityDataType = unknown> {
 
   private contentFormatters: Record<ContentType, (input: any) => any> = {
     [ContentType.Json]: (input: any) =>
+      input !== null && (typeof input === "object" || typeof input === "string")
+        ? JSON.stringify(input)
+        : input,
+    [ContentType.JsonApi]: (input: any) =>
       input !== null && (typeof input === "object" || typeof input === "string")
         ? JSON.stringify(input)
         : input,
@@ -3019,6 +2969,7 @@ export class Api<
         method: "POST",
         body: body,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -3122,6 +3073,7 @@ export class Api<
         method: "POST",
         body: body,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -3360,6 +3312,7 @@ export class Api<
         method: "POST",
         body: body,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -3383,6 +3336,7 @@ export class Api<
         method: "POST",
         body: body,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -4035,126 +3989,6 @@ export class Api<
         ...params,
       }),
   };
-  subnet = {
-    /**
-     * No description
-     *
-     * @tags Subnet
-     * @name SubnetRegToken
-     * @summary SUBNET registraton token
-     * @request GET:/subnet/registration-token
-     * @secure
-     */
-    subnetRegToken: (params: RequestParams = {}) =>
-      this.request<SubnetRegTokenResponse, ApiError>({
-        path: `/subnet/registration-token`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Subnet
-     * @name SubnetInfo
-     * @summary Subnet info
-     * @request GET:/subnet/info
-     * @secure
-     */
-    subnetInfo: (params: RequestParams = {}) =>
-      this.request<License, ApiError>({
-        path: `/subnet/info`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Subnet
-     * @name SubnetApiKey
-     * @summary Subnet api key
-     * @request GET:/subnet/apikey
-     * @secure
-     */
-    subnetApiKey: (
-      query: {
-        token: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<ApiKey, ApiError>({
-        path: `/subnet/apikey`,
-        method: "GET",
-        query: query,
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Subnet
-     * @name SubnetRegister
-     * @summary Register cluster with Subnet
-     * @request POST:/subnet/register
-     * @secure
-     */
-    subnetRegister: (body: SubnetRegisterRequest, params: RequestParams = {}) =>
-      this.request<void, ApiError>({
-        path: `/subnet/register`,
-        method: "POST",
-        body: body,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Subnet
-     * @name SubnetLogin
-     * @summary Login to SUBNET
-     * @request POST:/subnet/login
-     * @secure
-     */
-    subnetLogin: (body: SubnetLoginRequest, params: RequestParams = {}) =>
-      this.request<SubnetLoginResponse, ApiError>({
-        path: `/subnet/login`,
-        method: "POST",
-        body: body,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Subnet
-     * @name SubnetLoginMfa
-     * @summary Login to SUBNET using mfa
-     * @request POST:/subnet/login/mfa
-     * @secure
-     */
-    subnetLoginMfa: (body: SubnetLoginMFARequest, params: RequestParams = {}) =>
-      this.request<SubnetLoginResponse, ApiError>({
-        path: `/subnet/login/mfa`,
-        method: "POST",
-        body: body,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-  };
   admin = {
     /**
      * No description
@@ -4620,7 +4454,7 @@ export class Api<
      * @tags Bucket
      * @name DeleteRemoteBucket
      * @summary Delete Remote Bucket
-     * @request DELETE:/remote-buckets/{source-bucket-name}/{arn}
+     * @request DELETE:/remote-buckets/{source_bucket_name}/{arn}
      * @secure
      */
     deleteRemoteBucket: (
@@ -4972,44 +4806,6 @@ export class Api<
         query: query,
         secure: true,
         format: "json",
-        ...params,
-      }),
-  };
-  support = {
-    /**
-     * No description
-     *
-     * @tags Support
-     * @name GetCallHomeOptionValue
-     * @summary Get Callhome current status
-     * @request GET:/support/callhome
-     * @secure
-     */
-    getCallHomeOptionValue: (params: RequestParams = {}) =>
-      this.request<CallHomeGetResponse, ApiError>({
-        path: `/support/callhome`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Support
-     * @name SetCallHomeStatus
-     * @summary Sets callhome status
-     * @request PUT:/support/callhome
-     * @secure
-     */
-    setCallHomeStatus: (body: CallHomeSetStatus, params: RequestParams = {}) =>
-      this.request<void, ApiError>({
-        path: `/support/callhome`,
-        method: "PUT",
-        body: body,
-        secure: true,
-        type: ContentType.Json,
         ...params,
       }),
   };

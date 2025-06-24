@@ -29,8 +29,6 @@ import bucketDetailsReducer from "./screens/Console/Buckets/BucketDetails/bucket
 import objectBrowserReducer from "./screens/Console/ObjectBrowser/objectBrowserSlice";
 import dashboardReducer from "./screens/Console/Dashboard/dashboardSlice";
 import createUserReducer from "./screens/Console/Users/AddUsersSlice";
-import licenseReducer from "./screens/Console/License/licenseSlice";
-import registerReducer from "./screens/Console/Support/registerSlice";
 import destinationSlice from "./screens/Console/EventDestinations/destinationsSlice";
 import { objectBrowserWSMiddleware } from "./websockets/objectBrowserWSMiddleware";
 
@@ -48,9 +46,7 @@ const rootReducer = combineReducers({
   objectBrowser: objectBrowserReducer,
   healthInfo: healthInfoReducer,
   dashboard: dashboardReducer,
-  register: registerReducer,
   createUser: createUserReducer,
-  license: licenseReducer,
   destination: destinationSlice,
 });
 

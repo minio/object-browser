@@ -14,164 +14,120 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { ArrowIcon, Button, PageLayout, ProgressBar, Grid } from "mds";
-import { SubnetInfo } from "./types";
-import api from "../../../common/api";
-import { IAM_PAGES } from "../../../common/SecureComponent/permissions";
-import LicensePlans from "./LicensePlans";
-import { useNavigate } from "react-router-dom";
-import RegistrationStatusBanner from "../Support/RegistrationStatusBanner";
-import withSuspense from "../Common/Components/withSuspense";
-import { getLicenseConsent } from "./utils";
+import React, { Fragment } from "react";
+import {
+  AGPLV3DarkLogo,
+  Box,
+  Grid,
+  HelpBox,
+  LicenseIcon,
+  PageLayout,
+} from "mds";
 import PageHeaderWrapper from "../Common/PageHeaderWrapper/PageHeaderWrapper";
-import HelpMenu from "../HelpMenu";
-import { setHelpName } from "../../../systemSlice";
-import { useAppDispatch } from "../../../store";
-
-const LicenseConsentModal = withSuspense(
-  React.lazy(() => import("./LicenseConsentModal")),
-);
 
 const License = () => {
-  const navigate = useNavigate();
-  const [activateProductModal, setActivateProductModal] =
-    useState<boolean>(false);
-
-  const [licenseInfo, setLicenseInfo] = useState<SubnetInfo>();
-  const [currentPlanID, setCurrentPlanID] = useState<number>(0);
-  const [loadingLicenseInfo, setLoadingLicenseInfo] = useState<boolean>(false);
-  const [initialLicenseLoading, setInitialLicenseLoading] =
-    useState<boolean>(true);
-  useState<boolean>(false);
-  const [clusterRegistered, setClusterRegistered] = useState<boolean>(false);
-
-  const [isLicenseConsentOpen, setIsLicenseConsentOpen] =
-    useState<boolean>(false);
-
-  const closeModalAndFetchLicenseInfo = () => {
-    setActivateProductModal(false);
-    fetchLicenseInfo();
-  };
-
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    dispatch(setHelpName("license"));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const isRegistered = licenseInfo && clusterRegistered;
-
-  const isAgplConsentDone = getLicenseConsent();
-
-  useEffect(() => {
-    const shouldConsent =
-      !isRegistered && !isAgplConsentDone && !initialLicenseLoading;
-
-    if (shouldConsent && !loadingLicenseInfo) {
-      setIsLicenseConsentOpen(true);
-    }
-  }, [
-    isRegistered,
-    isAgplConsentDone,
-    initialLicenseLoading,
-    loadingLicenseInfo,
-  ]);
-
-  const fetchLicenseInfo = useCallback(() => {
-    if (loadingLicenseInfo) {
-      return;
-    }
-    setLoadingLicenseInfo(true);
-    api
-      .invoke("GET", `/api/v1/subnet/info`)
-      .then((res: SubnetInfo) => {
-        if (res) {
-          if (res.plan === "STANDARD") {
-            setCurrentPlanID(1);
-          } else if (
-            ["ENTERPRISE", "ENTERPRISE-LITE", "ENTERPRISE-PLUS"].includes(
-              res.plan,
-            )
-          ) {
-            setCurrentPlanID(2);
-          } else {
-            setCurrentPlanID(1);
-          }
-          setLicenseInfo(res);
-        }
-        setClusterRegistered(true);
-        setLoadingLicenseInfo(false);
-      })
-      .catch(() => {
-        setClusterRegistered(false);
-        setLoadingLicenseInfo(false);
-      });
-  }, [loadingLicenseInfo]);
-
-  useEffect(() => {
-    if (initialLicenseLoading) {
-      fetchLicenseInfo();
-      setInitialLicenseLoading(false);
-    }
-  }, [fetchLicenseInfo, initialLicenseLoading, setInitialLicenseLoading]);
-
-  if (loadingLicenseInfo) {
-    return (
-      <Grid item xs={12}>
-        <ProgressBar />
-      </Grid>
-    );
-  }
-
   return (
     <Fragment>
-      <PageHeaderWrapper
-        label="MinIO License and Support Plan"
-        actions={
-          <Fragment>
-            {!isRegistered && (
-              <Button
-                id={"login-with-subnet"}
-                onClick={() => navigate(IAM_PAGES.REGISTER_SUPPORT)}
-                style={{
-                  fontSize: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  textDecoration: "none",
-                }}
-                icon={<ArrowIcon />}
-                variant={"callAction"}
-              >
-                Register your cluster
-              </Button>
-            )}
-            <HelpMenu />
-          </Fragment>
-        }
-      />
-
+      <PageHeaderWrapper label={"License"} />
       <PageLayout>
         <Grid item xs={12}>
-          {isRegistered && (
-            <RegistrationStatusBanner email={licenseInfo?.email} />
-          )}
+          <HelpBox
+            title={"License"}
+            iconComponent={<LicenseIcon />}
+            help={
+              <Fragment>
+                <p>
+                  This is just a fork of the{" "}
+                  <a href="https://github.com/minio/object-browser">
+                    MinIO Console
+                  </a>{" "}
+                  for my own personal educational purposes, and therefore it
+                  incorporates MinIO® source code. You may also want to look
+                  for other maintained{" "}
+                  <a href="https://github.com/minio/object-browser/forks">
+                    forks
+                  </a>
+                  .
+                </p>
+                <p>
+                  It is important to note that <strong>MINIO</strong> is a
+                  registered trademark of the MinIO Corporation. Consequently,
+                  this project is not affiliated with or endorsed by the MinIO
+                  Corporation.
+                </p>
+              </Fragment>
+            }
+          />
+          <Box
+            sx={{
+              display: "flex",
+              flexFlow: "column",
+              "& .link-text": {
+                color: "#2781B0",
+                fontWeight: 600,
+              },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "40px",
+                justifyContent: "center",
+                "& .min-icon": {
+                  fill: "blue",
+                  width: "188px",
+                  height: "62px",
+                },
+              }}
+            >
+              <AGPLV3DarkLogo />
+            </Box>
+            <Box
+              sx={{
+                marginBottom: "27px",
+              }}
+            >
+              Console is licensed under the GNU Affero General Public License
+              (AGPL) Version 3.0.
+            </Box>
+            <Box
+              sx={{
+                paddingBottom: "23px",
+              }}
+            >
+              For more information, please refer to the license at{" "}
+              <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">
+                https://www.gnu.org/licenses/agpl-3.0.en.html
+              </a>
+              .
+            </Box>
+            <Box
+              sx={{
+                marginBottom: "27px",
+              }}
+            >
+              This software incorporates MinIO® source code which is also
+              licensed under the GNU AGPL v3, for which, the full text can be
+              found here:{" "}
+              <a
+                href={`https://www.gnu.org/licenses/agpl-3.0.html`}
+                rel="noopener"
+                className={"link-text"}
+              >
+                https://www.gnu.org/licenses/agpl-3.0.html.
+              </a>
+            </Box>
+            <Box
+              sx={{
+                paddingBottom: "23px",
+              }}
+            >
+              <strong>MINIO</strong> is a registered trademark of the MinIO
+              Corporation.
+            </Box>
+          </Box>
         </Grid>
-
-        <LicensePlans
-          activateProductModal={activateProductModal}
-          closeModalAndFetchLicenseInfo={closeModalAndFetchLicenseInfo}
-          licenseInfo={licenseInfo}
-          currentPlanID={currentPlanID}
-          setActivateProductModal={setActivateProductModal}
-        />
-
-        <LicenseConsentModal
-          isOpen={isLicenseConsentOpen}
-          onClose={() => {
-            setIsLicenseConsentOpen(false);
-          }}
-        />
       </PageLayout>
     </Fragment>
   );

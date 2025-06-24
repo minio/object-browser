@@ -17,19 +17,14 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { Button, PageLayout, FormLayout, Box, Checkbox, InputLabel } from "mds";
 import { wsProtocol } from "../../../utils/wsUtils";
-import { useNavigate } from "react-router-dom";
-import { registeredCluster } from "../../../config";
 import { useAppDispatch } from "../../../store";
 import { setHelpName } from "../../../systemSlice";
-import RegisterCluster from "./RegisterCluster";
 import PageHeaderWrapper from "../Common/PageHeaderWrapper/PageHeaderWrapper";
 import HelpMenu from "../HelpMenu";
 
 var socket: any = null;
 
 const Profile = () => {
-  const navigate = useNavigate();
-
   const [profilingStarted, setProfilingStarted] = useState<boolean>(false);
   const [types, setTypes] = useState<string[]>([
     "cpu",
@@ -38,7 +33,6 @@ const Profile = () => {
     "mutex",
     "goroutines",
   ]);
-  const clusterRegistered = registeredCluster();
   const typesList = [
     { label: "cpu", value: "cpu" },
     { label: "mem", value: "mem" },
@@ -117,7 +111,6 @@ const Profile = () => {
     <Fragment>
       <PageHeaderWrapper label="Profile" actions={<HelpMenu />} />
       <PageLayout>
-        {!clusterRegistered && <RegisterCluster compactMode />}
         <FormLayout>
           <Box
             sx={{
@@ -131,7 +124,7 @@ const Profile = () => {
             {typesList.map((t) => (
               <Checkbox
                 checked={types.indexOf(t.value) > -1}
-                disabled={profilingStarted || !clusterRegistered}
+                disabled={profilingStarted}
                 key={`checkbox-${t.label}`}
                 id={`checkbox-${t.label}`}
                 label={t.label}
@@ -152,15 +145,9 @@ const Profile = () => {
             <Button
               id={"start-profiling"}
               type="submit"
-              variant={clusterRegistered ? "callAction" : "regular"}
-              disabled={
-                profilingStarted || types.length < 1 || !clusterRegistered
-              }
+              variant={"callAction"}
+              disabled={profilingStarted || types.length < 1}
               onClick={() => {
-                if (!clusterRegistered) {
-                  navigate("/support/register");
-                  return;
-                }
                 startProfiling();
               }}
               label={"Start Profiling"}
@@ -170,7 +157,7 @@ const Profile = () => {
               type="submit"
               variant="callAction"
               color="primary"
-              disabled={!profilingStarted || !clusterRegistered}
+              disabled={!profilingStarted}
               onClick={() => {
                 stopProfiling();
               }}

@@ -5,12 +5,6 @@
       "links": [
         {
           "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "SUBNET Registration and Support",
-          "url": "https://min.io/docs/minio/linux/administration/console/subnet-registration.html",
-          "body": "Learn how to register your MinIO deployment and access our SUBNET support system"
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
           "title": "Troubleshooting",
           "url": "https://min.io/docs/minio/linux/operations/troubleshooting.html",
           "body": "Need more help?  Check out additional Troubleshooting options"
@@ -2405,71 +2399,6 @@
       ]
     }
   },
-  "license": {
-    "docs": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "SUBNET Registration and Support",
-          "url": "https://min.io/docs/minio/linux/administration/console/subnet-registration.html",
-          "body": "Learn how to register your MinIO deployment and access our SUBNET support system"
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "Troubleshooting",
-          "url": "https://min.io/docs/minio/linux/operations/troubleshooting.html",
-          "body": "Need more help?  Check out additional Troubleshooting options"
-        }
-      ]
-    },
-    "video": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://i.ytimg.com/an_webp/Zyc-xhNcPco/mqdefault_6s.webp?du=3000&sqp=CPyt0qQG&rs=AOn4CLCbgR7oBe0xvtH8yvHof9HeWeXQOg",
-          "title": "What is SUBNET?",
-          "url": "https://www.youtube.com/watch?v=Zyc-xhNcPco",
-          "body": "The MinIO Subscription Network (SUBNET for short) is a simple, yet powerful software stack that ensures commercial customers are getting the very best out of their MinIO instances."
-        }
-      ]
-    },
-    "blog": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2023/03/SUBNET-Healthcheck-and-Performance.jpg",
-          "title": "SUBNET Healthcheck",
-          "url": "https://blog.min.io/subnet-healthcheck-and-performance/",
-          "body": "HealthCheck provides a graphical user interface for supported components and runs diagnostics checks continually to ensure your environment is running optimally."
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2023/02/Understanding-the-MinIO-Subscription-Network---Direct-to-Engineer-Engagement--copy--1-.png",
-          "title": "Direct-to-Engineer Engagement",
-          "url": "https://blog.min.io/subnet-series-communication/",
-          "body": "When things get big, cross clouds or involve mission-critical workloads, even the most sophisticated enterprises want someone on the other end of the line."
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2022/09/Screen-Shot-2022-09-30-at-3.58.52-PM.png",
-          "title": "The Beauty of the Panic Button",
-          "url": "https://blog.min.io/the-beauty-of-the-panic-button/",
-          "body": "The Panic Button is remarkable in its simplicity and its power. When pressed it summons every engineer to your SUBNET issue. Everyone. On every continent. Instantaneously. It is, effectively, an instantaneous SLA."
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2022/08/Supportability-blogpost-1.png",
-          "title": "Supportability as Software with MinIO SUBNET",
-          "url": "https://blog.min.io/supportability-minio-subnet/",
-          "body": "In the same way that DevOps and Cloud Native require a rethinking of old paradigms of development, MinIO’s approach to supportability is driving new thinking on support."
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "Why our Customers Buy",
-          "url": "https://blog.min.io/why_our_customers_subscribe/",
-          "body": "We recently asked our customer base to participate in a flash survey to tell us what motivated them to buy and why. Here is what they told us."
-        }
-      ]
-    }
-  },
   "error_logs": {
     "docs": {
       "header": "Error logs can be filtered by node and log type, as well as search for specific text in the logs.",
@@ -3466,65 +3395,6 @@
     "blog": {
       "header": null,
       "links": []
-    }
-  },
-  "register": {
-    "docs": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "Register",
-          "url": "https://min.io/docs/minio/kubernetes/upstream/operations/troubleshooting.html#registering-your-minio-deployment-with-subnet",
-          "body": "Learn how to register your MinIO deployment and access our SUBNET support system"
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "SUBNET Registration and Support",
-          "url": "https://min.io/docs/minio/linux/administration/console/subnet-registration.html",
-          "body": "You can use the MinIO Console to perform several of the license and subscription related functions available in MinIO"
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "Troubleshooting",
-          "url": "https://min.io/docs/minio/linux/operations/troubleshooting.html",
-          "body": "Need more help?  Check out additional Troubleshooting options"
-        }
-      ]
-    },
-    "video": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://i.ytimg.com/an_webp/Zyc-xhNcPco/mqdefault_6s.webp?du=3000&sqp=CNKby6IG&rs=AOn4CLBb47uG6Tw6SNaFW5_tmc7eAVqOtg",
-          "title": "What is SUBNET?",
-          "url": "https://www.youtube.com/watch?v=Zyc-xhNcPco",
-          "body": "The MinIO Subscription Network (SUBNET for short) is a simple, yet powerful software stack that ensures commercial customers are getting the very best out of their MinIO instances."
-        }
-      ]
-    },
-    "blog": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2023/03/SUBNET-Healthcheck-and-Performance.jpg",
-          "title": "SUBNET Healthcheck",
-          "url": "https://blog.min.io/subnet-healthcheck-and-performance/",
-          "body": "HealthCheck provides a graphical user interface for supported components and runs diagnostics checks continually to ensure your environment is running optimally."
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2022/09/Screen-Shot-2022-09-30-at-3.58.52-PM.png",
-          "title": "The Beauty of the Panic Button",
-          "url": "https://blog.min.io/the-beauty-of-the-panic-button/",
-          "body": "The Panic Button is remarkable in its simplicity and its power. When pressed it summons every engineer to your SUBNET issue. Everyone. On every continent. Instantaneously. It is, effectively, an instantaneous SLA."
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2022/08/Supportability-blogpost-1.png",
-          "title": "Supportability as Software with MinIO SUBNET",
-          "url": "https://blog.min.io/supportability-minio-subnet/",
-          "body": "In the same way that DevOps and Cloud Native require a rethinking of old paradigms of development, MinIO’s approach to supportability is driving new thinking on support."
-        }
-      ]
     }
   },
   "inspect": {
@@ -4761,53 +4631,6 @@
       "links": []
     }
   },
-  "call_home": {
-    "docs": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "SUBNET Registration and Support",
-          "url": "https://min.io/docs/minio/linux/administration/console/subnet-registration.html",
-          "body": "Learn how to register your MinIO deployment and access our SUBNET support system"
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2020/12/pay_banner-01-01-01-01-01.png",
-          "title": "Troubleshooting",
-          "url": "https://min.io/docs/minio/linux/operations/troubleshooting.html",
-          "body": "Need more help?  Check out additional Troubleshooting options"
-        }
-      ]
-    },
-    "video": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://i.ytimg.com/an_webp/Zyc-xhNcPco/mqdefault_6s.webp?du=3000&sqp=CPyt0qQG&rs=AOn4CLCbgR7oBe0xvtH8yvHof9HeWeXQOg",
-          "title": "What is SUBNET?",
-          "url": "https://www.youtube.com/watch?v=Zyc-xhNcPco",
-          "body": "The MinIO Subscription Network (SUBNET for short) is a simple, yet powerful software stack that ensures commercial customers are getting the very best out of their MinIO instances."
-        }
-      ]
-    },
-    "blog": {
-      "header": null,
-      "links": [
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2023/03/SUBNET-call-home.jpg",
-          "title": "SUBNET Callhome Diagnostics",
-          "url": "https://blog.min.io/subnet-call-home-diagnostics/",
-          "body": "Imagine tracking your system's health daily, highlighting the slightest problems, so you can seek help before minor issues become major concerns."
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2023/03/SUBNET-Healthcheck-and-Performance.jpg",
-          "title": "SUBNET Healthcheck",
-          "url": "https://blog.min.io/subnet-healthcheck-and-performance/",
-          "body": "HealthCheck provides a graphical user interface for supported components and runs diagnostics checks continually to ensure your environment is running optimally."
-        }
-      ]
-    }
-  },
   "event_destinations": {
     "docs": {
       "header": null,
@@ -4887,12 +4710,6 @@
           "title": "Managing Objects with Tagging and Policies",
           "url": "https://blog.min.io/managing-objects-tagging-policies/",
           "body": "Learn how to use tags to enable fine-grained object access, event notifications and lifecycle management."
-        },
-        {
-          "img": "https://blog.min.io/content/images/size/w1000/2023/03/SUBNET-call-home.jpg",
-          "title": "SUBNET Callhome Diagnostics",
-          "url": "https://blog.min.io/subnet-call-home-diagnostics/",
-          "body": "Imagine a system that tracks your health daily, highlighting even the slightest problems, so that you can seek help before minor issues become major concerns. With MinIO’s new call-home diagnostics, you can have just that."
         },
         {
           "img": "https://blog.min.io/content/images/size/w1000/2023/03/SUBNET-Healthcheck-and-Performance.jpg",
@@ -5004,12 +4821,6 @@
         },
         {
           "img": "https://min.io/resources/img/logo/MINIO_wordmark.png",
-          "title": "SUBNET Registration and Support",
-          "url": "https://min.io/docs/minio/linux/administration/console/subnet-registration.html",
-          "body": "Learn how to register your MinIO deployment and access our SUBNET support system"
-        },
-        {
-          "img": "https://min.io/resources/img/logo/MINIO_wordmark.png",
           "title": "Login help",
           "url": "https://min.io/docs/minio/kubernetes/upstream/administration/minio-console.html#configuration",
           "body": "Text snippet that will be relevant to the user will  go here  made to look nice in the helpitem size  on two-three lines"
@@ -5053,13 +4864,6 @@
           "title": "Replication Internals",
           "url": "https://min.io/docs/minio/windows/administration/bucket-replication.html#minio-replication-process",
           "body": "Learn details of the MinIO replication process."
-        },
-
-        {
-          "img": "https://min.io/resources/img/logo/MINIO_wordmark.png",
-          "title": "SUBNET Registration and Support",
-          "url": "https://min.io/docs/minio/linux/administration/console/subnet-registration.html",
-          "body": "Learn how to register your MinIO deployment and access our SUBNET support system"
         },
 
         {
@@ -5140,13 +4944,6 @@
           "title": "Replication Internals",
           "url": "https://min.io/docs/minio/windows/administration/bucket-replication.html#minio-replication-process",
           "body": "Learn details of the MinIO replication process."
-        },
-
-        {
-          "img": "https://min.io/resources/img/logo/MINIO_wordmark.png",
-          "title": "SUBNET Registration and Support",
-          "url": "https://min.io/docs/minio/linux/administration/console/subnet-registration.html",
-          "body": "Learn how to register your MinIO deployment and access our SUBNET support system"
         },
 
         {

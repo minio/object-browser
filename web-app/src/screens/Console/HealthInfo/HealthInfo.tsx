@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { Box, Button, Grid, HelpBox, InfoIcon, Loader, PageLayout } from "mds";
 import {
   DiagStatError,
@@ -36,15 +35,12 @@ import {
   healthInfoMessageReceived,
   healthInfoResetMessage,
 } from "./healthInfoSlice";
-import { registeredCluster } from "../../../config";
 import TestWrapper from "../Common/TestWrapper/TestWrapper";
-import RegisterCluster from "../Support/RegisterCluster";
 import PageHeaderWrapper from "../Common/PageHeaderWrapper/PageHeaderWrapper";
 import HelpMenu from "../HelpMenu";
 
 const HealthInfo = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const message = useSelector((state: AppState) => state.healthInfo.message);
 
@@ -61,7 +57,6 @@ const HealthInfo = () => {
   const [title, setTitle] = useState<string>("Health Report");
   const [diagFileContent, setDiagFileContent] = useState<string>("");
   const [subnetResponse, setSubnetResponse] = useState<string>("");
-  const clusterRegistered = registeredCluster();
 
   const download = () => {
     let element = document.createElement("a");
@@ -196,10 +191,6 @@ const HealthInfo = () => {
   }, [startDiagnostic, dispatch]);
 
   const startDiagnosticAction = () => {
-    if (!clusterRegistered) {
-      navigate("/support/register");
-      return;
-    }
     setStartDiagnostic(true);
   };
 
@@ -212,7 +203,6 @@ const HealthInfo = () => {
       <PageHeaderWrapper label="Health" actions={<HelpMenu />} />
 
       <PageLayout>
-        {!clusterRegistered && <RegisterCluster compactMode />}
         <Box withBorders>
           <TestWrapper title={title}>
             <Grid
@@ -242,13 +232,10 @@ const HealthInfo = () => {
                   {subnetResponse !== "" &&
                     !subnetResponse.toLowerCase().includes("error") && (
                       <Grid item xs={12}>
-                        <strong>
-                          Health report uploaded to SUBNET successfully!
-                        </strong>
+                        <strong>Health report generated successfully!</strong>
                         &nbsp;{" "}
                         <strong>
-                          See the results on your{" "}
-                          <a href={subnetResponse}>SUBNET Dashboard</a>{" "}
+                          You can download the the Health report JSON File.
                         </strong>
                       </Grid>
                     )}
@@ -256,15 +243,10 @@ const HealthInfo = () => {
                     subnetResponse.toLowerCase().includes("error")) &&
                     serverDiagnosticStatus === DiagStatSuccess && (
                       <Grid item xs={12}>
-                        <strong>
-                          Something went wrong uploading your Health report to
-                          SUBNET.
-                        </strong>
+                        <strong>Something went wrong.</strong>
                         &nbsp;{" "}
                         <strong>
-                          Log into your{" "}
-                          <a href="https://subnet.min.io">SUBNET Account</a> to
-                          manually upload your Health report.
+                          May try again or download Health report JSON File.
                         </strong>
                       </Grid>
                     )}
@@ -305,10 +287,8 @@ const HealthInfo = () => {
                         <Button
                           id="start-new-diagnostic"
                           type="submit"
-                          variant={
-                            !clusterRegistered ? "regular" : "callAction"
-                          }
-                          disabled={startDiagnostic || !clusterRegistered}
+                          variant={"callAction"}
+                          disabled={startDiagnostic}
                           onClick={startDiagnosticAction}
                           label={buttonStartText}
                         />
@@ -320,12 +300,12 @@ const HealthInfo = () => {
             </Grid>
           </TestWrapper>
         </Box>
-        {!startDiagnostic && clusterRegistered && (
+        {!startDiagnostic && (
           <Fragment>
             <br />
             <HelpBox
               title={
-                "Cluster Health Report will be uploaded to SUBNET, and is viewable from your SUBNET Diagnostics dashboard."
+                "Cluster Health Report will be generated, you will be able to download the JSON File."
               }
               iconComponent={<InfoIcon />}
               help={

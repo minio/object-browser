@@ -29,7 +29,6 @@ import {
   AccountsMenuIcon,
   AuditLogsMenuIcon,
   BucketsMenuIcon,
-  CallHomeMenuIcon,
   DocumentationIcon,
   GroupsMenuIcon,
   HealthMenuIcon,
@@ -95,10 +94,7 @@ const validateItem = (item: IMenuItem) => {
   return false;
 };
 
-export const validRoutes = (
-  features: string[] | null | undefined,
-  licenseNotification: boolean = false,
-) => {
+export const validRoutes = (features: string[] | null | undefined) => {
   const ldapIsEnabled = (features && features.includes("ldap-idp")) || false;
   const kmsIsEnabled = (features && features.includes("kms")) || false;
 
@@ -261,48 +257,40 @@ export const validRoutes = (
       icon: <SettingsIcon />,
     },
     {
-      group: "Subnet",
+      group: "Administrator",
       path: IAM_PAGES.LICENSE,
       name: "License",
       id: "license",
       icon: <LicenseIcon />,
-      badge: licenseNotification,
       forceDisplay: true,
     },
     {
-      group: "Subnet",
+      group: "Tools",
       name: "Health",
       id: "diagnostics",
       icon: <HealthMenuIcon />,
       path: IAM_PAGES.TOOLS_DIAGNOSTICS,
     },
     {
-      group: "Subnet",
+      group: "Tools",
       name: "Performance",
       id: "performance",
       icon: <PerformanceMenuIcon />,
       path: IAM_PAGES.TOOLS_SPEEDTEST,
     },
     {
-      group: "Subnet",
+      group: "Tools",
       name: "Profile",
       id: "profile",
       icon: <ProfileMenuIcon />,
       path: IAM_PAGES.PROFILE,
     },
     {
-      group: "Subnet",
+      group: "Tools",
       name: "Inspect",
       id: "inspectObjects",
       path: IAM_PAGES.SUPPORT_INSPECT,
       icon: <InspectMenuIcon />,
-    },
-    {
-      group: "Subnet",
-      name: "Call Home",
-      id: "callhome",
-      icon: <CallHomeMenuIcon />,
-      path: IAM_PAGES.CALL_HOME,
     },
   ];
 

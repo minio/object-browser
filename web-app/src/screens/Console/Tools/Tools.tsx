@@ -19,18 +19,14 @@ import { Route, Routes } from "react-router-dom";
 
 import withSuspense from "../Common/Components/withSuspense";
 import NotFoundPage from "../../NotFoundPage";
-import CallHome from "../Support/CallHome";
 
 const Inspect = withSuspense(React.lazy(() => import("./Inspect")));
-const Register = withSuspense(React.lazy(() => import("../Support/Register")));
 const Profile = withSuspense(React.lazy(() => import("../Support/Profile")));
 
 const Tools = () => {
   return (
     <Routes>
-      <Route path={"register"} element={<Register />} />
       <Route path={"profile"} element={<Profile />} />
-      <Route path={"call-home"} element={<CallHome />} />
       <Route path={"inspect"} element={<Inspect />} />
       <Route path={"*"} element={<NotFoundPage />} />
     </Routes>

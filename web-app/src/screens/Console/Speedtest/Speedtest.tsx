@@ -16,7 +16,6 @@
 
 import React, { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -33,12 +32,10 @@ import STResults from "./STResults";
 import ProgressBarWrapper from "../Common/ProgressBarWrapper/ProgressBarWrapper";
 import InputUnitMenu from "../Common/FormComponents/InputUnitMenu/InputUnitMenu";
 import DistributedOnly from "../Common/DistributedOnly/DistributedOnly";
-import RegisterCluster from "../Support/RegisterCluster";
 import PageHeaderWrapper from "../Common/PageHeaderWrapper/PageHeaderWrapper";
 import HelpMenu from "../HelpMenu";
 import { SecureComponent } from "../../../common/SecureComponent";
 import { selDistSet, setHelpName } from "../../../systemSlice";
-import { registeredCluster } from "../../../config";
 import { useAppDispatch } from "../../../store";
 import { wsProtocol } from "../../../utils/wsUtils";
 import { SpeedTestResponse } from "./types";
@@ -49,7 +46,6 @@ import {
 
 const Speedtest = () => {
   const distributedSetup = useSelector(selDistSet);
-  const navigate = useNavigate();
 
   const [start, setStart] = useState<boolean>(false);
   const [currStatus, setCurrStatus] = useState<SpeedTestResponse[] | null>(
@@ -62,7 +58,6 @@ const Speedtest = () => {
   const [currentValue, setCurrentValue] = useState<number>(0);
   const [totalSeconds, setTotalSeconds] = useState<number>(0);
   const [speedometerValue, setSpeedometerValue] = useState<number>(0);
-  const clusterRegistered = registeredCluster();
 
   useEffect(() => {
     // begin watch if bucketName in bucketList and start pressed
@@ -154,11 +149,6 @@ const Speedtest = () => {
   const buttonLabel = start ? "Start" : stoppedLabel;
 
   const startSpeedtestButton = () => {
-    if (!clusterRegistered) {
-      navigate("/support/register");
-      return;
-    }
-
     setCurrStatus(null);
     setStart(true);
   };
@@ -174,7 +164,6 @@ const Speedtest = () => {
       <PageHeaderWrapper label="Performance" actions={<HelpMenu />} />
 
       <PageLayout>
-        {!clusterRegistered && <RegisterCluster compactMode />}
         {!distributedSetup ? (
           <DistributedOnly
             iconComponent={<SpeedtestIcon />}
@@ -229,7 +218,7 @@ const Speedtest = () => {
                       }}
                       noLabelMinWidth={true}
                       value={size}
-                      disabled={start || !clusterRegistered}
+                      disabled={start}
                       overlayObject={
                         <InputUnitMenu
                           id={"size-unit"}
@@ -240,7 +229,7 @@ const Speedtest = () => {
                             { label: "MiB", value: "MiB" },
                             { label: "GiB", value: "GiB" },
                           ]}
-                          disabled={start || !clusterRegistered}
+                          disabled={start}
                         />
                       }
                     />
@@ -259,14 +248,14 @@ const Speedtest = () => {
                       }}
                       noLabelMinWidth={true}
                       value={duration}
-                      disabled={start || !clusterRegistered}
+                      disabled={start}
                       overlayObject={
                         <InputUnitMenu
                           id={"size-unit"}
                           onUnitChange={() => {}}
                           unitSelected={"s"}
                           unitsList={[{ label: "s", value: "s" }]}
-                          disabled={start || !clusterRegistered}
+                          disabled={start}
                         />
                       }
                       pattern={"[0-9]*"}
@@ -280,15 +269,10 @@ const Speedtest = () => {
                     type="button"
                     id={"start-speed-test"}
                     variant={
-                      clusterRegistered && currStatus !== null && !start
-                        ? "callAction"
-                        : "regular"
+                      currStatus !== null && !start ? "callAction" : "regular"
                     }
                     disabled={
-                      duration.trim() === "" ||
-                      size.trim() === "" ||
-                      start ||
-                      !clusterRegistered
+                      duration.trim() === "" || size.trim() === "" || start
                     }
                     label={buttonLabel}
                   />
@@ -309,7 +293,7 @@ const Speedtest = () => {
               </Grid>
             </Box>
 
-            {!start && !currStatus && clusterRegistered && (
+            {!start && !currStatus && (
               <Fragment>
                 <br />
                 <HelpBox

@@ -27,7 +27,6 @@ import {
   PasswordKeyIcon,
   Switch,
 } from "mds";
-import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   deleteCookie,
@@ -40,11 +39,9 @@ import {
   setHelpName,
 } from "../../../systemSlice";
 import { useAppDispatch } from "../../../store";
-import { registeredCluster } from "../../../config";
 import ModalWrapper from "../Common/ModalWrapper/ModalWrapper";
 import DistributedOnly from "../Common/DistributedOnly/DistributedOnly";
 import KeyRevealer from "./KeyRevealer";
-import RegisterCluster from "../Support/RegisterCluster";
 import PageHeaderWrapper from "../Common/PageHeaderWrapper/PageHeaderWrapper";
 import HelpMenu from "../HelpMenu";
 
@@ -89,7 +86,6 @@ const ExampleBlock = ({
 
 const Inspect = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const distributedSetup = useSelector(selDistSet);
 
   const [volumeName, setVolumeName] = useState<string>("");
@@ -103,7 +99,6 @@ const Inspect = () => {
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [volumeError, setVolumeError] = useState<string>("");
   const [pathError, setPathError] = useState<string>("");
-  const clusterRegistered = registeredCluster();
   /**
    * Validation Effect
    */
@@ -194,7 +189,6 @@ const Inspect = () => {
       <PageHeaderWrapper label={"Inspect"} actions={<HelpMenu />} />
 
       <PageLayout>
-        {!clusterRegistered && <RegisterCluster compactMode />}
         {!distributedSetup ? (
           <DistributedOnly
             iconComponent={<InspectMenuIcon />}
@@ -356,10 +350,6 @@ const Inspect = () => {
               autoComplete="off"
               onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
-                if (!clusterRegistered) {
-                  navigate("/support/register");
-                  return;
-                }
                 performInspect();
               }}
             >
@@ -374,7 +364,6 @@ const Inspect = () => {
                 error={volumeError}
                 required
                 placeholder={"test-bucket"}
-                disabled={!clusterRegistered}
               />
               <InputBox
                 id="inspect_path"
@@ -387,7 +376,6 @@ const Inspect = () => {
                 value={inspectPath}
                 required
                 placeholder={"test*/xl.meta"}
-                disabled={!clusterRegistered}
               />
               <Switch
                 label="Encrypt"
@@ -399,7 +387,6 @@ const Inspect = () => {
                 onChange={() => {
                   setIsEncrypt(!isEncrypt);
                 }}
-                disabled={!clusterRegistered}
               />
               <Box
                 sx={{
@@ -419,14 +406,13 @@ const Inspect = () => {
                   data-test-id="inspect-clear-button"
                   onClick={resetForm}
                   label={"Clear"}
-                  disabled={!clusterRegistered}
                 />
                 <Button
                   id={"inspect-start"}
                   type="submit"
-                  variant={!clusterRegistered ? "regular" : "callAction"}
+                  variant={"callAction"}
                   data-test-id="inspect-submit-button"
-                  disabled={!isFormValid || !clusterRegistered}
+                  disabled={!isFormValid}
                   label={"Inspect"}
                 />
               </Box>
