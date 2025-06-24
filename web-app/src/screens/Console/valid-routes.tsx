@@ -40,6 +40,7 @@ import {
   MetricsMenuIcon,
   MonitoringMenuIcon,
   ObjectBrowserIcon,
+  RecoverIcon,
   SettingsIcon,
   TiersIcon,
   UsersMenuIcon,
@@ -217,6 +218,13 @@ export const validRoutes = (
       name: "Tiering",
       icon: <TiersIcon />,
       id: "tiers",
+    },
+    {
+      group: "Administrator",
+      path: IAM_PAGES.SITE_REPLICATION,
+      name: "Site Replication",
+      icon: <RecoverIcon />,
+      id: "sitereplication",
     },
     {
       group: "Administrator",

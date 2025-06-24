@@ -902,7 +902,88 @@ jobs:
       - name: Run tests
         working-directory: ./web-app
         run: yarn test --passWithNoTests
+  replication:
+    name: Site Replication Test
+    needs:
+      - lint-job
+      - ui-assets
+      - semgrep-static-code-analysis
+      - latest-minio
+    runs-on: [ubuntu-latest]
 
+    strategy:
+      matrix:
+        go-version: [1.24.x]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Go ${{ matrix.go-version }} on ${{ matrix.os }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+        id: go
+
+      - name: Clone github.com/minio/minio
+        uses: actions/checkout@master
+        with:
+          repository: minio/minio
+          path: "minio_repository"
+      - name: Check-out matching MinIO branch
+        env:
+          GH_BRANCH: ${{ github.head_ref || github.ref_name }}
+          GH_PR_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          GH_PR_ACCOUNT=`echo $GH_PR_REPO | sed "s/\\/.*//"`
+          if [ ! -z "$GH_PR_ACCOUNT" ] && [ ! "$GH_PR_ACCOUNT" = "minio" ]; then
+            ALTREPO="https://github.com/$GH_PR_ACCOUNT/minio.git"
+            echo "Attempting to fetch $ALTREPO..."
+            git remote add alt $ALTREPO
+            (git fetch alt && git checkout "alt/$GH_BRANCH") || echo "$ALTREPO ($GH_BRANCH) not available, so keeping default repository/branch"
+          fi
+      - uses: actions/cache@v4
+        id: minio-latest-cache
+        name: MinIO Latest Cache
+        with:
+          path: |
+            ./minio
+          key: ${{ runner.os }}-minio-latest-${{ hashFiles('./minio_repository/go.sum') }}
+
+      - name: Build on ${{ matrix.os }}
+        run: |
+          echo "The idea is to build minio image from downloaded repository";
+          cd $GITHUB_WORKSPACE/minio_repository;
+          echo "Get git version to build MinIO Image";
+          VERSION=`git rev-parse HEAD`;
+          echo $VERSION;
+          echo "Create MinIO image";
+          make docker VERSION=$VERSION;
+
+          docker build -q --no-cache -t minio/minio:$VERSION . -f Dockerfile
+          echo "Jumping back to console repository to run the integration test"
+          cd $GITHUB_WORKSPACE;
+
+          echo "We are going to use the built image on test-integration";
+          MINIO_VERSION="minio/minio:$VERSION";
+          echo $MINIO_VERSION;
+
+          make test-replication MINIO_VERSION=$MINIO_VERSION;
+      - uses: actions/cache@v4
+        id: coverage-cache-replication
+        name: Coverage Cache Replication
+        with:
+          path: |
+            ./replication/coverage/
+          key: ${{ runner.os }}-replication-coverage-2-${{ github.run_id }}
+
+      # To save our replication.out file into an artifact.
+      # By default, GitHub stores build logs and artifacts for 90 days.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: replication-artifact
+          path: ./replication/coverage/replication.out
+          if-no-files-found: error
   sso-integration:
     name: SSO Integration Test
     needs:
@@ -995,6 +1076,7 @@ jobs:
       - test-api-on-go
       - test-pkg-on-go
       - sso-integration
+      - replication
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -1031,6 +1113,14 @@ jobs:
           key: ${{ runner.os }}-sso-coverage-2-${{ github.run_id }}
 
       - uses: actions/cache@v4
+        id: coverage-cache-replication
+        name: Coverage Cache Replication
+        with:
+          path: |
+            ./replication/coverage/
+          key: ${{ runner.os }}-replication-coverage-2-${{ github.run_id }}
+
+      - uses: actions/cache@v4
         id: coverage-cache-api
         name: Coverage Cache API
         with:
@@ -1046,6 +1136,12 @@ jobs:
             ./pkg/coverage/
           key: ${{ runner.os }}-coverage-pkg-2-${{ github.run_id }}
 
+      # Get the replication.out file from the artifact since this is working for self host runner.
+      - uses: actions/download-artifact@v4
+        with:
+          name: replication-artifact
+          path: replication/coverage
+
       - name: Get coverage
         run: |
           echo "change directory to gocovmerge"
@@ -1057,7 +1153,7 @@ jobs:
           echo "go build gocoverage.go"
           go build gocovmerge.go
           echo "put together the outs for final coverage resolution"
-          ./gocovmerge ../integration/coverage/system.out ../sso-integration/coverage/sso-system.out ../api/coverage/coverage.out ../pkg/coverage/coverage-pkg.out > all.out
+          ./gocovmerge ../integration/coverage/system.out ../replication/coverage/replication.out ../sso-integration/coverage/sso-system.out ../api/coverage/coverage.out ../pkg/coverage/coverage-pkg.out > all.out
           echo "grep to obtain the result"
           go tool cover -func=all.out | grep total > tmp2
           result=`cat tmp2 | awk 'END {print $3}'`

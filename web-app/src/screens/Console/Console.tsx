@@ -123,6 +123,16 @@ const ConfigurationOptions = React.lazy(
 );
 
 const AddGroupScreen = React.lazy(() => import("./Groups/AddGroupScreen"));
+const SiteReplication = React.lazy(
+  () => import("./Configurations/SiteReplication/SiteReplication"),
+);
+const SiteReplicationStatus = React.lazy(
+  () => import("./Configurations/SiteReplication/SiteReplicationStatus"),
+);
+
+const AddReplicationSites = React.lazy(
+  () => import("./Configurations/SiteReplication/AddReplicationSites"),
+);
 
 const KMSRoutes = React.lazy(() => import("./KMS/KMSRoutes"));
 
@@ -347,6 +357,18 @@ const Console = () => {
     {
       component: ListTiersConfiguration,
       path: IAM_PAGES.TIERS,
+    },
+    {
+      component: SiteReplication,
+      path: IAM_PAGES.SITE_REPLICATION,
+    },
+    {
+      component: SiteReplicationStatus,
+      path: IAM_PAGES.SITE_REPLICATION_STATUS,
+    },
+    {
+      component: AddReplicationSites,
+      path: IAM_PAGES.SITE_REPLICATION_ADD,
     },
     {
       component: Account,
