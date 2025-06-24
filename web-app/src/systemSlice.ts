@@ -196,6 +196,7 @@ export const {
   setErrorSnackMessage,
   setModalErrorSnackMessage,
   setModalSnackMessage,
+  setServerDiagStat,
   globalSetDistributedSetup,
   setSiteReplicationInfo,
   setOverrideStyles,
