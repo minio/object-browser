@@ -138,7 +138,7 @@ const Inspect = () => {
 
   const performInspect = async () => {
     let basename = document.baseURI.replace(window.location.origin, "");
-    const urlOfInspectApi = `${basename}/api/v1/admin/inspect?volume=${encodeURIComponent(volumeName)}&file=${encodeURIComponent(inspectPath)}&encrypt=${isEncrypt}`;
+    const urlOfInspectApi = `${basename}api/v1/admin/inspect?volume=${encodeURIComponent(volumeName)}&file=${encodeURIComponent(inspectPath)}&encrypt=${isEncrypt}`;
 
     makeRequest(urlOfInspectApi)
       .then(async (res) => {
