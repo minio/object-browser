@@ -136,8 +136,7 @@ const Login = () => {
 
   let docsURL = "https://min.io/docs/minio/linux/index.html?ref=con";
   if (isK8S) {
-    docsURL =
-      "https://min.io/docs/minio/kubernetes/upstream/index.html?ref=con";
+    docsURL = "https://min.io/docs/minio/kubernetes/upstream/index.html";
   }
 
   useEffect(() => {
@@ -192,20 +191,16 @@ const Login = () => {
             </a>
           </Box>
         }
-        promoHeader={
-          <span style={{ fontSize: 28 }}>High-Performance Object Store</span>
-        }
+        promoHeader={<span style={{ fontSize: 28 }}>Console</span>}
         promoInfo={
           <span style={{ fontSize: 14, lineHeight: 1 }}>
-            MinIO is a cloud-native object store built to run on any
-            infrastructure - public, private or edge clouds. Primary use cases
-            include data lakes, databases, AI/ML, SaaS applications and fast
-            backup & recovery. MinIO is dual licensed under GNU AGPL v3 and
-            commercial license. To learn more, visit{" "}
-            <a href={"https://min.io/?ref=con"} target="_blank" rel="noopener">
-              www.min.io
-            </a>
-            .
+            This is just a fork of the MinIO Console for my own personal
+            educational purposes, and therefore it incorporates MinIO® source
+            code. You may also want to look for other maintained forks.
+            <br></br>
+            It is important to note that <strong>MINIO</strong> is a registered
+            trademark of the MinIO Corporation. Consequently, this project is
+            not affiliated with or endorsed by the MinIO Corporation.
           </span>
         }
         backgroundAnimation={backgroundAnimation}
