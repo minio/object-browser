@@ -199,7 +199,7 @@ func serveWS(w http.ResponseWriter, req *http.Request) {
 		calls := req.URL.Query().Get("calls")
 		threshold, _ := strconv.ParseInt(req.URL.Query().Get("threshold"), 10, 64)
 		onlyErrors := req.URL.Query().Get("onlyErrors")
-		stCode, errorStCode := strconv.ParseInt(req.URL.Query().Get("statusCode"), 10, 64)
+		stCode, errorStCode := strconv.ParseInt(req.URL.Query().Get("statusCode"), 10, 32)
 		method := req.URL.Query().Get("method")
 		funcName := req.URL.Query().Get("funcname")
 		path := req.URL.Query().Get("path")
