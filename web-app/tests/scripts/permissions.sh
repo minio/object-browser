@@ -100,8 +100,10 @@ __init__() {
 main() {
   (yarn start &>/dev/null) &
   (./console server &>/dev/null) &
+  CONSOLE_PID=$!
   (testcafe "firefox:headless" "$1" -q --skip-js-errors -c 3)
   cleanup
+  kill -15 $CONSOLE_PID
 }
 
 (__init__ "$@" && main "$@")

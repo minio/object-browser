@@ -49,7 +49,7 @@ func NewDeleteRemoteBucket(ctx *middleware.Context, handler DeleteRemoteBucketHa
 }
 
 /*
-	DeleteRemoteBucket swagger:route DELETE /remote-buckets/{source-bucket-name}/{arn} Bucket deleteRemoteBucket
+	DeleteRemoteBucket swagger:route DELETE /remote-buckets/{source_bucket_name}/{arn} Bucket deleteRemoteBucket
 
 Delete Remote Bucket
 */

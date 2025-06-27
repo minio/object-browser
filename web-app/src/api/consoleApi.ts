@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -9,14 +10,54 @@
  * ---------------------------------------------------------------
  */
 
-export interface AccountChangePasswordRequest {
-  current_secret_key: string;
-  new_secret_key: string;
+export enum ObjectRetentionUnit {
+  Days = "days",
+  Years = "years",
 }
 
-export interface ChangeUserPasswordRequest {
-  selectedUser: string;
-  newSecretKey: string;
+export enum ObjectRetentionMode {
+  Governance = "governance",
+  Compliance = "compliance",
+}
+
+export enum ObjectLegalHoldStatus {
+  Enabled = "enabled",
+  Disabled = "disabled",
+}
+
+export enum NofiticationService {
+  Webhook = "webhook",
+  Amqp = "amqp",
+  Kafka = "kafka",
+  Mqtt = "mqtt",
+  Nats = "nats",
+  Nsq = "nsq",
+  Mysql = "mysql",
+  Postgres = "postgres",
+  Elasticsearch = "elasticsearch",
+  Redis = "redis",
+}
+
+export enum NotificationEventType {
+  Put = "put",
+  Delete = "delete",
+  Get = "get",
+  Replica = "replica",
+  Ilm = "ilm",
+  Scanner = "scanner",
+}
+
+/** @default "user" */
+export enum PolicyEntity {
+  User = "user",
+  Group = "group",
+}
+
+/** @default "PRIVATE" */
+export enum BucketAccess {
+  PRIVATE = "PRIVATE",
+  PUBLIC = "PUBLIC",
+  CUSTOM = "CUSTOM",
 }
 
 /** @default "sse-s3" */
@@ -25,11 +66,14 @@ export enum BucketEncryptionType {
   SseKms = "sse-kms",
 }
 
-/** @default "PRIVATE" */
-export enum BucketAccess {
-  PRIVATE = "PRIVATE",
-  PUBLIC = "PUBLIC",
-  CUSTOM = "CUSTOM",
+export interface AccountChangePasswordRequest {
+  current_secret_key: string;
+  new_secret_key: string;
+}
+
+export interface ChangeUserPasswordRequest {
+  selectedUser: string;
+  newSecretKey: string;
 }
 
 export interface UserServiceAccountItem {
@@ -185,12 +229,6 @@ export interface Policy {
   policy?: string;
 }
 
-/** @default "user" */
-export enum PolicyEntity {
-  User = "user",
-  Group = "group",
-}
-
 export interface SetPolicyRequest {
   entityType: PolicyEntity;
   entityName: string;
@@ -289,15 +327,6 @@ export interface SetConfigRequest {
   key_values: ConfigurationKV[];
   /** Used if configuration is an event notification's target */
   arn_resource_id?: string;
-}
-
-export enum NotificationEventType {
-  Put = "put",
-  Delete = "delete",
-  Get = "get",
-  Replica = "replica",
-  Ilm = "ilm",
-  Scanner = "scanner",
 }
 
 export interface NotificationConfig {
@@ -629,19 +658,6 @@ export interface UpdateUserGroups {
   groups: string[];
 }
 
-export enum NofiticationService {
-  Webhook = "webhook",
-  Amqp = "amqp",
-  Kafka = "kafka",
-  Mqtt = "mqtt",
-  Nats = "nats",
-  Nsq = "nsq",
-  Mysql = "mysql",
-  Postgres = "postgres",
-  Elasticsearch = "elasticsearch",
-  Redis = "redis",
-}
-
 export interface NotificationEndpointItem {
   service?: NofiticationService;
   account_id?: string;
@@ -847,18 +863,8 @@ export interface LogSearchResponse {
   results?: object;
 }
 
-export enum ObjectLegalHoldStatus {
-  Enabled = "enabled",
-  Disabled = "disabled",
-}
-
 export interface PutObjectLegalHoldRequest {
   status: ObjectLegalHoldStatus;
-}
-
-export enum ObjectRetentionMode {
-  Governance = "governance",
-  Compliance = "compliance",
 }
 
 export interface PutObjectRetentionRequest {
@@ -875,11 +881,6 @@ export interface PutBucketTagsRequest {
   tags?: any;
 }
 
-export enum ObjectRetentionUnit {
-  Days = "days",
-  Years = "years",
-}
-
 export interface PutBucketRetentionRequest {
   mode: ObjectRetentionMode;
   unit: ObjectRetentionUnit;
@@ -892,6 +893,189 @@ export interface GetBucketRetentionConfig {
   unit?: ObjectRetentionUnit;
   /** @format int32 */
   validity?: number;
+}
+
+export interface BucketLifecycleResponse {
+  lifecycle?: ObjectBucketLifecycle[];
+}
+
+export interface ExpirationResponse {
+  date?: string;
+  /** @format int64 */
+  days?: number;
+  delete_marker?: boolean;
+  delete_all?: boolean;
+  /** @format int64 */
+  noncurrent_expiration_days?: number;
+  /** @format int64 */
+  newer_noncurrent_expiration_versions?: number;
+}
+
+export interface TransitionResponse {
+  date?: string;
+  storage_class?: string;
+  /** @format int64 */
+  days?: number;
+  /** @format int64 */
+  noncurrent_transition_days?: number;
+  noncurrent_storage_class?: string;
+}
+
+export interface LifecycleTag {
+  key?: string;
+  value?: string;
+}
+
+export interface ObjectBucketLifecycle {
+  id?: string;
+  prefix?: string;
+  status?: string;
+  expiration?: ExpirationResponse;
+  transition?: TransitionResponse;
+  tags?: LifecycleTag[];
+}
+
+export interface AddBucketLifecycle {
+  /** ILM Rule type (Expiry or transition) */
+  type?: "expiry" | "transition";
+  /** Non required field, it matches a prefix to perform ILM operations on it */
+  prefix?: string;
+  /** Non required field, tags to match ILM files */
+  tags?: string;
+  /**
+   * Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM
+   * @format int32
+   * @default 0
+   */
+  expiry_days?: number;
+  /**
+   * Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM
+   * @format int32
+   * @default 0
+   */
+  transition_days?: number;
+  /** Required only in case of transition is set. it refers to a tier */
+  storage_class?: string;
+  /** Non required, toggle to disable or enable rule */
+  disable?: boolean;
+  /** Non required, toggle to disable or enable rule */
+  expired_object_delete_marker?: boolean;
+  /** Non required, toggle to disable or enable rule */
+  expired_object_delete_all?: boolean;
+  /**
+   * Non required, can be set in case of expiration is enabled
+   * @format int32
+   * @default 0
+   */
+  noncurrentversion_expiration_days?: number;
+  /**
+   * Non required, can be set in case of transition is enabled
+   * @format int32
+   * @default 0
+   */
+  noncurrentversion_transition_days?: number;
+  /**
+   * Non required, can be set in case of expiration is enabled
+   * @format int32
+   * @default 0
+   */
+  newer_noncurrentversion_expiration_versions?: number;
+  /** Non required, can be set in case of transition is enabled */
+  noncurrentversion_transition_storage_class?: string;
+}
+
+export interface UpdateBucketLifecycle {
+  /** ILM Rule type (Expiry or transition) */
+  type: "expiry" | "transition";
+  /** Non required field, it matches a prefix to perform ILM operations on it */
+  prefix?: string;
+  /** Non required field, tags to match ILM files */
+  tags?: string;
+  /**
+   * Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM
+   * @format int32
+   * @default 0
+   */
+  expiry_days?: number;
+  /**
+   * Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM
+   * @format int32
+   * @default 0
+   */
+  transition_days?: number;
+  /** Required only in case of transition is set. it refers to a tier */
+  storage_class?: string;
+  /** Non required, toggle to disable or enable rule */
+  disable?: boolean;
+  /** Non required, toggle to disable or enable rule */
+  expired_object_delete_marker?: boolean;
+  /** Non required, toggle to disable or enable rule */
+  expired_object_delete_all?: boolean;
+  /**
+   * Non required, can be set in case of expiration is enabled
+   * @format int32
+   * @default 0
+   */
+  noncurrentversion_expiration_days?: number;
+  /**
+   * Non required, can be set in case of transition is enabled
+   * @format int32
+   * @default 0
+   */
+  noncurrentversion_transition_days?: number;
+  /** Non required, can be set in case of transition is enabled */
+  noncurrentversion_transition_storage_class?: string;
+}
+
+export interface AddMultiBucketLifecycle {
+  buckets: string[];
+  /** ILM Rule type (Expiry or transition) */
+  type: "expiry" | "transition";
+  /** Non required field, it matches a prefix to perform ILM operations on it */
+  prefix?: string;
+  /** Non required field, tags to match ILM files */
+  tags?: string;
+  /**
+   * Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM
+   * @format int32
+   * @default 0
+   */
+  expiry_days?: number;
+  /**
+   * Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM
+   * @format int32
+   * @default 0
+   */
+  transition_days?: number;
+  /** Required only in case of transition is set. it refers to a tier */
+  storage_class?: string;
+  /** Non required, toggle to disable or enable rule */
+  expired_object_delete_marker?: boolean;
+  /** Non required, toggle to disable or enable rule */
+  expired_object_delete_all?: boolean;
+  /**
+   * Non required, can be set in case of expiration is enabled
+   * @format int32
+   * @default 0
+   */
+  noncurrentversion_expiration_days?: number;
+  /**
+   * Non required, can be set in case of transition is enabled
+   * @format int32
+   * @default 0
+   */
+  noncurrentversion_transition_days?: number;
+  /** Non required, can be set in case of transition is enabled */
+  noncurrentversion_transition_storage_class?: string;
+}
+
+export interface MulticycleResultItem {
+  bucketName?: string;
+  error?: string;
+}
+
+export interface MultiLifecycleResult {
+  results?: MulticycleResultItem[];
 }
 
 export interface PrefixAccessPair {
@@ -914,15 +1098,6 @@ export interface ConfigExportResponse {
   status?: string;
 }
 
-export interface License {
-  email?: string;
-  organization?: string;
-  account_id?: number;
-  storage_capacity?: number;
-  plan?: string;
-  expires_at?: string;
-}
-
 export interface ApiKey {
   apiKey?: string;
 }
@@ -931,6 +1106,59 @@ export interface PolicyArgs {
   id?: string;
   action?: string;
   bucket_name?: string;
+}
+
+export interface TierS3 {
+  name?: string;
+  endpoint?: string;
+  accesskey?: string;
+  secretkey?: string;
+  bucket?: string;
+  prefix?: string;
+  region?: string;
+  storageclass?: string;
+  usage?: string;
+  objects?: string;
+  versions?: string;
+}
+
+export interface TierMinio {
+  name?: string;
+  endpoint?: string;
+  accesskey?: string;
+  secretkey?: string;
+  bucket?: string;
+  prefix?: string;
+  region?: string;
+  storageclass?: string;
+  usage?: string;
+  objects?: string;
+  versions?: string;
+}
+
+export interface TierAzure {
+  name?: string;
+  endpoint?: string;
+  accountname?: string;
+  accountkey?: string;
+  bucket?: string;
+  prefix?: string;
+  region?: string;
+  usage?: string;
+  objects?: string;
+  versions?: string;
+}
+
+export interface TierGcs {
+  name?: string;
+  endpoint?: string;
+  creds?: string;
+  bucket?: string;
+  prefix?: string;
+  region?: string;
+  usage?: string;
+  objects?: string;
+  versions?: string;
 }
 
 export interface DeleteFile {
@@ -943,6 +1171,30 @@ export interface UserSAs {
   path?: string;
   versionID?: string;
   recursive?: boolean;
+}
+
+export interface Tier {
+  status?: boolean;
+  type?: "s3" | "gcs" | "azure" | "minio" | "unsupported";
+  s3?: TierS3;
+  gcs?: TierGcs;
+  azure?: TierAzure;
+  minio?: TierMinio;
+}
+
+export interface TierListResponse {
+  items?: Tier[];
+}
+
+export interface TiersNameListResponse {
+  items?: string[];
+}
+
+export interface TierCredentialsRequest {
+  access_key?: string;
+  secret_key?: string;
+  /** a base64 encoded value */
+  creds?: string;
 }
 
 export interface RewindItem {
@@ -1141,16 +1393,6 @@ export interface ReleaseAuthor {
   subscriptions_url?: string;
 }
 
-export interface CallHomeGetResponse {
-  diagnosticsStatus?: boolean;
-  logsStatus?: boolean;
-}
-
-export interface CallHomeSetStatus {
-  diagState: boolean;
-  logsState: boolean;
-}
-
 export interface LdapEntitiesRequest {
   users?: string[];
   groups?: string[];
@@ -1233,6 +1475,7 @@ type CancelToken = Symbol | string | number;
 
 export enum ContentType {
   Json = "application/json",
+  JsonApi = "application/vnd.api+json",
   FormData = "multipart/form-data",
   UrlEncoded = "application/x-www-form-urlencoded",
   Text = "text/plain",
@@ -1296,6 +1539,10 @@ export class HttpClient<SecurityDataType = unknown> {
 
   private contentFormatters: Record<ContentType, (input: any) => any> = {
     [ContentType.Json]: (input: any) =>
+      input !== null && (typeof input === "object" || typeof input === "string")
+        ? JSON.stringify(input)
+        : input,
+    [ContentType.JsonApi]: (input: any) =>
       input !== null && (typeof input === "object" || typeof input === "string")
         ? JSON.stringify(input)
         : input,
@@ -2473,6 +2720,115 @@ export class Api<
      * No description
      *
      * @tags Bucket
+     * @name GetBucketLifecycle
+     * @summary Bucket Lifecycle
+     * @request GET:/buckets/{bucket_name}/lifecycle
+     * @secure
+     */
+    getBucketLifecycle: (bucketName: string, params: RequestParams = {}) =>
+      this.request<BucketLifecycleResponse, ApiError>({
+        path: `/buckets/${encodeURIComponent(bucketName)}/lifecycle`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Bucket
+     * @name AddBucketLifecycle
+     * @summary Add Bucket Lifecycle
+     * @request POST:/buckets/{bucket_name}/lifecycle
+     * @secure
+     */
+    addBucketLifecycle: (
+      bucketName: string,
+      body: AddBucketLifecycle,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ApiError>({
+        path: `/buckets/${encodeURIComponent(bucketName)}/lifecycle`,
+        method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Bucket
+     * @name AddMultiBucketLifecycle
+     * @summary Add Multi Bucket Lifecycle
+     * @request POST:/buckets/multi-lifecycle
+     * @secure
+     */
+    addMultiBucketLifecycle: (
+      body: AddMultiBucketLifecycle,
+      params: RequestParams = {},
+    ) =>
+      this.request<MultiLifecycleResult, ApiError>({
+        path: `/buckets/multi-lifecycle`,
+        method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Bucket
+     * @name UpdateBucketLifecycle
+     * @summary Update Lifecycle rule
+     * @request PUT:/buckets/{bucket_name}/lifecycle/{lifecycle_id}
+     * @secure
+     */
+    updateBucketLifecycle: (
+      bucketName: string,
+      lifecycleId: string,
+      body: UpdateBucketLifecycle,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ApiError>({
+        path: `/buckets/${encodeURIComponent(bucketName)}/lifecycle/${encodeURIComponent(lifecycleId)}`,
+        method: "PUT",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Bucket
+     * @name DeleteBucketLifecycleRule
+     * @summary Delete Lifecycle rule
+     * @request DELETE:/buckets/{bucket_name}/lifecycle/{lifecycle_id}
+     * @secure
+     */
+    deleteBucketLifecycleRule: (
+      bucketName: string,
+      lifecycleId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ApiError>({
+        path: `/buckets/${encodeURIComponent(bucketName)}/lifecycle/${encodeURIComponent(lifecycleId)}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Bucket
      * @name GetBucketRewind
      * @summary Get objects in a bucket for a rewind date
      * @request GET:/buckets/{bucket_name}/rewind/{date}
@@ -2613,6 +2969,7 @@ export class Api<
         method: "POST",
         body: body,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -2716,6 +3073,7 @@ export class Api<
         method: "POST",
         body: body,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -2954,6 +3312,7 @@ export class Api<
         method: "POST",
         body: body,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -2977,6 +3336,7 @@ export class Api<
         method: "POST",
         body: body,
         secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
@@ -3591,6 +3951,44 @@ export class Api<
         ...params,
       }),
   };
+  profiling = {
+    /**
+     * No description
+     *
+     * @tags Profile
+     * @name ProfilingStart
+     * @summary Start recording profile data
+     * @request POST:/profiling/start
+     * @secure
+     */
+    profilingStart: (body: ProfilingStartRequest, params: RequestParams = {}) =>
+      this.request<StartProfilingList, ApiError>({
+        path: `/profiling/start`,
+        method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Profile
+     * @name ProfilingStop
+     * @summary Stop and download profile data
+     * @request POST:/profiling/stop
+     * @secure
+     */
+    profilingStop: (params: RequestParams = {}) =>
+      this.request<File, ApiError>({
+        path: `/profiling/stop`,
+        method: "POST",
+        secure: true,
+        ...params,
+      }),
+  };
   admin = {
     /**
      * No description
@@ -3707,6 +4105,252 @@ export class Api<
     /**
      * No description
      *
+     * @tags SiteReplication
+     * @name GetSiteReplicationInfo
+     * @summary Get list of Replication Sites
+     * @request GET:/admin/site-replication
+     * @secure
+     */
+    getSiteReplicationInfo: (params: RequestParams = {}) =>
+      this.request<SiteReplicationInfoResponse, ApiError>({
+        path: `/admin/site-replication`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags SiteReplication
+     * @name SiteReplicationInfoAdd
+     * @summary Add a Replication Site
+     * @request POST:/admin/site-replication
+     * @secure
+     */
+    siteReplicationInfoAdd: (
+      body: SiteReplicationAddRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<SiteReplicationAddResponse, ApiError>({
+        path: `/admin/site-replication`,
+        method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags SiteReplication
+     * @name SiteReplicationEdit
+     * @summary Edit a Replication Site
+     * @request PUT:/admin/site-replication
+     * @secure
+     */
+    siteReplicationEdit: (body: PeerInfo, params: RequestParams = {}) =>
+      this.request<PeerSiteEditResponse, ApiError>({
+        path: `/admin/site-replication`,
+        method: "PUT",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags SiteReplication
+     * @name SiteReplicationRemove
+     * @summary Remove a Replication Site
+     * @request DELETE:/admin/site-replication
+     * @secure
+     */
+    siteReplicationRemove: (body: PeerInfoRemove, params: RequestParams = {}) =>
+      this.request<PeerSiteRemoveResponse, ApiError>({
+        path: `/admin/site-replication`,
+        method: "DELETE",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags SiteReplication
+     * @name GetSiteReplicationStatus
+     * @summary Display overall site replication status
+     * @request GET:/admin/site-replication/status
+     * @secure
+     */
+    getSiteReplicationStatus: (
+      query?: {
+        /**
+         * Include Bucket stats
+         * @default true
+         */
+        buckets?: boolean;
+        /**
+         * Include Group stats
+         * @default true
+         */
+        groups?: boolean;
+        /**
+         * Include Policies stats
+         * @default true
+         */
+        policies?: boolean;
+        /**
+         * Include Policies stats
+         * @default true
+         */
+        users?: boolean;
+        /** Entity Type to lookup */
+        entityType?: string;
+        /** Entity Value to lookup */
+        entityValue?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<SiteReplicationStatusResponse, ApiError>({
+        path: `/admin/site-replication/status`,
+        method: "GET",
+        query: query,
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Tiering
+     * @name TiersList
+     * @summary Returns a list of tiers for ilm
+     * @request GET:/admin/tiers
+     * @secure
+     */
+    tiersList: (params: RequestParams = {}) =>
+      this.request<TierListResponse, ApiError>({
+        path: `/admin/tiers`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Tiering
+     * @name AddTier
+     * @summary Allows to configure a new tier
+     * @request POST:/admin/tiers
+     * @secure
+     */
+    addTier: (body: Tier, params: RequestParams = {}) =>
+      this.request<void, ApiError>({
+        path: `/admin/tiers`,
+        method: "POST",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Tiering
+     * @name TiersListNames
+     * @summary Returns a list of tiers' names for ilm
+     * @request GET:/admin/tiers/names
+     * @secure
+     */
+    tiersListNames: (params: RequestParams = {}) =>
+      this.request<TiersNameListResponse, ApiError>({
+        path: `/admin/tiers/names`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Tiering
+     * @name GetTier
+     * @summary Get Tier
+     * @request GET:/admin/tiers/{type}/{name}
+     * @secure
+     */
+    getTier: (
+      type: "s3" | "gcs" | "azure" | "minio",
+      name: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<Tier, ApiError>({
+        path: `/admin/tiers/${encodeURIComponent(type)}/${encodeURIComponent(name)}`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Tiering
+     * @name EditTierCredentials
+     * @summary Edit Tier Credentials
+     * @request PUT:/admin/tiers/{type}/{name}/credentials
+     * @secure
+     */
+    editTierCredentials: (
+      type: "s3" | "gcs" | "azure" | "minio",
+      name: string,
+      body: TierCredentialsRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, ApiError>({
+        path: `/admin/tiers/${encodeURIComponent(type)}/${encodeURIComponent(name)}/credentials`,
+        method: "PUT",
+        body: body,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Tiering
+     * @name RemoveTier
+     * @summary Remove Tier
+     * @request DELETE:/admin/tiers/{name}/remove
+     * @secure
+     */
+    removeTier: (name: string, params: RequestParams = {}) =>
+      this.request<void, ApiError>({
+        path: `/admin/tiers/${encodeURIComponent(name)}/remove`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Inspect
      * @name Inspect
      * @summary Inspect Files on Drive
@@ -3810,7 +4454,7 @@ export class Api<
      * @tags Bucket
      * @name DeleteRemoteBucket
      * @summary Delete Remote Bucket
-     * @request DELETE:/remote-buckets/{source-bucket-name}/{arn}
+     * @request DELETE:/remote-buckets/{source_bucket_name}/{arn}
      * @secure
      */
     deleteRemoteBucket: (

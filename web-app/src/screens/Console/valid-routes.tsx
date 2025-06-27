@@ -31,7 +31,9 @@ import {
   BucketsMenuIcon,
   DocumentationIcon,
   GroupsMenuIcon,
+  HealthMenuIcon,
   IdentityMenuIcon,
+  InspectMenuIcon,
   LambdaIcon,
   LicenseIcon,
   LockOpenIcon,
@@ -40,8 +42,14 @@ import {
   MetricsMenuIcon,
   MonitoringMenuIcon,
   ObjectBrowserIcon,
+  PerformanceMenuIcon,
+  ProfileMenuIcon,
+  RecoverIcon,
   SettingsIcon,
+  TiersIcon,
+  TraceMenuIcon,
   UsersMenuIcon,
+  WatchIcon,
 } from "mds";
 import { hasPermission } from "../../common/SecureComponent";
 import EncryptionIcon from "../../icons/SidebarMenus/EncryptionIcon";
@@ -86,10 +94,7 @@ const validateItem = (item: IMenuItem) => {
   return false;
 };
 
-export const validRoutes = (
-  features: string[] | null | undefined,
-  licenseNotification: boolean = false,
-) => {
+export const validRoutes = (features: string[] | null | undefined) => {
   const ldapIsEnabled = (features && features.includes("ldap-idp")) || false;
   const kmsIsEnabled = (features && features.includes("kms")) || false;
 
@@ -195,6 +200,18 @@ export const validRoutes = (
           icon: <AuditLogsMenuIcon />,
         },
         {
+          name: "Trace",
+          id: "monitorTrace",
+          path: IAM_PAGES.TOOLS_TRACE,
+          icon: <TraceMenuIcon />,
+        },
+        {
+          name: "Watch",
+          id: "monitorWatch",
+          icon: <WatchIcon />,
+          path: IAM_PAGES.TOOLS_WATCH,
+        },
+        {
           name: "Encryption",
           id: "monitorEncryption",
           path: IAM_PAGES.KMS_STATUS,
@@ -209,6 +226,20 @@ export const validRoutes = (
       name: "Events",
       icon: <LambdaIcon />,
       id: "lambda",
+    },
+    {
+      group: "Administrator",
+      path: IAM_PAGES.TIERS,
+      name: "Tiering",
+      icon: <TiersIcon />,
+      id: "tiers",
+    },
+    {
+      group: "Administrator",
+      path: IAM_PAGES.SITE_REPLICATION,
+      name: "Site Replication",
+      icon: <RecoverIcon />,
+      id: "sitereplication",
     },
     {
       group: "Administrator",
@@ -231,8 +262,35 @@ export const validRoutes = (
       name: "License",
       id: "license",
       icon: <LicenseIcon />,
-      badge: licenseNotification,
       forceDisplay: true,
+    },
+    {
+      group: "Tools",
+      name: "Health",
+      id: "diagnostics",
+      icon: <HealthMenuIcon />,
+      path: IAM_PAGES.TOOLS_DIAGNOSTICS,
+    },
+    {
+      group: "Tools",
+      name: "Performance",
+      id: "performance",
+      icon: <PerformanceMenuIcon />,
+      path: IAM_PAGES.TOOLS_SPEEDTEST,
+    },
+    {
+      group: "Tools",
+      name: "Profile",
+      id: "profile",
+      icon: <ProfileMenuIcon />,
+      path: IAM_PAGES.PROFILE,
+    },
+    {
+      group: "Tools",
+      name: "Inspect",
+      id: "inspectObjects",
+      path: IAM_PAGES.SUPPORT_INSPECT,
+      icon: <InspectMenuIcon />,
     },
   ];
 

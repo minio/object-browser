@@ -58,7 +58,7 @@ func (o *DeleteRemoteBucketURL) SetBasePath(bp string) {
 func (o *DeleteRemoteBucketURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/remote-buckets/{source-bucket-name}/{arn}"
+	var _path = "/remote-buckets/{source_bucket_name}/{arn}"
 
 	arn := o.Arn
 	if arn != "" {
@@ -69,7 +69,7 @@ func (o *DeleteRemoteBucketURL) Build() (*url.URL, error) {
 
 	sourceBucketName := o.SourceBucketName
 	if sourceBucketName != "" {
-		_path = strings.Replace(_path, "{source-bucket-name}", sourceBucketName, -1)
+		_path = strings.Replace(_path, "{source_bucket_name}", sourceBucketName, -1)
 	} else {
 		return nil, errors.New("sourceBucketName is required on DeleteRemoteBucketURL")
 	}

@@ -313,6 +313,380 @@ func init() {
         }
       }
     },
+    "/admin/site-replication": {
+      "get": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Get list of Replication Sites",
+        "operationId": "GetSiteReplicationInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/siteReplicationInfoResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Edit a Replication Site",
+        "operationId": "SiteReplicationEdit",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/peerInfo"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/peerSiteEditResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Add a Replication Site",
+        "operationId": "SiteReplicationInfoAdd",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/siteReplicationAddRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/siteReplicationAddResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Remove a Replication Site",
+        "operationId": "SiteReplicationRemove",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/peerInfoRemove"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/peerSiteRemoveResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/site-replication/status": {
+      "get": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Display overall site replication status",
+        "operationId": "GetSiteReplicationStatus",
+        "parameters": [
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Bucket stats",
+            "name": "buckets",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Group stats",
+            "name": "groups",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Policies stats",
+            "name": "policies",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Policies stats",
+            "name": "users",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Entity Type to lookup",
+            "name": "entityType",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Entity Value to lookup",
+            "name": "entityValue",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/siteReplicationStatusResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers": {
+      "get": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Returns a list of tiers for ilm",
+        "operationId": "TiersList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tierListResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Allows to configure a new tier",
+        "operationId": "AddTier",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tier"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers/names": {
+      "get": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Returns a list of tiers' names for ilm",
+        "operationId": "TiersListNames",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tiersNameListResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers/{name}/remove": {
+      "delete": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Remove Tier",
+        "operationId": "RemoveTier",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers/{type}/{name}": {
+      "get": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Get Tier",
+        "operationId": "GetTier",
+        "parameters": [
+          {
+            "enum": [
+              "s3",
+              "gcs",
+              "azure",
+              "minio"
+            ],
+            "type": "string",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tier"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers/{type}/{name}/credentials": {
+      "put": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Edit Tier Credentials",
+        "operationId": "EditTierCredentials",
+        "parameters": [
+          {
+            "enum": [
+              "s3",
+              "gcs",
+              "azure",
+              "minio"
+            ],
+            "type": "string",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tierCredentialsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
     "/bucket-policy/{bucket}": {
       "get": {
         "tags": [
@@ -600,6 +974,39 @@ func init() {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/maxShareLinkExpResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/buckets/multi-lifecycle": {
+      "post": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Add Multi Bucket Lifecycle",
+        "operationId": "AddMultiBucketLifecycle",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addMultiBucketLifecycle"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/multiLifecycleResult"
             }
           },
           "default": {
@@ -917,6 +1324,145 @@ func init() {
             "schema": {
               "$ref": "#/definitions/notificationDeleteRequest"
             }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/buckets/{bucket_name}/lifecycle": {
+      "get": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Bucket Lifecycle",
+        "operationId": "GetBucketLifecycle",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "bucket_name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/bucketLifecycleResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Add Bucket Lifecycle",
+        "operationId": "AddBucketLifecycle",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "bucket_name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addBucketLifecycle"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/buckets/{bucket_name}/lifecycle/{lifecycle_id}": {
+      "put": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Update Lifecycle rule",
+        "operationId": "UpdateBucketLifecycle",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "bucket_name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "lifecycle_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/updateBucketLifecycle"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Delete Lifecycle rule",
+        "operationId": "DeleteBucketLifecycleRule",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "bucket_name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "lifecycle_id",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {
@@ -3283,6 +3829,65 @@ func init() {
         }
       }
     },
+    "/profiling/start": {
+      "post": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Start recording profile data",
+        "operationId": "ProfilingStart",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/profilingStartRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/startProfilingList"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/profiling/stop": {
+      "post": {
+        "produces": [
+          "application/zip"
+        ],
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Stop and download profile data",
+        "operationId": "ProfilingStop",
+        "responses": {
+          "201": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
     "/releases": {
       "get": {
         "tags": [
@@ -3415,7 +4020,7 @@ func init() {
         }
       }
     },
-    "/remote-buckets/{source-bucket-name}/{arn}": {
+    "/remote-buckets/{source_bucket_name}/{arn}": {
       "delete": {
         "tags": [
           "Bucket"
@@ -3425,7 +4030,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "source-bucket-name",
+            "name": "source_bucket_name",
             "in": "path",
             "required": true
           },
@@ -4254,6 +4859,77 @@ func init() {
         }
       }
     },
+    "addBucketLifecycle": {
+      "type": "object",
+      "properties": {
+        "disable": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_all": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_marker": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expiry_days": {
+          "description": "Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "newer_noncurrentversion_expiration_versions": {
+          "description": "Non required, can be set in case of expiration is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_expiration_days": {
+          "description": "Non required, can be set in case of expiration is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_days": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_storage_class": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "string"
+        },
+        "prefix": {
+          "description": "Non required field, it matches a prefix to perform ILM operations on it",
+          "type": "string"
+        },
+        "storage_class": {
+          "description": "Required only in case of transition is set. it refers to a tier",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Non required field, tags to match ILM files",
+          "type": "string"
+        },
+        "transition_days": {
+          "description": "Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "type": {
+          "description": "ILM Rule type (Expiry or transition)",
+          "type": "string",
+          "enum": [
+            "expiry",
+            "transition"
+          ]
+        }
+      }
+    },
     "addBucketReplication": {
       "type": "object",
       "properties": {
@@ -4280,6 +4956,77 @@ func init() {
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "addMultiBucketLifecycle": {
+      "type": "object",
+      "required": [
+        "buckets",
+        "type"
+      ],
+      "properties": {
+        "buckets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expired_object_delete_all": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_marker": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expiry_days": {
+          "description": "Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_expiration_days": {
+          "description": "Non required, can be set in case of expiration is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_days": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_storage_class": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "string"
+        },
+        "prefix": {
+          "description": "Non required field, it matches a prefix to perform ILM operations on it",
+          "type": "string"
+        },
+        "storage_class": {
+          "description": "Required only in case of transition is set. it refers to a tier",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Non required field, tags to match ILM files",
+          "type": "string"
+        },
+        "transition_days": {
+          "description": "Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "type": {
+          "description": "ILM Rule type (Expiry or transition)",
+          "type": "string",
+          "enum": [
+            "expiry",
+            "transition"
+          ]
         }
       }
     },
@@ -4514,6 +5261,17 @@ func init() {
         }
       }
     },
+    "bucketLifecycleResponse": {
+      "type": "object",
+      "properties": {
+        "lifecycle": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objectBucketLifecycle"
+          }
+        }
+      }
+    },
     "bucketObLockingResponse": {
       "type": "object",
       "properties": {
@@ -4738,32 +5496,6 @@ func init() {
         }
       }
     },
-    "callHomeGetResponse": {
-      "type": "object",
-      "properties": {
-        "diagnosticsStatus": {
-          "type": "boolean"
-        },
-        "logsStatus": {
-          "type": "boolean"
-        }
-      }
-    },
-    "callHomeSetStatus": {
-      "type": "object",
-      "required": [
-        "diagState",
-        "logsState"
-      ],
-      "properties": {
-        "diagState": {
-          "type": "boolean"
-        },
-        "logsState": {
-          "type": "boolean"
-        }
-      }
-    },
     "changeUserPasswordRequest": {
       "type": "object",
       "required": [
@@ -4910,6 +5642,32 @@ func init() {
         },
         "maxConcurrentUploads": {
           "type": "integer"
+        }
+      }
+    },
+    "expirationResponse": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "days": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "delete_all": {
+          "type": "boolean"
+        },
+        "delete_marker": {
+          "type": "boolean"
+        },
+        "newer_noncurrent_expiration_versions": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "noncurrent_expiration_days": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
@@ -5329,26 +6087,14 @@ func init() {
         }
       }
     },
-    "license": {
+    "lifecycleTag": {
       "type": "object",
       "properties": {
-        "account_id": {
-          "type": "integer"
-        },
-        "email": {
+        "key": {
           "type": "string"
         },
-        "expires_at": {
+        "value": {
           "type": "string"
-        },
-        "organization": {
-          "type": "string"
-        },
-        "plan": {
-          "type": "string"
-        },
-        "storage_capacity": {
-          "type": "integer"
         }
       }
     },
@@ -5816,6 +6562,27 @@ func init() {
         }
       }
     },
+    "multiLifecycleResult": {
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/multicycleResultItem"
+          }
+        }
+      }
+    },
+    "multicycleResultItem": {
+      "type": "object",
+      "properties": {
+        "bucketName": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
     "nofiticationService": {
       "type": "string",
       "enum": [
@@ -5943,6 +6710,32 @@ func init() {
         "ilm",
         "scanner"
       ]
+    },
+    "objectBucketLifecycle": {
+      "type": "object",
+      "properties": {
+        "expiration": {
+          "$ref": "#/definitions/expirationResponse"
+        },
+        "id": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/lifecycleTag"
+          }
+        },
+        "transition": {
+          "$ref": "#/definitions/transitionResponse"
+        }
+      }
     },
     "objectLegalHoldStatus": {
       "type": "string",
@@ -7001,6 +7794,310 @@ func init() {
         }
       }
     },
+    "tier": {
+      "type": "object",
+      "properties": {
+        "azure": {
+          "type": "object",
+          "$ref": "#/definitions/tier_azure"
+        },
+        "gcs": {
+          "type": "object",
+          "$ref": "#/definitions/tier_gcs"
+        },
+        "minio": {
+          "type": "object",
+          "$ref": "#/definitions/tier_minio"
+        },
+        "s3": {
+          "type": "object",
+          "$ref": "#/definitions/tier_s3"
+        },
+        "status": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "s3",
+            "gcs",
+            "azure",
+            "minio",
+            "unsupported"
+          ]
+        }
+      }
+    },
+    "tierCredentialsRequest": {
+      "type": "object",
+      "properties": {
+        "access_key": {
+          "type": "string"
+        },
+        "creds": {
+          "description": "a base64 encoded value",
+          "type": "string"
+        },
+        "secret_key": {
+          "type": "string"
+        }
+      }
+    },
+    "tierListResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tier"
+          }
+        }
+      }
+    },
+    "tier_azure": {
+      "type": "object",
+      "properties": {
+        "accountkey": {
+          "type": "string"
+        },
+        "accountname": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "string"
+        }
+      }
+    },
+    "tier_gcs": {
+      "type": "object",
+      "properties": {
+        "bucket": {
+          "type": "string"
+        },
+        "creds": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "string"
+        }
+      }
+    },
+    "tier_minio": {
+      "type": "object",
+      "properties": {
+        "accesskey": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "secretkey": {
+          "type": "string"
+        },
+        "storageclass": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "string"
+        }
+      }
+    },
+    "tier_s3": {
+      "type": "object",
+      "properties": {
+        "accesskey": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "secretkey": {
+          "type": "string"
+        },
+        "storageclass": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "string"
+        }
+      }
+    },
+    "tiersNameListResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "transitionResponse": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "days": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "noncurrent_storage_class": {
+          "type": "string"
+        },
+        "noncurrent_transition_days": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "storage_class": {
+          "type": "string"
+        }
+      }
+    },
+    "updateBucketLifecycle": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "disable": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_all": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_marker": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expiry_days": {
+          "description": "Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_expiration_days": {
+          "description": "Non required, can be set in case of expiration is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_days": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_storage_class": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "string"
+        },
+        "prefix": {
+          "description": "Non required field, it matches a prefix to perform ILM operations on it",
+          "type": "string"
+        },
+        "storage_class": {
+          "description": "Required only in case of transition is set. it refers to a tier",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Non required field, tags to match ILM files",
+          "type": "string"
+        },
+        "transition_days": {
+          "description": "Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "type": {
+          "description": "ILM Rule type (Expiry or transition)",
+          "type": "string",
+          "enum": [
+            "expiry",
+            "transition"
+          ]
+        }
+      }
+    },
     "updateGroupRequest": {
       "type": "object",
       "required": [
@@ -7548,6 +8645,380 @@ func init() {
         }
       }
     },
+    "/admin/site-replication": {
+      "get": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Get list of Replication Sites",
+        "operationId": "GetSiteReplicationInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/siteReplicationInfoResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Edit a Replication Site",
+        "operationId": "SiteReplicationEdit",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/peerInfo"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/peerSiteEditResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Add a Replication Site",
+        "operationId": "SiteReplicationInfoAdd",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/siteReplicationAddRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/siteReplicationAddResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Remove a Replication Site",
+        "operationId": "SiteReplicationRemove",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/peerInfoRemove"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/peerSiteRemoveResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/site-replication/status": {
+      "get": {
+        "tags": [
+          "SiteReplication"
+        ],
+        "summary": "Display overall site replication status",
+        "operationId": "GetSiteReplicationStatus",
+        "parameters": [
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Bucket stats",
+            "name": "buckets",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Group stats",
+            "name": "groups",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Policies stats",
+            "name": "policies",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Policies stats",
+            "name": "users",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Entity Type to lookup",
+            "name": "entityType",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Entity Value to lookup",
+            "name": "entityValue",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/siteReplicationStatusResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers": {
+      "get": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Returns a list of tiers for ilm",
+        "operationId": "TiersList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tierListResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Allows to configure a new tier",
+        "operationId": "AddTier",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tier"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers/names": {
+      "get": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Returns a list of tiers' names for ilm",
+        "operationId": "TiersListNames",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tiersNameListResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers/{name}/remove": {
+      "delete": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Remove Tier",
+        "operationId": "RemoveTier",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers/{type}/{name}": {
+      "get": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Get Tier",
+        "operationId": "GetTier",
+        "parameters": [
+          {
+            "enum": [
+              "s3",
+              "gcs",
+              "azure",
+              "minio"
+            ],
+            "type": "string",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/tier"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/tiers/{type}/{name}/credentials": {
+      "put": {
+        "tags": [
+          "Tiering"
+        ],
+        "summary": "Edit Tier Credentials",
+        "operationId": "EditTierCredentials",
+        "parameters": [
+          {
+            "enum": [
+              "s3",
+              "gcs",
+              "azure",
+              "minio"
+            ],
+            "type": "string",
+            "name": "type",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/tierCredentialsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
     "/bucket-policy/{bucket}": {
       "get": {
         "tags": [
@@ -7859,6 +9330,39 @@ func init() {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/maxShareLinkExpResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/buckets/multi-lifecycle": {
+      "post": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Add Multi Bucket Lifecycle",
+        "operationId": "AddMultiBucketLifecycle",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addMultiBucketLifecycle"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/multiLifecycleResult"
             }
           },
           "default": {
@@ -8184,6 +9688,145 @@ func init() {
             "schema": {
               "$ref": "#/definitions/notificationDeleteRequest"
             }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/buckets/{bucket_name}/lifecycle": {
+      "get": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Bucket Lifecycle",
+        "operationId": "GetBucketLifecycle",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "bucket_name",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/bucketLifecycleResponse"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Add Bucket Lifecycle",
+        "operationId": "AddBucketLifecycle",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "bucket_name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addBucketLifecycle"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/buckets/{bucket_name}/lifecycle/{lifecycle_id}": {
+      "put": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Update Lifecycle rule",
+        "operationId": "UpdateBucketLifecycle",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "bucket_name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "lifecycle_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/updateBucketLifecycle"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response."
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Bucket"
+        ],
+        "summary": "Delete Lifecycle rule",
+        "operationId": "DeleteBucketLifecycleRule",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "bucket_name",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "lifecycle_id",
+            "in": "path",
+            "required": true
           }
         ],
         "responses": {
@@ -10578,6 +12221,65 @@ func init() {
         }
       }
     },
+    "/profiling/start": {
+      "post": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Start recording profile data",
+        "operationId": "ProfilingStart",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/profilingStartRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/startProfilingList"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/profiling/stop": {
+      "post": {
+        "produces": [
+          "application/zip"
+        ],
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Stop and download profile data",
+        "operationId": "ProfilingStop",
+        "responses": {
+          "201": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "default": {
+            "description": "Generic error response.",
+            "schema": {
+              "$ref": "#/definitions/ApiError"
+            }
+          }
+        }
+      }
+    },
     "/releases": {
       "get": {
         "tags": [
@@ -10710,7 +12412,7 @@ func init() {
         }
       }
     },
-    "/remote-buckets/{source-bucket-name}/{arn}": {
+    "/remote-buckets/{source_bucket_name}/{arn}": {
       "delete": {
         "tags": [
           "Bucket"
@@ -10720,7 +12422,7 @@ func init() {
         "parameters": [
           {
             "type": "string",
-            "name": "source-bucket-name",
+            "name": "source_bucket_name",
             "in": "path",
             "required": true
           },
@@ -11719,6 +13421,77 @@ func init() {
         }
       }
     },
+    "addBucketLifecycle": {
+      "type": "object",
+      "properties": {
+        "disable": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_all": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_marker": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expiry_days": {
+          "description": "Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "newer_noncurrentversion_expiration_versions": {
+          "description": "Non required, can be set in case of expiration is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_expiration_days": {
+          "description": "Non required, can be set in case of expiration is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_days": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_storage_class": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "string"
+        },
+        "prefix": {
+          "description": "Non required field, it matches a prefix to perform ILM operations on it",
+          "type": "string"
+        },
+        "storage_class": {
+          "description": "Required only in case of transition is set. it refers to a tier",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Non required field, tags to match ILM files",
+          "type": "string"
+        },
+        "transition_days": {
+          "description": "Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "type": {
+          "description": "ILM Rule type (Expiry or transition)",
+          "type": "string",
+          "enum": [
+            "expiry",
+            "transition"
+          ]
+        }
+      }
+    },
     "addBucketReplication": {
       "type": "object",
       "properties": {
@@ -11745,6 +13518,77 @@ func init() {
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "addMultiBucketLifecycle": {
+      "type": "object",
+      "required": [
+        "buckets",
+        "type"
+      ],
+      "properties": {
+        "buckets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expired_object_delete_all": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_marker": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expiry_days": {
+          "description": "Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_expiration_days": {
+          "description": "Non required, can be set in case of expiration is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_days": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_storage_class": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "string"
+        },
+        "prefix": {
+          "description": "Non required field, it matches a prefix to perform ILM operations on it",
+          "type": "string"
+        },
+        "storage_class": {
+          "description": "Required only in case of transition is set. it refers to a tier",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Non required field, tags to match ILM files",
+          "type": "string"
+        },
+        "transition_days": {
+          "description": "Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "type": {
+          "description": "ILM Rule type (Expiry or transition)",
+          "type": "string",
+          "enum": [
+            "expiry",
+            "transition"
+          ]
         }
       }
     },
@@ -11979,6 +13823,17 @@ func init() {
         }
       }
     },
+    "bucketLifecycleResponse": {
+      "type": "object",
+      "properties": {
+        "lifecycle": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/objectBucketLifecycle"
+          }
+        }
+      }
+    },
     "bucketObLockingResponse": {
       "type": "object",
       "properties": {
@@ -12198,32 +14053,6 @@ func init() {
         }
       }
     },
-    "callHomeGetResponse": {
-      "type": "object",
-      "properties": {
-        "diagnosticsStatus": {
-          "type": "boolean"
-        },
-        "logsStatus": {
-          "type": "boolean"
-        }
-      }
-    },
-    "callHomeSetStatus": {
-      "type": "object",
-      "required": [
-        "diagState",
-        "logsState"
-      ],
-      "properties": {
-        "diagState": {
-          "type": "boolean"
-        },
-        "logsState": {
-          "type": "boolean"
-        }
-      }
-    },
     "changeUserPasswordRequest": {
       "type": "object",
       "required": [
@@ -12370,6 +14199,32 @@ func init() {
         },
         "maxConcurrentUploads": {
           "type": "integer"
+        }
+      }
+    },
+    "expirationResponse": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "days": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "delete_all": {
+          "type": "boolean"
+        },
+        "delete_marker": {
+          "type": "boolean"
+        },
+        "newer_noncurrent_expiration_versions": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "noncurrent_expiration_days": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
@@ -12789,26 +14644,14 @@ func init() {
         }
       }
     },
-    "license": {
+    "lifecycleTag": {
       "type": "object",
       "properties": {
-        "account_id": {
-          "type": "integer"
-        },
-        "email": {
+        "key": {
           "type": "string"
         },
-        "expires_at": {
+        "value": {
           "type": "string"
-        },
-        "organization": {
-          "type": "string"
-        },
-        "plan": {
-          "type": "string"
-        },
-        "storage_capacity": {
-          "type": "integer"
         }
       }
     },
@@ -13276,6 +15119,27 @@ func init() {
         }
       }
     },
+    "multiLifecycleResult": {
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/multicycleResultItem"
+          }
+        }
+      }
+    },
+    "multicycleResultItem": {
+      "type": "object",
+      "properties": {
+        "bucketName": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
     "nofiticationService": {
       "type": "string",
       "enum": [
@@ -13403,6 +15267,32 @@ func init() {
         "ilm",
         "scanner"
       ]
+    },
+    "objectBucketLifecycle": {
+      "type": "object",
+      "properties": {
+        "expiration": {
+          "$ref": "#/definitions/expirationResponse"
+        },
+        "id": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/lifecycleTag"
+          }
+        },
+        "transition": {
+          "$ref": "#/definitions/transitionResponse"
+        }
+      }
     },
     "objectLegalHoldStatus": {
       "type": "string",
@@ -14441,6 +16331,310 @@ func init() {
           "type": "integer",
           "format": "int64",
           "title": "number of start results"
+        }
+      }
+    },
+    "tier": {
+      "type": "object",
+      "properties": {
+        "azure": {
+          "type": "object",
+          "$ref": "#/definitions/tier_azure"
+        },
+        "gcs": {
+          "type": "object",
+          "$ref": "#/definitions/tier_gcs"
+        },
+        "minio": {
+          "type": "object",
+          "$ref": "#/definitions/tier_minio"
+        },
+        "s3": {
+          "type": "object",
+          "$ref": "#/definitions/tier_s3"
+        },
+        "status": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "s3",
+            "gcs",
+            "azure",
+            "minio",
+            "unsupported"
+          ]
+        }
+      }
+    },
+    "tierCredentialsRequest": {
+      "type": "object",
+      "properties": {
+        "access_key": {
+          "type": "string"
+        },
+        "creds": {
+          "description": "a base64 encoded value",
+          "type": "string"
+        },
+        "secret_key": {
+          "type": "string"
+        }
+      }
+    },
+    "tierListResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tier"
+          }
+        }
+      }
+    },
+    "tier_azure": {
+      "type": "object",
+      "properties": {
+        "accountkey": {
+          "type": "string"
+        },
+        "accountname": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "string"
+        }
+      }
+    },
+    "tier_gcs": {
+      "type": "object",
+      "properties": {
+        "bucket": {
+          "type": "string"
+        },
+        "creds": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "string"
+        }
+      }
+    },
+    "tier_minio": {
+      "type": "object",
+      "properties": {
+        "accesskey": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "secretkey": {
+          "type": "string"
+        },
+        "storageclass": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "string"
+        }
+      }
+    },
+    "tier_s3": {
+      "type": "object",
+      "properties": {
+        "accesskey": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "objects": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "secretkey": {
+          "type": "string"
+        },
+        "storageclass": {
+          "type": "string"
+        },
+        "usage": {
+          "type": "string"
+        },
+        "versions": {
+          "type": "string"
+        }
+      }
+    },
+    "tiersNameListResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "transitionResponse": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "days": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "noncurrent_storage_class": {
+          "type": "string"
+        },
+        "noncurrent_transition_days": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "storage_class": {
+          "type": "string"
+        }
+      }
+    },
+    "updateBucketLifecycle": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "disable": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_all": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expired_object_delete_marker": {
+          "description": "Non required, toggle to disable or enable rule",
+          "type": "boolean"
+        },
+        "expiry_days": {
+          "description": "Required in case of expiry_date or transition fields are not set. it defines an expiry days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_expiration_days": {
+          "description": "Non required, can be set in case of expiration is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_days": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "noncurrentversion_transition_storage_class": {
+          "description": "Non required, can be set in case of transition is enabled",
+          "type": "string"
+        },
+        "prefix": {
+          "description": "Non required field, it matches a prefix to perform ILM operations on it",
+          "type": "string"
+        },
+        "storage_class": {
+          "description": "Required only in case of transition is set. it refers to a tier",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Non required field, tags to match ILM files",
+          "type": "string"
+        },
+        "transition_days": {
+          "description": "Required in case of transition_date or expiry fields are not set. it defines a transition days for ILM",
+          "type": "integer",
+          "format": "int32",
+          "default": 0
+        },
+        "type": {
+          "description": "ILM Rule type (Expiry or transition)",
+          "type": "string",
+          "enum": [
+            "expiry",
+            "transition"
+          ]
         }
       }
     },

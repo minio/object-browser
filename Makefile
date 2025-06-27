@@ -66,7 +66,7 @@ swagger-console:
 	@git restore api/server.go
 
 swagger-typescript-api:
-	@(cd web-app; yarn swagger-typescript-api -p $(path) -o $(output) -n $(name) --custom-config ../generator.config.js; cd ..)
+	@(cd web-app; yarn swagger-typescript-api generate -p $(path) -o $(output) -n $(name) --custom-config ../generator.config.js; cd ..)
 
 assets:
 	@(if [ -f "${NVM_DIR}/nvm.sh" ]; then \. "${NVM_DIR}/nvm.sh" && nvm install && nvm use && npm install -g yarn ; fi &&\
@@ -220,6 +220,26 @@ test-permissions-5:
 test-permissions-6:
 	@(docker run -v /data1 -v /data2 -v /data3 -v /data4 -d --name minio --rm -p 9000:9000 quay.io/minio/minio:latest server /data{1...4})
 	@(env bash $(PWD)/web-app/tests/scripts/permissions.sh "web-app/tests/permissions-6/")
+	@(docker stop minio)
+
+test-permissions-7:
+	@(docker run -v /data1 -v /data2 -v /data3 -v /data4 -d --name minio --rm -p 9000:9000 quay.io/minio/minio:latest server /data{1...4})
+	@(env bash $(PWD)/web-app/tests/scripts/permissions.sh "web-app/tests/permissions-7/")
+	@(docker stop minio)
+
+test-permissions-8:
+	@(docker run -v /data1 -v /data2 -v /data3 -v /data4 -d --name minio --rm -p 9000:9000 quay.io/minio/minio:latest server /data{1...4})
+	@(env bash $(PWD)/web-app/tests/scripts/permissions.sh "web-app/tests/permissions-8/")
+	@(docker stop minio)
+
+test-permissions-A:
+	@(docker run -v /data1 -v /data2 -v /data3 -v /data4 -d --name minio --rm -p 9000:9000 quay.io/minio/minio:latest server /data{1...4})
+	@(env bash $(PWD)/web-app/tests/scripts/permissions.sh "web-app/tests/permissions-A/")
+	@(docker stop minio)
+
+test-permissions-B:
+	@(docker run -v /data1 -v /data2 -v /data3 -v /data4 -d --name minio --rm -p 9000:9000 quay.io/minio/minio:latest server /data{1...4})
+	@(env bash $(PWD)/web-app/tests/scripts/permissions.sh "web-app/tests/permissions-B/")
 	@(docker stop minio)
 
 test-apply-permissions:

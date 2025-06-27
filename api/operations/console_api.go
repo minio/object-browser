@@ -24,6 +24,7 @@ package operations
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -47,11 +48,14 @@ import (
 	"github.com/minio/console/api/operations/logging"
 	"github.com/minio/console/api/operations/object"
 	"github.com/minio/console/api/operations/policy"
+	"github.com/minio/console/api/operations/profile"
 	"github.com/minio/console/api/operations/public"
 	"github.com/minio/console/api/operations/release"
 	"github.com/minio/console/api/operations/service"
 	"github.com/minio/console/api/operations/service_account"
+	"github.com/minio/console/api/operations/site_replication"
 	"github.com/minio/console/api/operations/system"
+	"github.com/minio/console/api/operations/tiering"
 	"github.com/minio/console/api/operations/user"
 	"github.com/minio/console/models"
 )
@@ -77,14 +81,23 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		JSONConsumer:          runtime.JSONConsumer(),
 		MultipartformConsumer: runtime.DiscardConsumer,
 
+		ApplicationZipProducer: runtime.ProducerFunc(func(w io.Writer, data interface{}) error {
+			return errors.NotImplemented("applicationZip producer has not yet been implemented")
+		}),
 		BinProducer:  runtime.ByteStreamProducer(),
 		JSONProducer: runtime.JSONProducer(),
 
 		AccountAccountChangePasswordHandler: account.AccountChangePasswordHandlerFunc(func(params account.AccountChangePasswordParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation account.AccountChangePassword has not yet been implemented")
 		}),
+		BucketAddBucketLifecycleHandler: bucket.AddBucketLifecycleHandlerFunc(func(params bucket.AddBucketLifecycleParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation bucket.AddBucketLifecycle has not yet been implemented")
+		}),
 		GroupAddGroupHandler: group.AddGroupHandlerFunc(func(params group.AddGroupParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation group.AddGroup has not yet been implemented")
+		}),
+		BucketAddMultiBucketLifecycleHandler: bucket.AddMultiBucketLifecycleHandlerFunc(func(params bucket.AddMultiBucketLifecycleParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation bucket.AddMultiBucketLifecycle has not yet been implemented")
 		}),
 		ConfigurationAddNotificationEndpointHandler: configuration.AddNotificationEndpointHandlerFunc(func(params configuration.AddNotificationEndpointParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.AddNotificationEndpoint has not yet been implemented")
@@ -94,6 +107,9 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		}),
 		BucketAddRemoteBucketHandler: bucket.AddRemoteBucketHandlerFunc(func(params bucket.AddRemoteBucketParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation bucket.AddRemoteBucket has not yet been implemented")
+		}),
+		TieringAddTierHandler: tiering.AddTierHandlerFunc(func(params tiering.AddTierParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation tiering.AddTier has not yet been implemented")
 		}),
 		UserAddUserHandler: user.AddUserHandlerFunc(func(params user.AddUserParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation user.AddUser has not yet been implemented")
@@ -155,6 +171,9 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		BucketDeleteBucketEventHandler: bucket.DeleteBucketEventHandlerFunc(func(params bucket.DeleteBucketEventParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation bucket.DeleteBucketEvent has not yet been implemented")
 		}),
+		BucketDeleteBucketLifecycleRuleHandler: bucket.DeleteBucketLifecycleRuleHandlerFunc(func(params bucket.DeleteBucketLifecycleRuleParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation bucket.DeleteBucketLifecycleRule has not yet been implemented")
+		}),
 		BucketDeleteBucketReplicationRuleHandler: bucket.DeleteBucketReplicationRuleHandlerFunc(func(params bucket.DeleteBucketReplicationRuleParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation bucket.DeleteBucketReplicationRule has not yet been implemented")
 		}),
@@ -194,6 +213,9 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		PublicDownloadSharedObjectHandler: public.DownloadSharedObjectHandlerFunc(func(params public.DownloadSharedObjectParams) middleware.Responder {
 			return middleware.NotImplemented("operation public.DownloadSharedObject has not yet been implemented")
 		}),
+		TieringEditTierCredentialsHandler: tiering.EditTierCredentialsHandlerFunc(func(params tiering.EditTierCredentialsParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation tiering.EditTierCredentials has not yet been implemented")
+		}),
 		BucketEnableBucketEncryptionHandler: bucket.EnableBucketEncryptionHandlerFunc(func(params bucket.EnableBucketEncryptionParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation bucket.EnableBucketEncryption has not yet been implemented")
 		}),
@@ -202,6 +224,9 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		}),
 		BucketGetBucketEncryptionInfoHandler: bucket.GetBucketEncryptionInfoHandlerFunc(func(params bucket.GetBucketEncryptionInfoParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation bucket.GetBucketEncryptionInfo has not yet been implemented")
+		}),
+		BucketGetBucketLifecycleHandler: bucket.GetBucketLifecycleHandlerFunc(func(params bucket.GetBucketLifecycleParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation bucket.GetBucketLifecycle has not yet been implemented")
 		}),
 		BucketGetBucketObjectLockingStatusHandler: bucket.GetBucketObjectLockingStatusHandlerFunc(func(params bucket.GetBucketObjectLockingStatusParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation bucket.GetBucketObjectLockingStatus has not yet been implemented")
@@ -241,6 +266,15 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		}),
 		ServiceAccountGetServiceAccountHandler: service_account.GetServiceAccountHandlerFunc(func(params service_account.GetServiceAccountParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation service_account.GetServiceAccount has not yet been implemented")
+		}),
+		SiteReplicationGetSiteReplicationInfoHandler: site_replication.GetSiteReplicationInfoHandlerFunc(func(params site_replication.GetSiteReplicationInfoParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation site_replication.GetSiteReplicationInfo has not yet been implemented")
+		}),
+		SiteReplicationGetSiteReplicationStatusHandler: site_replication.GetSiteReplicationStatusHandlerFunc(func(params site_replication.GetSiteReplicationStatusParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation site_replication.GetSiteReplicationStatus has not yet been implemented")
+		}),
+		TieringGetTierHandler: tiering.GetTierHandlerFunc(func(params tiering.GetTierParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation tiering.GetTier has not yet been implemented")
 		}),
 		UserGetUserInfoHandler: user.GetUserInfoHandlerFunc(func(params user.GetUserInfoParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation user.GetUserInfo has not yet been implemented")
@@ -362,6 +396,12 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		ConfigurationPostConfigsImportHandler: configuration.PostConfigsImportHandlerFunc(func(params configuration.PostConfigsImportParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.PostConfigsImport has not yet been implemented")
 		}),
+		ProfileProfilingStartHandler: profile.ProfilingStartHandlerFunc(func(params profile.ProfilingStartParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation profile.ProfilingStart has not yet been implemented")
+		}),
+		ProfileProfilingStopHandler: profile.ProfilingStopHandlerFunc(func(params profile.ProfilingStopParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation profile.ProfilingStop has not yet been implemented")
+		}),
 		BucketPutBucketTagsHandler: bucket.PutBucketTagsHandlerFunc(func(params bucket.PutBucketTagsParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation bucket.PutBucketTags has not yet been implemented")
 		}),
@@ -385,6 +425,9 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		}),
 		PolicyRemovePolicyHandler: policy.RemovePolicyHandlerFunc(func(params policy.RemovePolicyParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation policy.RemovePolicy has not yet been implemented")
+		}),
+		TieringRemoveTierHandler: tiering.RemoveTierHandlerFunc(func(params tiering.RemoveTierParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation tiering.RemoveTier has not yet been implemented")
 		}),
 		UserRemoveUserHandler: user.RemoveUserHandlerFunc(func(params user.RemoveUserParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation user.RemoveUser has not yet been implemented")
@@ -424,6 +467,24 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		}),
 		ObjectShareObjectHandler: object.ShareObjectHandlerFunc(func(params object.ShareObjectParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation object.ShareObject has not yet been implemented")
+		}),
+		SiteReplicationSiteReplicationEditHandler: site_replication.SiteReplicationEditHandlerFunc(func(params site_replication.SiteReplicationEditParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation site_replication.SiteReplicationEdit has not yet been implemented")
+		}),
+		SiteReplicationSiteReplicationInfoAddHandler: site_replication.SiteReplicationInfoAddHandlerFunc(func(params site_replication.SiteReplicationInfoAddParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation site_replication.SiteReplicationInfoAdd has not yet been implemented")
+		}),
+		SiteReplicationSiteReplicationRemoveHandler: site_replication.SiteReplicationRemoveHandlerFunc(func(params site_replication.SiteReplicationRemoveParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation site_replication.SiteReplicationRemove has not yet been implemented")
+		}),
+		TieringTiersListHandler: tiering.TiersListHandlerFunc(func(params tiering.TiersListParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation tiering.TiersList has not yet been implemented")
+		}),
+		TieringTiersListNamesHandler: tiering.TiersListNamesHandlerFunc(func(params tiering.TiersListNamesParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation tiering.TiersListNames has not yet been implemented")
+		}),
+		BucketUpdateBucketLifecycleHandler: bucket.UpdateBucketLifecycleHandlerFunc(func(params bucket.UpdateBucketLifecycleParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation bucket.UpdateBucketLifecycle has not yet been implemented")
 		}),
 		IdpUpdateConfigurationHandler: idp.UpdateConfigurationHandlerFunc(func(params idp.UpdateConfigurationParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation idp.UpdateConfiguration has not yet been implemented")
@@ -488,6 +549,9 @@ type ConsoleAPI struct {
 	//   - multipart/form-data
 	MultipartformConsumer runtime.Consumer
 
+	// ApplicationZipProducer registers a producer for the following mime types:
+	//   - application/zip
+	ApplicationZipProducer runtime.Producer
 	// BinProducer registers a producer for the following mime types:
 	//   - application/octet-stream
 	BinProducer runtime.Producer
@@ -508,14 +572,20 @@ type ConsoleAPI struct {
 
 	// AccountAccountChangePasswordHandler sets the operation handler for the account change password operation
 	AccountAccountChangePasswordHandler account.AccountChangePasswordHandler
+	// BucketAddBucketLifecycleHandler sets the operation handler for the add bucket lifecycle operation
+	BucketAddBucketLifecycleHandler bucket.AddBucketLifecycleHandler
 	// GroupAddGroupHandler sets the operation handler for the add group operation
 	GroupAddGroupHandler group.AddGroupHandler
+	// BucketAddMultiBucketLifecycleHandler sets the operation handler for the add multi bucket lifecycle operation
+	BucketAddMultiBucketLifecycleHandler bucket.AddMultiBucketLifecycleHandler
 	// ConfigurationAddNotificationEndpointHandler sets the operation handler for the add notification endpoint operation
 	ConfigurationAddNotificationEndpointHandler configuration.AddNotificationEndpointHandler
 	// PolicyAddPolicyHandler sets the operation handler for the add policy operation
 	PolicyAddPolicyHandler policy.AddPolicyHandler
 	// BucketAddRemoteBucketHandler sets the operation handler for the add remote bucket operation
 	BucketAddRemoteBucketHandler bucket.AddRemoteBucketHandler
+	// TieringAddTierHandler sets the operation handler for the add tier operation
+	TieringAddTierHandler tiering.AddTierHandler
 	// UserAddUserHandler sets the operation handler for the add user operation
 	UserAddUserHandler user.AddUserHandler
 	// SystemAdminInfoHandler sets the operation handler for the admin info operation
@@ -556,6 +626,8 @@ type ConsoleAPI struct {
 	BucketDeleteBucketHandler bucket.DeleteBucketHandler
 	// BucketDeleteBucketEventHandler sets the operation handler for the delete bucket event operation
 	BucketDeleteBucketEventHandler bucket.DeleteBucketEventHandler
+	// BucketDeleteBucketLifecycleRuleHandler sets the operation handler for the delete bucket lifecycle rule operation
+	BucketDeleteBucketLifecycleRuleHandler bucket.DeleteBucketLifecycleRuleHandler
 	// BucketDeleteBucketReplicationRuleHandler sets the operation handler for the delete bucket replication rule operation
 	BucketDeleteBucketReplicationRuleHandler bucket.DeleteBucketReplicationRuleHandler
 	// IdpDeleteConfigurationHandler sets the operation handler for the delete configuration operation
@@ -582,12 +654,16 @@ type ConsoleAPI struct {
 	ObjectDownloadMultipleObjectsHandler object.DownloadMultipleObjectsHandler
 	// PublicDownloadSharedObjectHandler sets the operation handler for the download shared object operation
 	PublicDownloadSharedObjectHandler public.DownloadSharedObjectHandler
+	// TieringEditTierCredentialsHandler sets the operation handler for the edit tier credentials operation
+	TieringEditTierCredentialsHandler tiering.EditTierCredentialsHandler
 	// BucketEnableBucketEncryptionHandler sets the operation handler for the enable bucket encryption operation
 	BucketEnableBucketEncryptionHandler bucket.EnableBucketEncryptionHandler
 	// ConfigurationExportConfigHandler sets the operation handler for the export config operation
 	ConfigurationExportConfigHandler configuration.ExportConfigHandler
 	// BucketGetBucketEncryptionInfoHandler sets the operation handler for the get bucket encryption info operation
 	BucketGetBucketEncryptionInfoHandler bucket.GetBucketEncryptionInfoHandler
+	// BucketGetBucketLifecycleHandler sets the operation handler for the get bucket lifecycle operation
+	BucketGetBucketLifecycleHandler bucket.GetBucketLifecycleHandler
 	// BucketGetBucketObjectLockingStatusHandler sets the operation handler for the get bucket object locking status operation
 	BucketGetBucketObjectLockingStatusHandler bucket.GetBucketObjectLockingStatusHandler
 	// BucketGetBucketQuotaHandler sets the operation handler for the get bucket quota operation
@@ -614,6 +690,12 @@ type ConsoleAPI struct {
 	PolicyGetSAUserPolicyHandler policy.GetSAUserPolicyHandler
 	// ServiceAccountGetServiceAccountHandler sets the operation handler for the get service account operation
 	ServiceAccountGetServiceAccountHandler service_account.GetServiceAccountHandler
+	// SiteReplicationGetSiteReplicationInfoHandler sets the operation handler for the get site replication info operation
+	SiteReplicationGetSiteReplicationInfoHandler site_replication.GetSiteReplicationInfoHandler
+	// SiteReplicationGetSiteReplicationStatusHandler sets the operation handler for the get site replication status operation
+	SiteReplicationGetSiteReplicationStatusHandler site_replication.GetSiteReplicationStatusHandler
+	// TieringGetTierHandler sets the operation handler for the get tier operation
+	TieringGetTierHandler tiering.GetTierHandler
 	// UserGetUserInfoHandler sets the operation handler for the get user info operation
 	UserGetUserInfoHandler user.GetUserInfoHandler
 	// PolicyGetUserPolicyHandler sets the operation handler for the get user policy operation
@@ -694,6 +776,10 @@ type ConsoleAPI struct {
 	ObjectPostBucketsBucketNameObjectsUploadHandler object.PostBucketsBucketNameObjectsUploadHandler
 	// ConfigurationPostConfigsImportHandler sets the operation handler for the post configs import operation
 	ConfigurationPostConfigsImportHandler configuration.PostConfigsImportHandler
+	// ProfileProfilingStartHandler sets the operation handler for the profiling start operation
+	ProfileProfilingStartHandler profile.ProfilingStartHandler
+	// ProfileProfilingStopHandler sets the operation handler for the profiling stop operation
+	ProfileProfilingStopHandler profile.ProfilingStopHandler
 	// BucketPutBucketTagsHandler sets the operation handler for the put bucket tags operation
 	BucketPutBucketTagsHandler bucket.PutBucketTagsHandler
 	// ObjectPutObjectLegalHoldHandler sets the operation handler for the put object legal hold operation
@@ -710,6 +796,8 @@ type ConsoleAPI struct {
 	GroupRemoveGroupHandler group.RemoveGroupHandler
 	// PolicyRemovePolicyHandler sets the operation handler for the remove policy operation
 	PolicyRemovePolicyHandler policy.RemovePolicyHandler
+	// TieringRemoveTierHandler sets the operation handler for the remove tier operation
+	TieringRemoveTierHandler tiering.RemoveTierHandler
 	// UserRemoveUserHandler sets the operation handler for the remove user operation
 	UserRemoveUserHandler user.RemoveUserHandler
 	// ConfigurationResetConfigHandler sets the operation handler for the reset config operation
@@ -736,6 +824,18 @@ type ConsoleAPI struct {
 	PolicySetPolicyMultipleHandler policy.SetPolicyMultipleHandler
 	// ObjectShareObjectHandler sets the operation handler for the share object operation
 	ObjectShareObjectHandler object.ShareObjectHandler
+	// SiteReplicationSiteReplicationEditHandler sets the operation handler for the site replication edit operation
+	SiteReplicationSiteReplicationEditHandler site_replication.SiteReplicationEditHandler
+	// SiteReplicationSiteReplicationInfoAddHandler sets the operation handler for the site replication info add operation
+	SiteReplicationSiteReplicationInfoAddHandler site_replication.SiteReplicationInfoAddHandler
+	// SiteReplicationSiteReplicationRemoveHandler sets the operation handler for the site replication remove operation
+	SiteReplicationSiteReplicationRemoveHandler site_replication.SiteReplicationRemoveHandler
+	// TieringTiersListHandler sets the operation handler for the tiers list operation
+	TieringTiersListHandler tiering.TiersListHandler
+	// TieringTiersListNamesHandler sets the operation handler for the tiers list names operation
+	TieringTiersListNamesHandler tiering.TiersListNamesHandler
+	// BucketUpdateBucketLifecycleHandler sets the operation handler for the update bucket lifecycle operation
+	BucketUpdateBucketLifecycleHandler bucket.UpdateBucketLifecycleHandler
 	// IdpUpdateConfigurationHandler sets the operation handler for the update configuration operation
 	IdpUpdateConfigurationHandler idp.UpdateConfigurationHandler
 	// GroupUpdateGroupHandler sets the operation handler for the update group operation
@@ -824,6 +924,9 @@ func (o *ConsoleAPI) Validate() error {
 		unregistered = append(unregistered, "MultipartformConsumer")
 	}
 
+	if o.ApplicationZipProducer == nil {
+		unregistered = append(unregistered, "ApplicationZipProducer")
+	}
 	if o.BinProducer == nil {
 		unregistered = append(unregistered, "BinProducer")
 	}
@@ -841,8 +944,14 @@ func (o *ConsoleAPI) Validate() error {
 	if o.AccountAccountChangePasswordHandler == nil {
 		unregistered = append(unregistered, "account.AccountChangePasswordHandler")
 	}
+	if o.BucketAddBucketLifecycleHandler == nil {
+		unregistered = append(unregistered, "bucket.AddBucketLifecycleHandler")
+	}
 	if o.GroupAddGroupHandler == nil {
 		unregistered = append(unregistered, "group.AddGroupHandler")
+	}
+	if o.BucketAddMultiBucketLifecycleHandler == nil {
+		unregistered = append(unregistered, "bucket.AddMultiBucketLifecycleHandler")
 	}
 	if o.ConfigurationAddNotificationEndpointHandler == nil {
 		unregistered = append(unregistered, "configuration.AddNotificationEndpointHandler")
@@ -852,6 +961,9 @@ func (o *ConsoleAPI) Validate() error {
 	}
 	if o.BucketAddRemoteBucketHandler == nil {
 		unregistered = append(unregistered, "bucket.AddRemoteBucketHandler")
+	}
+	if o.TieringAddTierHandler == nil {
+		unregistered = append(unregistered, "tiering.AddTierHandler")
 	}
 	if o.UserAddUserHandler == nil {
 		unregistered = append(unregistered, "user.AddUserHandler")
@@ -913,6 +1025,9 @@ func (o *ConsoleAPI) Validate() error {
 	if o.BucketDeleteBucketEventHandler == nil {
 		unregistered = append(unregistered, "bucket.DeleteBucketEventHandler")
 	}
+	if o.BucketDeleteBucketLifecycleRuleHandler == nil {
+		unregistered = append(unregistered, "bucket.DeleteBucketLifecycleRuleHandler")
+	}
 	if o.BucketDeleteBucketReplicationRuleHandler == nil {
 		unregistered = append(unregistered, "bucket.DeleteBucketReplicationRuleHandler")
 	}
@@ -952,6 +1067,9 @@ func (o *ConsoleAPI) Validate() error {
 	if o.PublicDownloadSharedObjectHandler == nil {
 		unregistered = append(unregistered, "public.DownloadSharedObjectHandler")
 	}
+	if o.TieringEditTierCredentialsHandler == nil {
+		unregistered = append(unregistered, "tiering.EditTierCredentialsHandler")
+	}
 	if o.BucketEnableBucketEncryptionHandler == nil {
 		unregistered = append(unregistered, "bucket.EnableBucketEncryptionHandler")
 	}
@@ -960,6 +1078,9 @@ func (o *ConsoleAPI) Validate() error {
 	}
 	if o.BucketGetBucketEncryptionInfoHandler == nil {
 		unregistered = append(unregistered, "bucket.GetBucketEncryptionInfoHandler")
+	}
+	if o.BucketGetBucketLifecycleHandler == nil {
+		unregistered = append(unregistered, "bucket.GetBucketLifecycleHandler")
 	}
 	if o.BucketGetBucketObjectLockingStatusHandler == nil {
 		unregistered = append(unregistered, "bucket.GetBucketObjectLockingStatusHandler")
@@ -999,6 +1120,15 @@ func (o *ConsoleAPI) Validate() error {
 	}
 	if o.ServiceAccountGetServiceAccountHandler == nil {
 		unregistered = append(unregistered, "service_account.GetServiceAccountHandler")
+	}
+	if o.SiteReplicationGetSiteReplicationInfoHandler == nil {
+		unregistered = append(unregistered, "site_replication.GetSiteReplicationInfoHandler")
+	}
+	if o.SiteReplicationGetSiteReplicationStatusHandler == nil {
+		unregistered = append(unregistered, "site_replication.GetSiteReplicationStatusHandler")
+	}
+	if o.TieringGetTierHandler == nil {
+		unregistered = append(unregistered, "tiering.GetTierHandler")
 	}
 	if o.UserGetUserInfoHandler == nil {
 		unregistered = append(unregistered, "user.GetUserInfoHandler")
@@ -1120,6 +1250,12 @@ func (o *ConsoleAPI) Validate() error {
 	if o.ConfigurationPostConfigsImportHandler == nil {
 		unregistered = append(unregistered, "configuration.PostConfigsImportHandler")
 	}
+	if o.ProfileProfilingStartHandler == nil {
+		unregistered = append(unregistered, "profile.ProfilingStartHandler")
+	}
+	if o.ProfileProfilingStopHandler == nil {
+		unregistered = append(unregistered, "profile.ProfilingStopHandler")
+	}
 	if o.BucketPutBucketTagsHandler == nil {
 		unregistered = append(unregistered, "bucket.PutBucketTagsHandler")
 	}
@@ -1143,6 +1279,9 @@ func (o *ConsoleAPI) Validate() error {
 	}
 	if o.PolicyRemovePolicyHandler == nil {
 		unregistered = append(unregistered, "policy.RemovePolicyHandler")
+	}
+	if o.TieringRemoveTierHandler == nil {
+		unregistered = append(unregistered, "tiering.RemoveTierHandler")
 	}
 	if o.UserRemoveUserHandler == nil {
 		unregistered = append(unregistered, "user.RemoveUserHandler")
@@ -1182,6 +1321,24 @@ func (o *ConsoleAPI) Validate() error {
 	}
 	if o.ObjectShareObjectHandler == nil {
 		unregistered = append(unregistered, "object.ShareObjectHandler")
+	}
+	if o.SiteReplicationSiteReplicationEditHandler == nil {
+		unregistered = append(unregistered, "site_replication.SiteReplicationEditHandler")
+	}
+	if o.SiteReplicationSiteReplicationInfoAddHandler == nil {
+		unregistered = append(unregistered, "site_replication.SiteReplicationInfoAddHandler")
+	}
+	if o.SiteReplicationSiteReplicationRemoveHandler == nil {
+		unregistered = append(unregistered, "site_replication.SiteReplicationRemoveHandler")
+	}
+	if o.TieringTiersListHandler == nil {
+		unregistered = append(unregistered, "tiering.TiersListHandler")
+	}
+	if o.TieringTiersListNamesHandler == nil {
+		unregistered = append(unregistered, "tiering.TiersListNamesHandler")
+	}
+	if o.BucketUpdateBucketLifecycleHandler == nil {
+		unregistered = append(unregistered, "bucket.UpdateBucketLifecycleHandler")
 	}
 	if o.IdpUpdateConfigurationHandler == nil {
 		unregistered = append(unregistered, "idp.UpdateConfigurationHandler")
@@ -1265,6 +1422,8 @@ func (o *ConsoleAPI) ProducersFor(mediaTypes []string) map[string]runtime.Produc
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
+		case "application/zip":
+			result["application/zip"] = o.ApplicationZipProducer
 		case "application/octet-stream":
 			result["application/octet-stream"] = o.BinProducer
 		case "application/json":
@@ -1316,7 +1475,15 @@ func (o *ConsoleAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/buckets/{bucket_name}/lifecycle"] = bucket.NewAddBucketLifecycle(o.context, o.BucketAddBucketLifecycleHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/groups"] = group.NewAddGroup(o.context, o.GroupAddGroupHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/buckets/multi-lifecycle"] = bucket.NewAddMultiBucketLifecycle(o.context, o.BucketAddMultiBucketLifecycleHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1329,6 +1496,10 @@ func (o *ConsoleAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/remote-buckets"] = bucket.NewAddRemoteBucket(o.context, o.BucketAddRemoteBucketHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/admin/tiers"] = tiering.NewAddTier(o.context, o.TieringAddTierHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1412,6 +1583,10 @@ func (o *ConsoleAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
+	o.handlers["DELETE"]["/buckets/{bucket_name}/lifecycle/{lifecycle_id}"] = bucket.NewDeleteBucketLifecycleRule(o.context, o.BucketDeleteBucketLifecycleRuleHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
 	o.handlers["DELETE"]["/buckets/{bucket_name}/replication/{rule_id}"] = bucket.NewDeleteBucketReplicationRule(o.context, o.BucketDeleteBucketReplicationRuleHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
@@ -1436,7 +1611,7 @@ func (o *ConsoleAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/remote-buckets/{source-bucket-name}/{arn}"] = bucket.NewDeleteRemoteBucket(o.context, o.BucketDeleteRemoteBucketHandler)
+	o.handlers["DELETE"]["/remote-buckets/{source_bucket_name}/{arn}"] = bucket.NewDeleteRemoteBucket(o.context, o.BucketDeleteRemoteBucketHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
@@ -1461,6 +1636,10 @@ func (o *ConsoleAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/download-shared-object/{url}"] = public.NewDownloadSharedObject(o.context, o.PublicDownloadSharedObjectHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/admin/tiers/{type}/{name}/credentials"] = tiering.NewEditTierCredentials(o.context, o.TieringEditTierCredentialsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -1473,6 +1652,10 @@ func (o *ConsoleAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/buckets/{bucket_name}/encryption/info"] = bucket.NewGetBucketEncryptionInfo(o.context, o.BucketGetBucketEncryptionInfoHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/buckets/{bucket_name}/lifecycle"] = bucket.NewGetBucketLifecycle(o.context, o.BucketGetBucketLifecycleHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -1525,6 +1708,18 @@ func (o *ConsoleAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/service-accounts/{access_key}"] = service_account.NewGetServiceAccount(o.context, o.ServiceAccountGetServiceAccountHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/admin/site-replication"] = site_replication.NewGetSiteReplicationInfo(o.context, o.SiteReplicationGetSiteReplicationInfoHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/admin/site-replication/status"] = site_replication.NewGetSiteReplicationStatus(o.context, o.SiteReplicationGetSiteReplicationStatusHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/admin/tiers/{type}/{name}"] = tiering.NewGetTier(o.context, o.TieringGetTierHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -1685,6 +1880,14 @@ func (o *ConsoleAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/configs/import"] = configuration.NewPostConfigsImport(o.context, o.ConfigurationPostConfigsImportHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/profiling/start"] = profile.NewProfilingStart(o.context, o.ProfileProfilingStartHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/profiling/stop"] = profile.NewProfilingStop(o.context, o.ProfileProfilingStopHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
@@ -1717,6 +1920,10 @@ func (o *ConsoleAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/policy/{name}"] = policy.NewRemovePolicy(o.context, o.PolicyRemovePolicyHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/admin/tiers/{name}/remove"] = tiering.NewRemoveTier(o.context, o.TieringRemoveTierHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
@@ -1769,6 +1976,30 @@ func (o *ConsoleAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/buckets/{bucket_name}/objects/share"] = object.NewShareObject(o.context, o.ObjectShareObjectHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/admin/site-replication"] = site_replication.NewSiteReplicationEdit(o.context, o.SiteReplicationSiteReplicationEditHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/admin/site-replication"] = site_replication.NewSiteReplicationInfoAdd(o.context, o.SiteReplicationSiteReplicationInfoAddHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/admin/site-replication"] = site_replication.NewSiteReplicationRemove(o.context, o.SiteReplicationSiteReplicationRemoveHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/admin/tiers"] = tiering.NewTiersList(o.context, o.TieringTiersListHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/admin/tiers/names"] = tiering.NewTiersListNames(o.context, o.TieringTiersListNamesHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/buckets/{bucket_name}/lifecycle/{lifecycle_id}"] = bucket.NewUpdateBucketLifecycle(o.context, o.BucketUpdateBucketLifecycleHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

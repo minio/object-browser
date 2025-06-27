@@ -2,7 +2,7 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Action": ["admin:OBDInfo"],
+      "Action": ["admin:OBDInfo", "admin:ServerInfo"],
       "Effect": "Allow",
       "Sid": ""
     }

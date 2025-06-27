@@ -7,7 +7,7 @@ toolchain go1.24.4
 require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cheggaaa/pb/v3 v3.1.6
-	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/dustin/go-humanize v1.0.1
 	github.com/fatih/color v1.18.0
 	github.com/go-openapi/errors v0.22.0
 	github.com/go-openapi/loads v0.22.0
@@ -29,7 +29,7 @@ require (
 	github.com/minio/selfupdate v0.6.0
 	github.com/minio/websocket v1.6.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/rs/xid v1.6.0 // indirect
+	github.com/rs/xid v1.6.0
 	github.com/secure-io/sio-go v0.3.1
 	github.com/stretchr/testify v1.10.0
 	github.com/tidwall/gjson v1.18.0 // indirect
