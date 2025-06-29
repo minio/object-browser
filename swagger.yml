@@ -4008,8 +4008,6 @@ definitions:
           $ref: "#/definitions/redirectRule"
       isK8S:
         type: boolean
-      animatedLogin:
-        type: boolean
   loginOauth2AuthRequest:
     type: object
     required:

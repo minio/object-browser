@@ -6283,9 +6283,6 @@ func init() {
     "loginDetails": {
       "type": "object",
       "properties": {
-        "animatedLogin": {
-          "type": "boolean"
-        },
         "isK8S": {
           "type": "boolean"
         },
@@ -14840,9 +14837,6 @@ func init() {
     "loginDetails": {
       "type": "object",
       "properties": {
-        "animatedLogin": {
-          "type": "boolean"
-        },
         "isK8S": {
           "type": "boolean"
         },

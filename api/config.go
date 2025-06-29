@@ -296,10 +296,6 @@ func getConsoleDevMode() bool {
 	return strings.ToLower(env.Get(ConsoleDevMode, "off")) == "on"
 }
 
-func getConsoleAnimatedLogin() bool {
-	return strings.ToLower(env.Get(ConsoleAnimatedLogin, "on")) == "on"
-}
-
 func getConsoleBrowserRedirectURL() string {
 	return env.Get(ConsoleBrowserRedirectURL, "")
 }

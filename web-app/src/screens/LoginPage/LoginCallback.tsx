@@ -146,7 +146,6 @@ const LoginCallback = () => {
             not affiliated with or endorsed by the MinIO Corporation.
           </span>
         }
-        backgroundAnimation={false}
       />
     </Fragment>
   ) : null;

@@ -242,7 +242,6 @@ func getLoginDetailsResponse(params authApi.LoginDetailParams, openIDProviders o
 		LoginStrategy: loginStrategy,
 		RedirectRules: redirectRules,
 		IsK8S:         isKubernetes(),
-		AnimatedLogin: getConsoleAnimatedLogin(),
 	}
 
 	return loginDetails, nil

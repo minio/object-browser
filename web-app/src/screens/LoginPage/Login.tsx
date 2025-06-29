@@ -55,10 +55,6 @@ const Login = () => {
 
   const isK8S = useSelector((state: AppState) => state.login.isK8S);
 
-  const backgroundAnimation = useSelector(
-    (state: AppState) => state.login.backgroundAnimation,
-  );
-
   useEffect(() => {
     if (navigateTo !== "") {
       dispatch(resetForm());
