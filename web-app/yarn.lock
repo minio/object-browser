@@ -2995,7 +2995,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/test@npm:^8.6.12":
+"@storybook/test@npm:^8.6.14":
   version: 8.6.14
   resolution: "@storybook/test@npm:8.6.14"
   dependencies:
@@ -5684,13 +5684,13 @@ __metadata:
   linkType: hard
 
 "canvas@npm:^3.0.0-rc2":
-  version: 3.1.1
-  resolution: "canvas@npm:3.1.1"
+  version: 3.1.2
+  resolution: "canvas@npm:3.1.2"
   dependencies:
     node-addon-api: "npm:^7.0.0"
     node-gyp: "npm:latest"
     prebuild-install: "npm:^7.1.3"
-  checksum: 10c0/abfd3875e6716b430f14245ba318c45a52667592aaa746644a4bb6bba7ae16f6debb9a180bdc477d5bbe2d1fe9b90191e7ad1c184233227dc434d1420b78b1ac
+  checksum: 10c0/a778d4cfe0ab2ac16681ad7e2d1388185f03c6d0e0e3121cfd1dfc8faba22e74eb6b3296ca0e48acd1d70c6a28e0380c634646bbc99ba946ebb2329acfe9cc97
   languageName: node
   linkType: hard
 
@@ -7104,15 +7104,6 @@ __metadata:
   version: 1.2.0
   resolution: "destroy@npm:1.2.0"
   checksum: 10c0/bd7633942f57418f5a3b80d5cb53898127bcf53e24cdf5d5f4396be471417671f0fee48a4ebe9a1e9defbde2a31280011af58a57e090ff822f589b443ed4e643
-  languageName: node
-  linkType: hard
-
-"detect-gpu@npm:^5.0.70":
-  version: 5.0.70
-  resolution: "detect-gpu@npm:5.0.70"
-  dependencies:
-    webgl-constants: "npm:^1.1.1"
-  checksum: 10c0/5a2053d4779edb3490821599b316b5362c8b55c30b82806c64bcfd21f40c67e2debfd677937899080aea2b27765471552bafeeae9c9f1cf63bdd07461a7e2163
   languageName: node
   linkType: hard
 
@@ -12115,19 +12106,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mds@https://github.com/minio/mds.git#v1.1.3":
-  version: 1.1.3
-  resolution: "mds@https://github.com/minio/mds.git#commit=ed34ced6ff27df3aacf5ba5456e2f954573e4445"
+"mds@https://github.com/georgmangold/mds.git#v1.1.4.1":
+  version: 1.1.4.1
+  resolution: "mds@https://github.com/georgmangold/mds.git#commit=a62aa175847603b34b1bd74ed273113f6dde5707"
   dependencies:
-    "@storybook/test": "npm:^8.6.12"
+    "@storybook/test": "npm:^8.6.14"
     "@types/styled-components": "npm:^5.1.34"
     "@uiw/react-textarea-code-editor": "npm:^3.1.1"
-    detect-gpu: "npm:^5.0.70"
     luxon: "npm:^3.6.1"
     react-calendar: "npm:^5.1.0"
     react-virtualized: "npm:^9.22.6"
     styled-components: "npm:^5.3.11"
-  checksum: 10c0/da8f68cd110aa7318ffa86bf4fd818c5fca7d8bef1847e51cde507f6d6209df806ca1dd702d1626d5acd82feae70038791b5b7afafe7b2988f2ae589d235f56c
+  checksum: 10c0/88e36236eeb3b03d41807d68924670b3639be25c6a9d105c3cfab04b3c457d28df23cad699c4254fda63cc3b9fbc48bd6866389f2588c11bb102dcb961610d88
   languageName: node
   linkType: hard
 
@@ -18990,7 +18980,7 @@ __metadata:
     local-storage-fallback: "npm:^4.1.3"
     lodash: "npm:^4.17.21"
     luxon: "npm:^3.6.1"
-    mds: "https://github.com/minio/mds.git#v1.1.3"
+    mds: "https://github.com/georgmangold/mds.git#v1.1.4.1"
     minio: "npm:^8.0.5"
     nyc: "npm:^15.1.0"
     prettier: "npm:3.5.3"
@@ -19037,13 +19027,6 @@ __metadata:
   version: 2.0.1
   resolution: "web-namespaces@npm:2.0.1"
   checksum: 10c0/df245f466ad83bd5cd80bfffc1674c7f64b7b84d1de0e4d2c0934fb0782e0a599164e7197a4bce310ee3342fd61817b8047ff04f076a1ce12dd470584142a4bd
-  languageName: node
-  linkType: hard
-
-"webgl-constants@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "webgl-constants@npm:1.1.1"
-  checksum: 10c0/525a9838b0cbcbab902d1bc5457882424a9c146f851042c901ae457123193f5c5e47846b47c1c999e4f3abc24322cac494cea0cc52fec28bd8eb3a05cd79d573
   languageName: node
   linkType: hard
 
