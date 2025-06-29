@@ -180,9 +180,16 @@ const Login = () => {
           </Box>
         }
         promoHeader={
-          <span style={{ fontSize: 115, lineHeight: 1 }}>
+          <span
+            style={{
+              fontSize: "clamp(6px, 6vw, 115px)",
+              lineHeight: 1,
+              display: "inline-block",
+              width: "100%",
+            }}
+          >
             Welcome to<br></br>
-            <span style={{ fontSize: 200 }}>CONSOLE</span>
+            <span style={{ fontSize: "clamp(6px, 8vw, 200px)" }}>CONSOLE</span>
           </span>
         }
         promoInfo={
