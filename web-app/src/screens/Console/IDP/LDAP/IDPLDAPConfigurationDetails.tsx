@@ -376,7 +376,7 @@ const IDPLDAPConfigurationDetails = () => {
                                 }
                                 contents={ldapHelpBoxContents}
                                 docLink={
-                                  "https://min.io/docs/minio/linux/operations/external-iam.html?ref=con#minio-external-iam-ad-ldap"
+                                  "https://min.io/docs/minio/linux/operations/external-iam.html#minio-external-iam-ad-ldap"
                                 }
                                 docText={"Learn more about LDAP Configurations"}
                               />

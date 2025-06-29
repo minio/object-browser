@@ -130,7 +130,7 @@ const ChangePassword = ({ open, closeModal }: IChangePasswordProps) => {
             <a
               target="_blank"
               rel="noopener"
-              href="https://min.io/docs/minio/linux/administration/identity-access-management/minio-user-management.html#id4?ref=con"
+              href="https://min.io/docs/minio/linux/administration/identity-access-management/minio-user-management.html#id4"
             >
               rotating
             </a>{" "}

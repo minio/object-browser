@@ -225,7 +225,7 @@ const SiteReplication = () => {
                     <br />
                     You can learn more at our{" "}
                     <a
-                      href="https://min.io/docs/minio/linux/operations/install-deploy-manage/multi-site-replication.html?ref=con"
+                      href="https://min.io/docs/minio/linux/operations/install-deploy-manage/multi-site-replication.html"
                       target="_blank"
                       rel="noopener"
                     >
@@ -270,7 +270,7 @@ const SiteReplication = () => {
                 <br />
                 You can learn more at our{" "}
                 <a
-                  href="https://github.com/minio/minio/tree/master/docs/site-replication?ref=con"
+                  href="https://github.com/minio/minio/tree/master/docs/site-replication"
                   target="_blank"
                   rel="noopener"
                 >

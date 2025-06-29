@@ -294,7 +294,7 @@ const AddBucket = () => {
                       <br />
                       Please deploy a server in{" "}
                       <a
-                        href="https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-multi-node-multi-drive.html?ref=con"
+                        href="https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-multi-node-multi-drive.html"
                         target="_blank"
                         rel="noopener"
                       >

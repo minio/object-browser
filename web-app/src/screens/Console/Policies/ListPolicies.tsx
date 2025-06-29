@@ -265,7 +265,7 @@ const ListPolicies = () => {
                   <br />
                   You can learn more at our{" "}
                   <a
-                    href="https://min.io/docs/minio/linux/administration/identity-access-management.html?ref=con#access-management"
+                    href="https://min.io/docs/minio/linux/administration/identity-access-management.html#access-management"
                     target="_blank"
                     rel="noopener"
                   >

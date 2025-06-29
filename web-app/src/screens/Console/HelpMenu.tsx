@@ -196,7 +196,7 @@ const HelpMenu = () => {
         <MoreLink
           LeadingIcon={MinIOTierIcon}
           text={"Visit MinIO Documentation"}
-          link={"https://docs.min.io/?ref=con"}
+          link={"https://docs.min.io/"}
           color={"#C5293F"}
         />
       </div>
@@ -248,7 +248,7 @@ const HelpMenu = () => {
         <MoreLink
           LeadingIcon={MinIOTierIcon}
           text={"Visit MinIO Blog"}
-          link={"https://blog.min.io/?ref=con"}
+          link={"https://blog.min.io/"}
           color={"#C5293F"}
         />
       </div>

@@ -2500,7 +2500,7 @@
         {
           "img": "https://min.io/resources/img/logo/MINIO_wordmark.png",
           "title": "Object Lambda",
-          "url": "https://min.io/docs/minio/linux/developers/transforms-with-object-lambda.html?ref=docs",
+          "url": "https://min.io/docs/minio/linux/developers/transforms-with-object-lambda.html",
           "body": "MinIO’s Object Lambda enables developers to programmatically transform objects on demand."
         },
         {
@@ -4297,7 +4297,7 @@
         {
           "img": "https://min.io/resources/img/logo/MINIO_wordmark.png",
           "title": "Object Lambda",
-          "url": "https://min.io/docs/minio/linux/developers/transforms-with-object-lambda.html?ref=docs",
+          "url": "https://min.io/docs/minio/linux/developers/transforms-with-object-lambda.html",
           "body": "MinIO’s Object Lambda enables developers to programmatically transform objects on demand."
         },
         {

@@ -130,7 +130,7 @@ const Login = () => {
       );
   }
 
-  let docsURL = "https://min.io/docs/minio/linux/index.html?ref=con";
+  let docsURL = "https://min.io/docs/minio/linux/index.html";
   if (isK8S) {
     docsURL = "https://min.io/docs/minio/kubernetes/upstream/index.html";
   }
