@@ -13,6 +13,7 @@ import { BucketHealth } from '../types';
 import { ErrorResponseHandler } from '../../../../common/types';
 import { useAppDispatch } from '../../../../store';
 import { setErrorSnackMessage } from '../../../../systemSlice';
+import { use } from 'i18next';
 
 const getStatusChip = (status: string) => {
     switch (status) {
@@ -30,17 +31,22 @@ const getStatusChip = (status: string) => {
 export default function BucketHealthInfo() {
     const dispatch = useAppDispatch();
     const [bucketHealth, setBucketHealth] = useState<BucketHealth[]>([])
-    
-    useEffect(()=>{
+
+    useEffect(() => {
         api
-        .invoke("GET", `/api/v1/buckets/default/health`)
-        .then((res: BucketHealth[]) => {
-            setBucketHealth(res)
-        })
-        .catch((err: ErrorResponseHandler) => {
-            dispatch(setErrorSnackMessage(err));
-        });
-    },[])
+            .invoke("GET", `/api/v1/buckets/default/health`)
+            .then((res: BucketHealth[]) => {
+
+                const sortedBucketHealth = [...res].sort((a:BucketHealth, b:BucketHealth) =>
+                    a.url.localeCompare(b.url)
+                );
+
+                setBucketHealth(sortedBucketHealth)
+            })
+            .catch((err: ErrorResponseHandler) => {
+                dispatch(setErrorSnackMessage(err));
+            });
+    }, [])
     return (
         <Box mt={4}>
             <Typography variant="h6" gutterBottom sx={{}}>
@@ -53,10 +59,13 @@ export default function BucketHealthInfo() {
                             sx={{
                                 boxShadow: 3,
                                 borderRadius: 2,
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
                             }}
                         >
-                            <CardContent>
-                                <Typography variant="body1" sx={{ mb: 1 }}>
+                            <CardContent sx={{ flexGrow: 1 }}>
+                                <Typography variant="body1" sx={{ mb: 1, wordBreak: 'break-word' }}>
                                     {url}
                                 </Typography>
                                 {getStatusChip(status)}
@@ -65,6 +74,7 @@ export default function BucketHealthInfo() {
                     </Grid>
                 ))}
             </Grid>
+
         </Box>
     );
 }
