@@ -34,7 +34,7 @@ import (
 var serverCmd = cli.Command{
 	Name:    "server",
 	Aliases: []string{"srv"},
-	Usage:   "Start MinIO Console server",
+	Usage:   "Start Console server",
 	Action:  StartServer,
 	Flags: []cli.Flag{
 		cli.StringFlag{
@@ -103,7 +103,7 @@ func buildServer() (*api.Server, error) {
 	server := api.NewServer(consoleAPI)
 
 	parser := flags.NewParser(server, flags.Default)
-	parser.ShortDescription = "MinIO Console Server"
+	parser.ShortDescription = "Console Server"
 	parser.LongDescription = swaggerSpec.Spec().Info.Description
 
 	server.ConfigureFlags()

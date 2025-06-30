@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-// Package api MinIO Console Server
+// Package api Console Server
 //
 //	Schemes:
 //	  http

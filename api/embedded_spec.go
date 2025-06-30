@@ -47,7 +47,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "title": "MinIO Console Server",
+    "title": "Console Server",
     "version": "0.1.0"
   },
   "basePath": "/api/v1",
@@ -8376,7 +8376,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "title": "MinIO Console Server",
+    "title": "Console Server",
     "version": "0.1.0"
   },
   "basePath": "/api/v1",
