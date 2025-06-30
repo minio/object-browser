@@ -37,7 +37,7 @@ export default function BucketHealthInfo() {
             .invoke("GET", `/api/v1/buckets/default/health`)
             .then((res: BucketHealth[]) => {
 
-                const sortedBucketHealth = [...res].sort((a:BucketHealth, b:BucketHealth) =>
+                const sortedBucketHealth = [...res].sort((a: BucketHealth, b: BucketHealth) =>
                     a.url.localeCompare(b.url)
                 );
 
@@ -64,11 +64,21 @@ export default function BucketHealthInfo() {
                                 flexDirection: 'column',
                             }}
                         >
-                            <CardContent sx={{ flexGrow: 1 }}>
-                                <Typography variant="body1" sx={{ mb: 1, wordBreak: 'break-word' }}>
-                                    {url}
-                                </Typography>
-                                {getStatusChip(status)}
+                            <CardContent sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                flexGrow: 1,
+                            }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="body1" sx={{ mb: 1, wordBreak: 'break-word' }}>
+                                        {url}
+                                    </Typography>
+                                </Box>
+                                <Box mt={2}>
+                                    {getStatusChip(status)}
+
+                                </Box>
                             </CardContent>
                         </Card>
                     </Grid>
