@@ -117,7 +117,7 @@ export const validRoutes = (features: string[] | null | undefined) => {
     },
     {
       group: "User",
-      path: "https://min.io/docs/minio/linux/index.html?ref=con",
+      path: "https://min.io/docs/minio/linux/index.html",
       name: "Documentation",
       icon: <DocumentationIcon />,
       forceDisplay: true,

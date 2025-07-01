@@ -504,7 +504,6 @@ export interface LoginDetails {
     | "redirect-service-account";
   redirectRules?: RedirectRule[];
   isK8S?: boolean;
-  animatedLogin?: boolean;
 }
 
 export interface LoginOauth2AuthRequest {
@@ -1679,7 +1678,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title MinIO Console Server
+ * @title Console Server
  * @version 0.1.0
  * @baseUrl /api/v1
  */

@@ -37,7 +37,6 @@ COPY --from=uilayer /app/build ./web-app/build
 RUN go build -trimpath --tags=kqueue,operator -ldflags "-w -s" -a -o console ./cmd/console
 
 FROM scratch
-ENV CONSOLE_ANIMATED_LOGIN=off
 EXPOSE 9090
 
 COPY --from=golayer /console/console .

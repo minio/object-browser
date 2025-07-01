@@ -134,7 +134,19 @@ const LoginCallback = () => {
             </Button>
           </CallBackContainer>
         }
-        promoHeader={<span style={{ fontSize: 28 }}>Console</span>}
+        promoHeader={
+          <span
+            style={{
+              fontSize: "clamp(6px, 6vw, 115px)",
+              lineHeight: 1,
+              display: "inline-block",
+              width: "100%",
+            }}
+          >
+            Welcome to<br></br>
+            <span style={{ fontSize: "clamp(6px, 8vw, 200px)" }}>CONSOLE</span>
+          </span>
+        }
         promoInfo={
           <span style={{ fontSize: 14, lineHeight: 1 }}>
             This is just a fork of the MinIO Console for my own personal
@@ -146,7 +158,6 @@ const LoginCallback = () => {
             not affiliated with or endorsed by the MinIO Corporation.
           </span>
         }
-        backgroundAnimation={false}
       />
     </Fragment>
   ) : null;

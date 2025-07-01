@@ -236,7 +236,7 @@ const ListEventDestinations = () => {
                         <br />
                         You can learn more at our{" "}
                         <a
-                          href="https://min.io/docs/minio/linux/administration/monitoring/bucket-notifications.html?ref=con"
+                          href="https://min.io/docs/minio/linux/administration/monitoring/bucket-notifications.html"
                           target="_blank"
                           rel="noopener"
                         >

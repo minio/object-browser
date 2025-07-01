@@ -392,7 +392,7 @@ const BucketReplicationPanel = () => {
                 <br />
                 You can learn more at our{" "}
                 <a
-                  href="https://min.io/docs/minio/linux/administration/bucket-replication.html?ref=con"
+                  href="https://min.io/docs/minio/linux/administration/bucket-replication.html"
                   target="_blank"
                   rel="noopener"
                 >

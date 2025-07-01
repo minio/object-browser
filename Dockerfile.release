@@ -17,7 +17,5 @@ COPY console /console
 
 EXPOSE 9090
 
-ENV CONSOLE_ANIMATED_LOGIN=off
-
 ENTRYPOINT ["/console"]
 CMD [ "server"]

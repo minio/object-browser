@@ -70,7 +70,7 @@ swagger-typescript-api:
 
 assets:
 	@(if [ -f "${NVM_DIR}/nvm.sh" ]; then \. "${NVM_DIR}/nvm.sh" && nvm install && nvm use && npm install -g yarn ; fi &&\
-	  cd web-app; corepack enable; yarn install --prefer-offline; make build-static; yarn prettier --write . --log-level warn; cd ..)
+	  cd web-app; corepack enable; yarn install --prefer-offline; make build-static-release; yarn prettier --write . --log-level warn; cd ..)
 
 test-integration:
 	@(docker stop pgsqlcontainer || true)

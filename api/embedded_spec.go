@@ -47,7 +47,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "title": "MinIO Console Server",
+    "title": "Console Server",
     "version": "0.1.0"
   },
   "basePath": "/api/v1",
@@ -6283,9 +6283,6 @@ func init() {
     "loginDetails": {
       "type": "object",
       "properties": {
-        "animatedLogin": {
-          "type": "boolean"
-        },
         "isK8S": {
           "type": "boolean"
         },
@@ -8379,7 +8376,7 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "title": "MinIO Console Server",
+    "title": "Console Server",
     "version": "0.1.0"
   },
   "basePath": "/api/v1",
@@ -14840,9 +14837,6 @@ func init() {
     "loginDetails": {
       "type": "object",
       "properties": {
-        "animatedLogin": {
-          "type": "boolean"
-        },
         "isK8S": {
           "type": "boolean"
         },

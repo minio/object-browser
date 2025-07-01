@@ -332,7 +332,7 @@ const Inspect = () => {
                     >
                       You can learn more at our{" "}
                       <a
-                        href="https://github.com/minio/minio/tree/master/docs/debugging?ref=con"
+                        href="https://github.com/minio/minio/tree/master/docs/debugging"
                         target="_blank"
                         rel="noopener"
                       >

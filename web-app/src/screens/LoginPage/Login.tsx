@@ -55,10 +55,6 @@ const Login = () => {
 
   const isK8S = useSelector((state: AppState) => state.login.isK8S);
 
-  const backgroundAnimation = useSelector(
-    (state: AppState) => state.login.backgroundAnimation,
-  );
-
   useEffect(() => {
     if (navigateTo !== "") {
       dispatch(resetForm());
@@ -134,7 +130,7 @@ const Login = () => {
       );
   }
 
-  let docsURL = "https://min.io/docs/minio/linux/index.html?ref=con";
+  let docsURL = "https://min.io/docs/minio/linux/index.html";
   if (isK8S) {
     docsURL = "https://min.io/docs/minio/kubernetes/upstream/index.html";
   }
@@ -167,7 +163,7 @@ const Login = () => {
             </a>
             <span className={"separator"}>|</span>
             <a
-              href="https://github.com/minio/minio"
+              href="https://github.com/georgmangold/console"
               target="_blank"
               rel="noopener"
             >
@@ -175,15 +171,7 @@ const Login = () => {
             </a>
             <span className={"separator"}>|</span>
             <a
-              href="https://subnet.min.io/?ref=con"
-              target="_blank"
-              rel="noopener"
-            >
-              Support
-            </a>
-            <span className={"separator"}>|</span>
-            <a
-              href="https://min.io/download/?ref=con"
+              href="https://github.com/georgmangold/console/releases"
               target="_blank"
               rel="noopener"
             >
@@ -191,7 +179,19 @@ const Login = () => {
             </a>
           </Box>
         }
-        promoHeader={<span style={{ fontSize: 28 }}>Console</span>}
+        promoHeader={
+          <span
+            style={{
+              fontSize: "clamp(6px, 6vw, 115px)",
+              lineHeight: 1,
+              display: "inline-block",
+              width: "100%",
+            }}
+          >
+            Welcome to<br></br>
+            <span style={{ fontSize: "clamp(6px, 8vw, 200px)" }}>CONSOLE</span>
+          </span>
+        }
         promoInfo={
           <span style={{ fontSize: 14, lineHeight: 1 }}>
             This is just a fork of the MinIO Console for my own personal
@@ -203,7 +203,6 @@ const Login = () => {
             not affiliated with or endorsed by the MinIO Corporation.
           </span>
         }
-        backgroundAnimation={backgroundAnimation}
       />
     </Fragment>
   );

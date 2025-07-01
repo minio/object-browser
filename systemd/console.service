@@ -1,5 +1,5 @@
 [Unit]
-Description=MinIO Console
+Description=Console UI for MinIO
 Documentation=https://min.io/docs/minio/linux/index.html
 Wants=network-online.target
 After=network-online.target
@@ -11,7 +11,7 @@ WorkingDirectory=/usr/local/
 User=console-user
 Group=console-user
 
-EnvironmentFile=/etc/default/minio-console
+EnvironmentFile=/etc/default/console
 
 ExecStart=/usr/local/bin/console server $CONSOLE_OPTS
 

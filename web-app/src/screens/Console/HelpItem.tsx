@@ -17,7 +17,6 @@
 import React, { Fragment } from "react";
 import { DocItem } from "./HelpMenu.types";
 import MoreLink from "../../common/MoreLink";
-import placeholderImg from "../../placeholderimage.png";
 
 interface IHelpItemProps {
   item: DocItem;
@@ -42,9 +41,9 @@ const HelpItem = ({ item, displayImage = true }: IHelpItemProps) => {
                 style={{
                   width: 208,
                   height: 116,
-                  backgroundImage: `url(${item.img}), url(${placeholderImg})`,
+                  backgroundImage: `url(${item.img})`,
                   backgroundPosition: "center center",
-                  backgroundSize: "cover",
+                  backgroundSize: "auto",
                   backgroundRepeat: "no-repeat",
                 }}
               />

@@ -5,6 +5,11 @@ build-static:
 	@if [ -f "${NVM_DIR}/nvm.sh" ]; then \. "${NVM_DIR}/nvm.sh" && nvm install && nvm use; fi && \
 	  yarn build
 
+build-static-release:
+	@echo "Building frontend static assets to 'build'"
+	@if [ -f "${NVM_DIR}/nvm.sh" ]; then \. "${NVM_DIR}/nvm.sh" && nvm install && nvm use; fi && \
+	  GENERATE_SOURCEMAP=false yarn build
+
 build-static-istanbul-coverage:
 	@echo "Building frontend static assets to 'build'"
 	@if [ -f "${NVM_DIR}/nvm.sh" ]; then \. "${NVM_DIR}/nvm.sh" && nvm install && nvm use; fi && \

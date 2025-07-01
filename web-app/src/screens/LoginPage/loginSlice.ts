@@ -23,7 +23,6 @@ interface LoginState {
   secretKey: string;
   sts: string;
   useSTS: boolean;
-  backgroundAnimation: boolean;
   loginStrategy: LoginDetails;
   loginSending: boolean;
   loadingFetchConfiguration: boolean;
@@ -44,7 +43,6 @@ const initialState: LoginState = {
   loginSending: false,
   loadingFetchConfiguration: true,
   isK8S: false,
-  backgroundAnimation: false,
   navigateTo: "",
   ssoEmbeddedIDPDisplay: false,
 };
@@ -86,7 +84,6 @@ const loginSlice = createSlice({
         if (action.payload) {
           state.loginStrategy = action.payload;
           state.isK8S = !!action.payload.isK8S;
-          state.backgroundAnimation = !!action.payload.animatedLogin;
         }
       })
       .addCase(doLoginAsync.pending, (state, action) => {
