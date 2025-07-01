@@ -100,6 +100,11 @@ func buildServer() (*api.Server, error) {
 
 	consoleAPI := operations.NewConsoleAPI(swaggerSpec)
 	consoleAPI.Logger = api.LogInfo
+	// Pass in console application config. This needs to happen before the
+	// ConfigureAPI() call.
+	api.GlobalMinIOConfig = api.MinIOConfig{
+		OpenIDProviders: api.BuildOpenIDConsoleConfig(),
+	}
 	server := api.NewServer(consoleAPI)
 
 	parser := flags.NewParser(server, flags.Default)
