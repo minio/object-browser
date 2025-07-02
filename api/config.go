@@ -299,3 +299,32 @@ func getConsoleDevMode() bool {
 func getConsoleBrowserRedirectURL() string {
 	return env.Get(ConsoleBrowserRedirectURL, "")
 }
+
+func BuildOpenIDConsoleConfig() oauth2.OpenIDPCfg {
+	pcfg := map[string]oauth2.ProviderConfig{}
+
+	url := env.Get(ConsoleIDPURL, env.Get(MinioIdentifyOpenIDConfigURL, ""))
+	clientID := env.Get(ConsoleIDPClientID, env.Get(MinioIdentifyOpenIDClientID, ""))
+	clientSecret := env.Get(ConsoleIDPSecret, env.Get(MinioIdentifyOpenIDClientSecret, ""))
+	redirectCallback := env.Get(ConsoleIDPCallbackURL, env.Get(MinioBrowserRedirectURL, ""))
+
+	// Only set config if url, clientID, clientSecret and redirectCallback are provided
+	if url != "" && clientID != "" && clientSecret != "" && redirectCallback != "" {
+		pcfg = map[string]oauth2.ProviderConfig{
+			"OIDC": {
+				URL:                     url,
+				ClientID:                clientID,
+				ClientSecret:            clientSecret,
+				RedirectCallback:        redirectCallback,
+				DisplayName:             env.Get(ConsoleIDPDisplayName, env.Get(MinioIdentifyOpenIDDisplayName, "")),
+				Scopes:                  env.Get(ConsoleIDPScopes, env.Get(MinioIdentifyOpenIDScopes, "openid,profile,email")),
+				Userinfo:                env.Get(ConsoleIDPUserInfo, env.Get(MinioIdentifyOpenIDClaimUserinfo, "")) == "on",
+				RedirectCallbackDynamic: env.Get(ConsoleIDPCallbackURLDynamic, env.Get(MinioIdentifyOpenIDRedirectURIDynamic, "")) == "on",
+				RoleArn:                 env.Get(ConsoleIDPRolePolicy, env.Get(MinioIdentifyOpenIDRolePolicy, "")),
+				EndSessionEndpoint:      env.Get(ConsoleIDPEndSessionEndpoint, ""),
+			},
+		}
+	}
+
+	return pcfg
+}

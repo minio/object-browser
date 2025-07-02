@@ -59,4 +59,26 @@ const (
 	LogSearchQueryAuthToken                      = "LOGSEARCH_QUERY_AUTH_TOKEN"
 	SlashSeparator                               = "/"
 	LocalAddress                                 = "127.0.0.1"
+
+	// Parts of Environment constants for console OIDC/ IDP/SSO as defined in pkg/auth/idp/oath2
+	ConsoleIDPDisplayName        = "CONSOLE_IDP_DISPLAY_NAME"
+	ConsoleIDPURL                = "CONSOLE_IDP_URL"
+	ConsoleIDPClientID           = "CONSOLE_IDP_CLIENT_ID"
+	ConsoleIDPSecret             = "CONSOLE_IDP_SECRET"
+	ConsoleIDPCallbackURL        = "CONSOLE_IDP_CALLBACK"
+	ConsoleIDPCallbackURLDynamic = "CONSOLE_IDP_CALLBACK_DYNAMIC"
+	ConsoleIDPScopes             = "CONSOLE_IDP_SCOPES"
+	ConsoleIDPUserInfo           = "CONSOLE_IDP_USERINFO"
+	ConsoleIDPRolePolicy         = "CONSOLE_IDP_ROLE_POLICY"
+	ConsoleIDPEndSessionEndpoint = "CONSOLE_IDP_END_SESSION_ENDPOINT"
+	// MinIO Server constants for OIDC
+	MinioIdentifyOpenIDDisplayName        = "MINIO_IDENTITY_OPENID_DISPLAY_NAME"
+	MinioIdentifyOpenIDConfigURL          = "MINIO_IDENTITY_OPENID_CONFIG_URL"
+	MinioIdentifyOpenIDClientID           = "MINIO_IDENTITY_OPENID_CLIENT_ID"
+	MinioIdentifyOpenIDClientSecret       = "MINIO_IDENTITY_OPENID_CLIENT_SECRET"
+	MinioBrowserRedirectURL               = "MINIO_BROWSER_REDIRECT_URL"
+	MinioIdentifyOpenIDRedirectURIDynamic = "MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC"
+	MinioIdentifyOpenIDScopes             = "MINIO_IDENTITY_OPENID_SCOPES"
+	MinioIdentifyOpenIDClaimUserinfo      = "MINIO_IDENTITY_OPENID_CLAIM_USERINFO"
+	MinioIdentifyOpenIDRolePolicy         = "MINIO_IDENTITY_OPENID_ROLE_POLICY"
 )
