@@ -199,7 +199,6 @@ paths:
             $ref: "#/definitions/error"
       tags:
         - UserAPI
-
   /buckets/{name}:
     get:
       summary: Bucket Info
@@ -237,6 +236,24 @@ paths:
             $ref: "#/definitions/error"
       tags:
         - UserAPI
+
+  /buckets/{name}/health:
+    get:
+      summary: Get bucket health status
+      description: Returns the health status of buckets including region, URL, and status.
+      operationId: getBucketHealth
+      parameters:
+        - name: name
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserAPI
+      responses:
+        '200':
+          description: Bucket health returned successfully
+          schema:
+            $ref: '#/definitions/BucketHealthResponse'
 
   /buckets/{bucket_name}/retention:
     get:
@@ -2993,6 +3010,20 @@ definitions:
         type: object
         additionalProperties:
           type: string
+  BucketHealthResponse:
+    type: object
+    properties:
+      region:
+        type: string
+        example: us-east-1
+      url:
+        type: string
+        format: uri
+        example: https://s3.example.com
+      status:
+        type: string
+        enum: [ up, down]
+        example: healthy
 
   makeBucketRequest:
     type: object

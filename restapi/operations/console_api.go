@@ -432,6 +432,9 @@ func NewConsoleAPI(spec *loads.Document) *ConsoleAPI {
 		AdminAPIUpdateUserInfoHandler: admin_api.UpdateUserInfoHandlerFunc(func(params admin_api.UpdateUserInfoParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation admin_api.UpdateUserInfo has not yet been implemented")
 		}),
+		UserAPIGetBucketHealthHandler: user_api.GetBucketHealthHandlerFunc(func(params user_api.GetBucketHealthParams, principal *models.Principal) middleware.Responder {
+			return middleware.NotImplemented("operation user_api.UserAPIGetBucketHealth has not yet been implemented")
+		}),
 
 		KeyAuth: func(token string, scopes []string) (*models.Principal, error) {
 			return nil, errors.NotImplemented("oauth2 bearer auth (key) has not yet been implemented")
@@ -732,6 +735,8 @@ type ConsoleAPI struct {
 	AdminAPIUpdateUserGroupsHandler admin_api.UpdateUserGroupsHandler
 	// AdminAPIUpdateUserInfoHandler sets the operation handler for the update user info operation
 	AdminAPIUpdateUserInfoHandler admin_api.UpdateUserInfoHandler
+	// UserAPIGetBucketHealthHandler sets the operation handler for the get bucket health operation
+	UserAPIGetBucketHealthHandler user_api.GetBucketHealthHandler
 
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
@@ -1184,6 +1189,10 @@ func (o *ConsoleAPI) Validate() error {
 	}
 	if o.AdminAPIUpdateUserInfoHandler == nil {
 		unregistered = append(unregistered, "admin_api.UpdateUserInfoHandler")
+	}
+
+	if o.UserAPIGetBucketHealthHandler == nil {
+		unregistered = append(unregistered, "user_api.UserAPIGetBucketHealthHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -1773,6 +1782,11 @@ func (o *ConsoleAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/user"] = admin_api.NewUpdateUserInfo(o.context, o.AdminAPIUpdateUserInfoHandler)
+
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/buckets/{name}/health"] = user_api.NewGetBucketHealth(o.context, o.UserAPIGetBucketHealthHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

@@ -41,6 +41,12 @@ export interface Details {
   versioning?: boolean;
 }
 
+export interface BucketHealth {
+  url: string;
+  region: string;
+  status: string;
+}
+
 export interface BucketInfo {
   name: string;
   access: string;

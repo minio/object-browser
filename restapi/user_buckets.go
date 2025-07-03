@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-openapi/strfmt"
 	"github.com/minio/madmin-go"
 	"github.com/minio/minio-go/v7"
 
@@ -179,6 +180,14 @@ func registerBucketsHandlers(api *operations.ConsoleAPI) {
 			return user_api.NewGetBucketRewindDefault(500).WithPayload(err)
 		}
 		return user_api.NewGetBucketRewindOK().WithPayload(getBucketRewind)
+	})
+
+	api.UserAPIGetBucketHealthHandler = user_api.GetBucketHealthHandlerFunc(func(params user_api.GetBucketHealthParams, session *models.Principal) middleware.Responder {
+		getBucketHealth, err := getSdsHealthResponse(session, params)
+		if err != nil {
+			return user_api.NewGetBucketRewindDefault(500).WithPayload(err)
+		}
+		return user_api.NewGetBucketHealthOK().WithPayload(getBucketHealth)
 	})
 }
 
@@ -1033,4 +1042,25 @@ func getBucketRewindResponse(session *models.Principal, params user_api.GetBucke
 	return &models.RewindResponse{
 		Objects: rewindItems,
 	}, nil
+}
+
+func getSdsHealthResponse(session *models.Principal, params user_api.GetBucketHealthParams) ([]*models.BucketHealthResponse, *models.Error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	mClient, err := newMinioClient(session)
+	if err != nil {
+		return nil, prepareError(err)
+	}
+
+	storageHealth, err := mClient.GetSDSHealth(ctx, "", "", minio.GetObjectOptions{})
+	if err != nil {
+		return nil, prepareError(err)
+	}
+
+	resp := make([]*models.BucketHealthResponse, len(storageHealth))
+	for i, sh := range storageHealth {
+		resp[i] = &models.BucketHealthResponse{URL: strfmt.URI(sh.Host), Status: sh.Status, Region: sh.Region}
+	}
+
+	return resp, nil
 }

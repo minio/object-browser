@@ -59,6 +59,7 @@ import {
 } from "./bucketDetailsSlice";
 import { useAppDispatch } from "../../../../store";
 import { useTranslation } from 'react-i18next';
+import BucketHealthInfo from "./BucketHealthInfo";
 
 
 const SetAccessPolicy = withSuspense(
@@ -189,7 +190,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
         .invoke("GET", `/api/v1/buckets`)
         .then((res: BucketList) => {
           const resBuckets = get(res, "buckets", []);
-
+          
           const bucketInfo = resBuckets.find(
             (bucket) => bucket.name === bucketName
           );
@@ -457,6 +458,7 @@ const BucketSummary = ({ classes }: IBucketSummaryProps) => {
           </SecureComponent>
         )}
       </Grid>
+      <BucketHealthInfo></BucketHealthInfo>
     </Fragment>
   );
 };
