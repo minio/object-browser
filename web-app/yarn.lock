@@ -12118,9 +12118,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mds@https://github.com/georgmangold/mds.git#v1.1.4.1":
-  version: 1.1.4.1
-  resolution: "mds@https://github.com/georgmangold/mds.git#commit=a62aa175847603b34b1bd74ed273113f6dde5707"
+"mds@https://github.com/georgmangold/mds.git#v1.1.4.2":
+  version: 1.1.4.2
+  resolution: "mds@https://github.com/georgmangold/mds.git#commit=375a0aeaf368977e7e3c65426722ee9965b53762"
   dependencies:
     "@storybook/test": "npm:^8.6.14"
     "@types/styled-components": "npm:^5.1.34"
@@ -12129,7 +12129,7 @@ __metadata:
     react-calendar: "npm:^5.1.0"
     react-virtualized: "npm:^9.22.6"
     styled-components: "npm:^5.3.11"
-  checksum: 10c0/88e36236eeb3b03d41807d68924670b3639be25c6a9d105c3cfab04b3c457d28df23cad699c4254fda63cc3b9fbc48bd6866389f2588c11bb102dcb961610d88
+  checksum: 10c0/543187d308c2ca2a2e21af1398fe51fd412624aa087dd8fadc5e40bc0bf8577abb1f57b5cebf7b8887735e6d02fec4daccd15a96df37229d0dd3ed654446a948
   languageName: node
   linkType: hard
 
@@ -18857,7 +18857,7 @@ __metadata:
     local-storage-fallback: "npm:^4.1.3"
     lodash: "npm:^4.17.21"
     luxon: "npm:^3.6.1"
-    mds: "https://github.com/georgmangold/mds.git#v1.1.4.1"
+    mds: "https://github.com/georgmangold/mds.git#v1.1.4.2"
     minio: "npm:^8.0.5"
     nyc: "npm:^15.1.0"
     prettier: "npm:3.5.3"
