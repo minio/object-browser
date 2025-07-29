@@ -1,5 +1,12 @@
 # Changelog
 
+## Release v2.0.3
+
+Changes:
+
+- Improved Privacy Policy User Experience
+
+
 ## Release v2.0.2
 
 Bug Fix:
