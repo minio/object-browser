@@ -49,7 +49,6 @@ test
     );
     await t
       .useRole(roles.bucketReadWrite)
-      .click(acknowledgeButton)
       .typeText(elements.filterBuckets, "bucketdelete3")
       .click(testBucketBrowseButtonFor("bucketdelete3"))
       .click(
