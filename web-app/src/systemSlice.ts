@@ -20,6 +20,7 @@ import { AppState } from "./store";
 import { SubnetInfo } from "./screens/Console/License/types";
 import { isDarkModeOn } from "./utils/stylesUtils";
 import { addBucketAsync } from "./screens/Console/Buckets/ListBuckets/AddBucket/addBucketThunks";
+import { getLicenseConsent } from "./screens/Console/License/utils";
 
 // determine whether we have the sidebar state stored on localstorage
 const initSideBarOpen = localStorage.getItem("sidebarOpen")
@@ -85,7 +86,7 @@ const initialState: SystemState = {
   darkMode: isDarkModeOn(),
   filterBucketList: "",
   loadBucketsListing: true,
-  licenseAcknowledged: false,
+  licenseAcknowledged: getLicenseConsent(),
 };
 
 const systemSlice = createSlice({

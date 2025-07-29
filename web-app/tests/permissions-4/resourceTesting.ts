@@ -211,7 +211,6 @@ test
       .expect(file.exists)
       .ok()
       .navigateTo(`http://localhost:9090/browser`)
-      .click(acknowledgeButton)
       .click(test3BucketBrowseButton)
       .wait(1500)
       .click(Selector(".ReactVirtualized__Table__rowColumn").withText("home"))

@@ -41,7 +41,6 @@ test
   })("Tags can be created and deleted", async (t) => {
     await t
       .useRole(roles.bucketObjectTags)
-      .click(acknowledgeButton)
       .typeText(elements.filterBuckets, "bucketobjecttags")
       .click(testBucketBrowseButtonFor("bucketobjecttags"))
       .click(
@@ -81,7 +80,6 @@ test
   })("User should not be able to create tag", async (t) => {
     await t
       .useRole(roles.bucketCannotTag)
-      .click(acknowledgeButton)
       .typeText(elements.filterBuckets, "bucketcannottag")
       .click(testBucketBrowseButtonFor("bucketcannottag"))
       .click(

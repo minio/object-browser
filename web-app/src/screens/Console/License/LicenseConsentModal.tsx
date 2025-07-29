@@ -33,29 +33,14 @@ const LicenseConsentModal = () => {
 
   const [displayForceAcknowledge, setDisplayForceAcknowledge] =
     useState<boolean>(false);
-  const [acknowledgeDisabled, setAcknowledgeDisabled] =
-    useState<boolean>(false);
 
   const licenseAcknowledged = useSelector(
     (state: AppState) => state.system.licenseAcknowledged,
   );
 
   const recordAgplConsent = () => {
-    setAcknowledgeDisabled(true);
-
-    fetch("https://dl.min.io/server/minio/agplv3-ack", {
-      mode: "no-cors",
-    })
-      .then(() => {
-        setLicenseConsent(); //to Local storage.
-        dispatch(setAcknowledgeLicense(true));
-        setAcknowledgeDisabled(false);
-      })
-      .catch(() => {
-        setAcknowledgeDisabled(false);
-        console.error("Error while trying to Acknowledge the license");
-        dispatch(setAcknowledgeLicense(true));
-      });
+    setLicenseConsent(); //to Local storage.
+    dispatch(setAcknowledgeLicense(true));
   };
 
   if (licenseAcknowledged) {
@@ -172,25 +157,15 @@ const LicenseConsentModal = () => {
               marginTop: "19px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: "center",
             }}
           >
-            <Box>
-              <a
-                href={"https://min.io/privacy-policy"}
-                target={"_blank"}
-                rel={"noreferrer"}
-              >
-                Privacy Policy
-              </a>
-            </Box>
             <Button
               id={"acknowledge-confirm"}
               type="button"
               variant="callAction"
               onClick={recordAgplConsent}
               label={"Acknowledge"}
-              disabled={acknowledgeDisabled}
             />
           </Box>
         </Box>
