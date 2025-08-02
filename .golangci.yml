@@ -39,6 +39,10 @@ linters:
     testifylint:
       disable:
         - go-require
+    revive:
+      rules:
+        - name: "var-naming"
+          disabled: true
   exclusions:
     generated: lax
     rules:

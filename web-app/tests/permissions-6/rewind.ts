@@ -50,7 +50,6 @@ test
   })("Rewind works in bucket", async (t) => {
     await t
       .useRole(roles.bucketReadWrite)
-      .click(acknowledgeButton)
       .typeText(elements.filterBuckets, "abucketrewind")
       .click(testBucketBrowseButtonFor("abucketrewind"))
       .expect(elements.table.exists)
