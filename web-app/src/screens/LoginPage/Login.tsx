@@ -131,7 +131,7 @@ const Login = () => {
       );
   }
 
-  let docsURL = "https://min.io/docs/minio/linux/index.html?ref=con";
+  let docsURL = "https://docs.min.io/community/minio-object-store/index.html?ref=con";
 
   useEffect(() => {
     dispatch(setHelpName("login"));
