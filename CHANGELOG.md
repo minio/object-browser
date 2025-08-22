@@ -42,9 +42,9 @@ Bug Fix:
 
 Deprecations:
 
-- Deprecated support of accounts & policies management, this can be managed by using mc admin commands. Please refer to the [MinIO Console User Management page](https://min.io/docs/minio/kubernetes/upstream/administration/identity-access-management/minio-user-management.html#id1) for more information.
-- Deprecated support of bucket management, this can be managed by using mc commands. Please refer to the [MinIO Client](https://min.io/docs/minio/linux/reference/minio-mc.html) for more information.
-- Deprecated support of configuration management, this can be managed by using mc admin config commands. Please refer to the [MinIO Client](https://min.io/docs/minio/linux/reference/minio-mc.html) for more information.
+- Deprecated support of accounts & policies management, this can be managed by using mc admin commands. Please refer to the [MinIO User Management page](https://docs.min.io/community/minio-object-store/administration/identity-access-management/minio-user-management.html#id1) for more information.
+- Deprecated support of bucket management, this can be managed by using mc commands. Please refer to the [MinIO Client](https://docs.min.io/community/minio-object-store/reference/minio-mc.html) for more information.
+- Deprecated support of configuration management, this can be managed by using mc admin config commands. Please refer to the [MinIO Client](https://docs.min.io/community/minio-object-store/reference/minio-mc.html) for more information.
 
 
 ## Release v1.7.6
@@ -67,9 +67,9 @@ Bug Fix:
 
 Deprecations:
 
-- Deprecated support tools User Interface in favor of mc admin commands. Please refer to the [MinIO SUBNET Registration page](https://min.io/docs/minio/linux/administration/console/subnet-registration.html#subnet) for more information.
-- Deprecated Site replication User Interface in favor of mc admin commands. Please refer to the [MinIO Site Replication page](https://min.io/docs/minio/linux/operations/install-deploy-manage/multi-site-replication.html) for more information.
-- Deprecated Lifecycle & Tiers User Interface in favor of mc admin commands. Please refer to the [MinIO Tiers page](https://min.io/docs/minio/linux/reference/minio-mc/mc-ilm-tier.html) for more information.
+- Deprecated support tools User Interface in favor of mc admin commands. Please refer to the [MinIO Client documentation page](https://docs.min.io/community/minio-object-store/reference/minio-mc.html) for more information.
+- Deprecated Site replication User Interface in favor of mc admin commands. Please refer to the [MinIO Site Replication page](https://docs.min.io/community/minio-object-store/reference/minio-mc-admin/mc-admin-replicate.html) for more information.
+- Deprecated Lifecycle & Tiers User Interface in favor of mc admin commands. Please refer to the [MinIO Tiers page](https://docs.min.io/community/minio-object-store/reference/minio-mc/mc-ilm-tier.html) for more information.
 
 Bug Fix:
 
