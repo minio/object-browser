@@ -1,5 +1,18 @@
 # Changelog
 
+## Release v2.0.4
+
+Bug Fix:
+
+- Updated some project dependencies for vulnerabilities
+- Updated doc links to new MinIO docs site
+- Fixed an issue with object download in Download preview page
+
+Changes:
+
+- Improved Versions mode experience
+
+
 ## Release v2.0.3
 
 Changes:
