@@ -114,7 +114,8 @@ const ObjectDetailPanel = ({
   const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const [totalVersionsSize, setTotalVersionsSize] = useState<number>(0);
-  const [moreVersionsThanLimit, setMoreVersionsThanLimit] = useState<boolean>(false);
+  const [moreVersionsThanLimit, setMoreVersionsThanLimit] =
+    useState<boolean>(false);
   const [longFileOpen, setLongFileOpen] = useState<boolean>(false);
   const [metaData, setMetaData] = useState<any | null>(null);
   const [loadMetadata, setLoadingMetadata] = useState<boolean>(false);
@@ -155,12 +156,11 @@ const ObjectDetailPanel = ({
         .listObjects(bucketName, {
           prefix: internalPaths,
           with_versions: distributedSetup,
-          limit: 21
+          limit: 21,
         })
         .then((res) => {
           const result: BucketObject[] = res.data.objects || [];
           if (distributedSetup) {
-
             setMoreVersionsThanLimit(result.length > 20);
             result.splice(20);
 
@@ -579,8 +579,11 @@ const ObjectDetailPanel = ({
               <Box className={"detailContainer"}>
                 <strong>Versions:</strong>
                 <br />
-                {versions.length}{moreVersionsThanLimit ? "+" : ""} version{versions.length !== 1 ? "s" : ""},{" "}
-                {niceBytesInt(totalVersionsSize)}{moreVersionsThanLimit ? "+" : ""}
+                {versions.length}
+                {moreVersionsThanLimit ? "+" : ""} version
+                {versions.length !== 1 ? "s" : ""},{" "}
+                {niceBytesInt(totalVersionsSize)}
+                {moreVersionsThanLimit ? "+" : ""}
               </Box>
             )}
           {selectedVersion === "" && (

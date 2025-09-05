@@ -94,7 +94,8 @@ const VersionsNavigator = ({
   const [actualInfo, setActualInfo] = useState<BucketObject | null>(null);
   const [objectToShare, setObjectToShare] = useState<BucketObject | null>(null);
   const [versions, setVersions] = useState<BucketObject[]>([]);
-  const [moreVersionsThanLimit, setMoreVersionsThanLimit] = useState<boolean>(false);
+  const [moreVersionsThanLimit, setMoreVersionsThanLimit] =
+    useState<boolean>(false);
   const [restoreVersionOpen, setRestoreVersionOpen] = useState<boolean>(false);
   const [restoreVersion, setRestoreVersion] = useState<BucketObject | null>(
     null,
@@ -428,12 +429,16 @@ const VersionsNavigator = ({
                   <Fragment>
                     <span className={"detailsSpacer"}>
                       <strong>
-                        {versions.length}{moreVersionsThanLimit ? "+" : ""}  Version
+                        {versions.length}
+                        {moreVersionsThanLimit ? "+" : ""} Version
                         {versions.length === 1 ? "" : "s"}&nbsp;&nbsp;&nbsp;
                       </strong>
                     </span>
                     <span className={"detailsSpacer"}>
-                      <strong>{niceBytesInt(totalSpace)}{moreVersionsThanLimit ? "+" : ""}</strong>
+                      <strong>
+                        {niceBytesInt(totalSpace)}
+                        {moreVersionsThanLimit ? "+" : ""}
+                      </strong>
                     </span>
                   </Fragment>
                 }
