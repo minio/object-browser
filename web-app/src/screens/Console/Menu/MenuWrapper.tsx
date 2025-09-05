@@ -59,7 +59,7 @@ const MenuWrapper = () => {
           <MenuItem
             name={"Documentation"}
             icon={<DocumentationIcon />}
-            path={"https://min.io/docs/minio/linux/index.html?ref=con"}
+            path={"https://docs.min.io/community/minio-object-store/index.html?ref=con"}
           />
           <MenuItem
             name={"License"}
