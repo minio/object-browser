@@ -516,5 +516,10 @@
   "sharding": "Fragmentation",
   "operation": "Opération",
   "downloads_uploads": "Téléchargements / Téléversement",
-  "done": "Terminé"
+  "done": "Terminé",
+  "add_a_S3_provider": "ajouter un fournisseur s3",
+  "accesskey": "Clé d'accès",
+  "secretkey": "Clé secrète",
+  "deleteprovider": "Supprimer le fournisseur",
+  "url_error_http_https_port" : "L'URL doit avoir http ou https et un port valide"
 }

@@ -119,9 +119,13 @@ const AddBucket = ({ classes }: IsetProps) => {
     "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(.|$)){4}$"
   );
   const bucketName = useSelector((state: AppState) => state.addBucket.name);
+  const tabs = useSelector((state: AppState) => state.addBucket.s3Tabs);
   const [validationResult, setValidationResult] = useState<boolean[]>([]);
+  const [s3ValidationResult, setS3ValidationResult] = useState<boolean[]>([]);
   const errorList = validationResult.filter((v) => !v);
   const hasErrors = errorList.length > 0;
+  const s3ErrorList = s3ValidationResult.filter((v) => !v);
+  const hasS3Errors = s3ErrorList.length > 0;
   const [records, setRecords] = useState<string[]>([]);
   const versioningEnabled = useSelector(
     (state: AppState) => state.addBucket.versioningEnabled
@@ -181,6 +185,23 @@ const AddBucket = ({ classes }: IsetProps) => {
     setValidationResult(bucketNameErrors);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bucketName]);
+
+  useEffect(() => {
+  const anyS3Errors = tabs.map((tab) => {
+    const url = tab.url.trim();
+    const startsWithHttp = /^https?:\/\//.test(url);
+    //taking everything after the // and before the next /, to isolate host with port
+    const afterProtocol = url.slice(url.indexOf("//") + 2);
+    const hostPort = afterProtocol.split("/")[0];
+    //number of ':' to see if port is good
+    const colonMatches = hostPort.match(/:/g);
+    const hasSingleColon = colonMatches ? colonMatches.length === 1 : false;
+    //looking for good format of port
+    const hasPort = hasSingleColon ? /^\d+$/.test(hostPort.split(":")[1]) : false;
+    return startsWithHttp && hasPort;
+  });
+  setS3ValidationResult(anyS3Errors);
+}, [tabs]);
 
   useEffect(() => {
     const fetchRecords = () => {
@@ -276,7 +297,7 @@ const AddBucket = ({ classes }: IsetProps) => {
                 <AddBucketName hasErrors={hasErrors} />
               </Grid>
               <Grid item xs={12}>
-                <AddBucketS3Config />
+                <AddBucketS3Config hasErrors={s3ValidationResult}/>
               </Grid>
               <Grid item xs={12}>
                 <BucketNamingRules errorList={validationResult} />
@@ -470,7 +491,7 @@ const AddBucket = ({ classes }: IsetProps) => {
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={addLoading || invalidFields.length > 0 || hasErrors}
+                disabled={addLoading || invalidFields.length > 0 || hasErrors || hasS3Errors}
               >
                 {t("create_bucket")}
               </Button>

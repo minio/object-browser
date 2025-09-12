@@ -516,5 +516,10 @@
   "sharding": "Sharding",
   "operation": "Operation",
   "downloads_uploads": "Downloads / Uploads",
-  "done": "Done"
+  "done": "Done",
+  "add_a_S3_provider": "Add A S3 Provider",
+  "accesskey": "Access Key",
+  "secretkey": "Secret Key",
+  "deleteprovider": "Delete Provider",
+  "url_error_http_https_port" : "The URL must have http or https and a valid port"
 }

@@ -40,6 +40,7 @@ export const addBucketAsync = createAsyncThunk(
     const retentionValidity = state.addBucket.retentionValidity;
     const distributedSetup = state.system.distributedSetup;
     const siteReplicationInfo = state.system.siteReplicationInfo;
+    const s3Tabs = state.addBucket.s3Tabs;
 
     let request: MakeBucketRequest = {
       name: bucketName,
@@ -69,22 +70,22 @@ export const addBucketAsync = createAsyncThunk(
       }
     }
 
-    var fileInput = document.getElementById('fileInput') as any;
-    var promise = new Promise<void>((resolve, reject) => {
-      if (fileInput !== null && fileInput.files[0] !== undefined) {
-        console.log(fileInput.files[0])
-        var reader = new FileReader()
-        reader.onload = async (e) => {
-          request.file = e.target?.result
-          resolve()
-        }
-        reader.readAsText(fileInput.files[0])
-      } else {
-        resolve()
-      }
-    })
+    if(s3Tabs.length !== 0 && s3Tabs != null){
+      const s3ConfigFile: { [key: string]: any } = {};
 
-    await promise
+      s3Tabs.forEach(tab => {
+        s3ConfigFile[tab.name] = {
+        url: tab.url,
+        accessKey: tab.accessKey,
+        secretKey: tab.secretKey,
+        api: tab.api,
+        path: tab.path
+        };
+      });
+
+      request.file = JSON.stringify(s3ConfigFile);
+    }
+
     return api
       .invoke("POST", "/api/v1/buckets", request)
       .then((res) => {
